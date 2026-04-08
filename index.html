@@ -150,6 +150,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .fc::before{content:'';position:absolute;inset:3px;border:1px solid rgba(201,168,76,.05);border-radius:5px;pointer-events:none}
 .fc::after{content:'';position:absolute;bottom:-5px;right:-5px;width:10px;height:10px;transform:rotate(45deg);background:var(--gold-lo);transition:background .2s}
 .fc-own{cursor:pointer}.fc-own:hover{border-color:var(--gold);background:var(--bg3)}.fc-own:hover::after{background:var(--gold)}
+.fc-salao-view{cursor:pointer;border-color:rgba(224,160,48,.25)!important}.fc-salao-view:hover{border-color:var(--amber)!important;background:rgba(224,160,48,.04)}.fc-salao-view:hover::after{background:var(--amber)}
 .fc-cross{cursor:pointer;border-color:rgba(62,207,160,.4)!important}.fc-cross:hover{border-color:var(--teal)!important;background:rgba(62,207,160,.04)}.fc-cross:hover::after{background:var(--teal)}
 .fc.sel{border-color:var(--gold);background:var(--bg3)}
 .fc.glow{animation:pulse 2s ease-in-out infinite}
@@ -195,7 +196,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .lv.ld{border-color:rgba(62,207,160,.18);background:rgba(62,207,160,.025)}
 .lv.ln{border-color:var(--gold-lo);background:var(--ga)}
 .lv.lp{border-color:rgba(201,168,76,.28);background:var(--ga);animation:pulse 2s ease-in-out infinite}
-.lv.ll{opacity:.2}
+.lv.ll{opacity:.38}
 .lvb{min-width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:11px;font-weight:600;flex-shrink:0;margin-top:2px}
 .bd{background:rgba(62,207,160,.2);color:var(--teal)}.bn{background:rgba(201,168,76,.2);color:var(--gold)}.bp{background:rgba(224,160,48,.2);color:var(--amber)}.bl{background:var(--bg4);color:var(--t2)}
 .lvbody{flex:1}
@@ -215,10 +216,29 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .logwho{font-family:'Cinzel',serif;font-size:10px;color:var(--gold)}
 #toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--bg3);border:1px solid var(--gold-lo);color:var(--t0);font-size:14px;font-family:'Cinzel',serif;padding:10px 26px;border-radius:6px;opacity:0;pointer-events:none;transition:all .28s;z-index:300;white-space:nowrap;box-shadow:0 8px 40px rgba(0,0,0,.7)}
 #toast.e{border-color:#7a1818;color:#e05050}#toast.w{border-color:var(--sick);color:var(--sick)}#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:600px){#hdr{padding:0 12px;gap:8px}#ct{padding:12px 12px 48px}.cgrid{gap:10px}.cc{width:128px;padding:18px 10px 16px}.ltitle{font-size:26px}.hwk,.hmoralbox{display:none}}
+@keyframes gentleGlow{0%,100%{opacity:.55;filter:drop-shadow(0 0 8px currentColor)}50%{opacity:1;filter:drop-shadow(0 0 22px currentColor) drop-shadow(0 0 40px currentColor)}}
+@keyframes twinkle{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes fadeOverlay{from{opacity:1}to{opacity:0;pointer-events:none}}
+#waitoverlay{display:none;position:fixed;inset:0;z-index:80;background:rgba(4,5,13,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);align-items:center;justify-content:center;flex-direction:column;gap:20px;transition:opacity .8s ease}
+#waitoverlay.on{display:flex}
+#waitoverlay.releasing{animation:fadeOverlay .9s ease forwards}
+.wait-icon{font-size:72px;animation:gentleGlow 2.4s ease-in-out infinite,twinkle 2.4s ease-in-out infinite}
+.wait-txt{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.28em;text-transform:uppercase;color:rgba(201,168,76,.5)}
+
+@keyframes diceRoll{0%{transform:scale(.7) rotate(-15deg);opacity:.3}60%{transform:scale(1.18) rotate(5deg);opacity:1}100%{transform:scale(1) rotate(0deg)}}
+.d10wrap{width:56px;height:56px;position:relative;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;cursor:default}
+.d10wrap svg{position:absolute;inset:0;width:100%;height:100%}
+.d10wrap span{position:relative;z-index:1;font-family:'Cinzel',serif;font-weight:700;font-size:17px}
+.d10wrap.rolling{animation:diceRoll .55s ease forwards}
 </style>
 </head>
 <body>
+
+<!-- WAIT OVERLAY (aparece sobre o app enquanto GM não libera) -->
+<div id="waitoverlay">
+  <div class="wait-icon" id="wait-icon">⚔️</div>
+  <div class="wait-txt">Aguardando liberação</div>
+</div>
 
 <div id="login"><div class="lw">
 <h1 class="ltitle">Pilares da Cidade Perdida</h1>
@@ -226,19 +246,19 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 <div class="ldeco"><div class="gem"></div><div class="orn" style="flex:1;max-width:320px"><span>◆</span></div><div class="gem"></div></div>
 <p style="font-family:'Cinzel',serif;font-size:12px;color:var(--t1);letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px">Escolha seu aventureiro</p>
 <div class="cgrid">
-<div class="cc" onclick="L('Magne')"><div class="ci" style="color:var(--blue)"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="32" y1="9" x2="32" y2="55"/><path d="M32 15 Q21 19 17 25 Q21 30 32 27"/><path d="M32 15 Q43 19 47 25 Q43 30 32 27"/><path d="M32 38 Q21 36 17 43 Q21 49 32 47"/><path d="M32 38 Q43 36 47 43 Q43 49 32 47"/><circle cx="32" cy="32" r="3.5" fill="currentColor" stroke="none"/></svg></div><div class="cn">Magne</div><div class="ccls">Bárbaro</div></div>
-<div class="cc" onclick="L('André')"><div class="ci" style="color:var(--amber)"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="32" y1="7" x2="32" y2="46"/><line x1="19" y1="19" x2="45" y2="19"/><path d="M27 46 Q32 55 37 46"/><rect x="13" y="28" width="15" height="18" rx="3"/><path d="M13 37 Q20.5 43 28 37"/></svg></div><div class="cn">André</div><div class="ccls">Guerreiro</div></div>
-<div class="cc" onclick="L('Klaus')"><div class="ci" style="color:var(--teal)"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="21"/><circle cx="32" cy="32" r="11"/><line x1="32" y1="21" x2="32" y2="11"/><line x1="32" y1="53" x2="32" y2="43"/><line x1="21" y1="32" x2="11" y2="32"/><line x1="53" y1="32" x2="43" y2="32"/><circle cx="32" cy="32" r="3.5" fill="currentColor" stroke="none" opacity=".75"/></svg></div><div class="cn">Klaus</div><div class="ccls">Monge</div></div>
-<div class="cc" onclick="L('Barunt')"><div class="ci" style="color:var(--rose)"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="11" y="36" width="42" height="15" rx="3"/><rect x="15" y="27" width="34" height="11" rx="2"/><rect x="20" y="18" width="14" height="11" rx="2"/><line x1="32" y1="51" x2="32" y2="58"/><line x1="43" y1="17" x2="53" y2="9"/><rect x="49" y="5" width="11" height="7" rx="1.5" transform="rotate(12 49 5)" fill="currentColor" stroke="none" opacity=".85"/></svg></div><div class="cn">Barunt</div><div class="ccls">Clérigo de Moradin</div></div>
-<div class="cc gm" onclick="oGM()"><div class="ci" style="color:var(--rose)"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 42 L15 20 L26 34 L32 13 L38 34 L49 20 L55 42 Z"/><line x1="9" y1="46" x2="55" y2="46"/><line x1="9" y1="51" x2="55" y2="51"/><circle cx="32" cy="13" r="3" fill="currentColor" stroke="none"/><circle cx="15" cy="20" r="2.5" fill="currentColor" stroke="none"/><circle cx="49" cy="20" r="2.5" fill="currentColor" stroke="none"/></svg></div><div class="cn">GM</div><div class="ccls">Mestre ✦ Senha</div></div>
+<div class="cc" onclick="L('Magne')"><div class="ci" style="color:var(--blue);font-size:44px;line-height:1">🪓</div><div class="cn">Magne</div><div class="ccls">Bárbaro</div></div>
+<div class="cc" onclick="L('André')"><div class="ci" style="color:var(--amber);font-size:44px;line-height:1">🛡️</div><div class="cn">André</div><div class="ccls">Guerreiro</div></div>
+<div class="cc" onclick="L('Klaus')"><div class="ci" style="color:var(--teal);font-size:44px;line-height:1">☯️</div><div class="cn">Klaus</div><div class="ccls">Monge</div></div>
+<div class="cc" onclick="L('Barunt')"><div class="ci" style="color:var(--rose);font-size:44px;line-height:1">⚒️</div><div class="cn">Barunt</div><div class="ccls">Clérigo de Moradin</div></div>
+<div class="cc gm" onclick="oGM()"><div class="ci" style="color:var(--rose);font-size:44px;line-height:1">📜</div><div class="cn">GM</div><div class="ccls">Mestre ✦ Senha</div></div>
 </div></div></div>
 
 <div id="gmm"><div class="mbox"><h3>◆ Acesso Restrito ◆</h3><div class="merr" id="gerr"></div><input type="password" id="gpwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')cGM()"><div class="mbtns"><button class="btn btn-gm btn-sm" onclick="cGM()">Entrar</button><button class="btn btn-sm" onclick="xGM()">Cancelar</button></div></div></div>
 
 <div id="ppick"><div class="ppw">
-  <div class="pptitle">Bem-vindo de volta,</div>
+  <div class="pptitle">Bem-vindo,</div>
   <div class="ppname" id="ppname">—</div>
-  <div class="ppask">Qual pilar você irá cuidar esta semana?</div>
+  <div class="ppask">Qual pilar você será o responsável?</div>
   <div class="ppgrid" id="ppgrid"></div>
 </div></div>
 
@@ -251,12 +271,52 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
   <div class="psbtns" id="psbtns"></div>
 </div></div>
 
+<!-- MORAL EVENT OVERLAY -->
+<div id="moraloverlay" style="display:none;position:fixed;inset:0;z-index:86;background:rgba(4,5,13,.93);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:20px">
+  <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(14px,2.2vw,22px);color:var(--rose);letter-spacing:.12em;text-align:center;text-shadow:0 0 30px rgba(224,96,144,.4)">EVENTO DE MORAL</div>
+  <div style="width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--rose),transparent)"></div>
+  <!-- Imagem placeholder — será substituída por conteúdo dinâmico no futuro -->
+  <div style="width:220px;height:220px;background:var(--bg2);border:1px solid rgba(224,96,144,.3);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:12px;font-style:italic;text-align:center;padding:20px" id="moral-img">
+    <span>🖼️<br><br>Imagem do<br>evento aqui</span>
+  </div>
+  <!-- Texto placeholder -->
+  <div style="max-width:420px;text-align:center;padding:14px 20px;background:var(--bg2);border:1px solid rgba(224,96,144,.2);border-radius:8px" id="moral-txt">
+    <div style="font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);font-style:italic;line-height:1.7">Texto descritivo do evento de moral aparecerá aqui. Uma situação que exige do responsável pela Moral toda sua perspicácia e carisma.</div>
+  </div>
+  <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(224,96,144,.4)">Aguardando o Mestre</div>
+</div>
+
+<!-- TEST OVERLAY (aparece quando é hora de fazer o teste) -->
+<div id="testoverlay" style="display:none;position:fixed;inset:0;z-index:85;background:rgba(4,5,13,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);align-items:center;justify-content:center;flex-direction:column;gap:20px">
+  <div id="test-icon" style="font-size:80px;animation:gentleGlow 2s ease-in-out infinite,twinkle 2s ease-in-out infinite"></div>
+  <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(16px,2.5vw,24px);color:var(--gold-hi);letter-spacing:.12em;text-align:center;text-shadow:0 0 40px rgba(236,216,120,.4)">TESTE DE HABILIDADE</div>
+  <div id="test-upgrade-name" style="font-family:'Cinzel',serif;font-size:20px;font-weight:600;color:var(--t0);letter-spacing:.08em;text-align:center"></div>
+  <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)"></div>
+  <div id="test-skill-box" style="padding:16px 32px;background:var(--bg2);border:1px solid var(--gold);border-radius:8px;text-align:center">
+    <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--t2);margin-bottom:8px">Teste Necessário</div>
+    <div id="test-skill-val" style="font-family:'Cinzel',serif;font-size:24px;color:var(--gold-hi);font-weight:600"></div>
+  </div>
+</div>
+
+<!-- WEEK EVENTS MODAL (aparece para GM no início de cada semana) -->
+<div id="weekmodal" style="display:none;position:fixed;inset:0;z-index:88;background:rgba(4,5,13,.92);backdrop-filter:blur(12px);align-items:flex-start;justify-content:center;padding:24px 20px;overflow-y:auto">
+<div style="width:100%;max-width:680px;margin:auto;animation:rise .3s ease">
+  <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(16px,2.5vw,22px);color:var(--gold-hi);text-align:center;letter-spacing:.1em;margin-bottom:4px" id="wm-title">INÍCIO DA SEMANA 1</div>
+  <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--t2);text-align:center;margin-bottom:24px">Role os dados para cada evento desta semana</div>
+  <div id="wm-events" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
+  <div style="text-align:center"><button class="btn btn-gm btn-sm" onclick="closeWeekModal()">✓ Iniciar Semana</button></div>
+</div>
+</div>
+
 <div id="app">
 <header id="hdr">
-<div class="hav" id="hav"></div>
+<div class="hav" id="hav" style="font-size:22px;background:var(--bg3)"></div>
 <div><div class="hnm" id="hnm">—</div><div class="hcls" id="hcls">—</div></div>
 <div class="hsep"></div>
+<div style="display:flex;flex-direction:column;gap:1px">
 <div class="hwk" id="hwk">Semana 1</div>
+<div id="hday" style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;color:var(--t2)">Dia 0</div>
+</div>
 <div class="hmoralbox"><span class="hmoral-lbl">Moral</span><span class="hmoral-val" id="hmoralv">0</span></div>
 <div class="hr">
 <div id="gmtog" style="display:none"><button class="btn btn-gm btn-sm" onclick="tGMP()">⚙ GM</button></div>
@@ -274,9 +334,10 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 <div class="gmtitle">⚙ Painel do Mestre — Controle Total</div>
 
 <div class="gmsec">
-<div class="gmslbl">Semana &amp; PE Base</div>
+<div class="gmslbl">Semana · Dia · PE Base</div>
 <div class="gmrow">
-<div class="gmgrp"><span class="gmlbl">Semana</span><input class="gminp" id="gwk" type="number" value="1" min="1" max="99"><button class="btn btn-gm btn-sm" onclick="gmWk()">▶ Ir</button></div>
+<button class="btn btn-gm btn-sm" onclick="gmNextWeek()">▶▶ Próxima Semana</button>
+<button class="btn btn-gm btn-sm" onclick="gmAdvDay()">+1 Dia</button>
 <div class="gmgrp"><span class="gmlbl">PE base/jogador</span><input class="gminp" id="gdtt" type="number" value="7" min="1" max="99"><button class="btn btn-gm btn-sm" onclick="gmPE()">✓</button></div>
 <button class="btn btn-sm" onclick="gmClearPE()">🔄 Resetar PE</button>
 </div></div>
@@ -289,6 +350,12 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 <button class="btn btn-gm btn-sm" onclick="gmMoral(1)">▲ +1</button>
 <div class="gmgrp" style="margin-left:8px"><span class="gmlbl">Definir</span><input class="gminp" id="gmoralinp" type="number" value="0" min="-4" max="2"><button class="btn btn-gm btn-sm" onclick="gmSetMoral()">✓</button></div>
 </div></div>
+
+<div class="gmsec">
+<div class="gmslbl">Probabilidades Base dos Eventos</div>
+<div id="gm-probs-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:6px"></div>
+<div style="margin-top:8px"><button class="btn btn-sm" style="font-size:10px;padding:4px 10px" onclick="gmResetProbs()">↺ Restaurar Padrão PDF</button></div>
+</div>
 
 <div class="gmsec">
 <div class="gmslbl">Névoa de Cinzas</div>
@@ -305,7 +372,12 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 <div class="gmrow">
 <button class="btn btn-danger btn-sm" onclick="if(confirm('Resetar tudo?'))gmReset()">↺ Reset Total</button>
 <button class="btn btn-danger btn-sm" onclick="gmClearAssignments()">✕ Limpar Atribuições</button>
-</div></div>
+</div>
+<div class="gmrow" style="margin-top:10px" id="gm-release-row">
+<button class="btn btn-gm btn-sm" id="gm-release-btn" onclick="gmReleaseGame()">▶ Liberar Jogo para os Jogadores</button>
+<span id="gm-release-status" style="font-size:12px;color:var(--t2)"></span>
+</div>
+</div>
 </div>
 
 <div id="fg"></div>
@@ -332,7 +404,7 @@ aqueduto:{name:'Infraestrutura',icon:'🏗️',c:'ct',a:'var(--teal)',p:'teal',l
 {pe:3,name:'Rede de Mensageiros',tag:'Comunicação',hab:'DES (Atletismo) CD 30',txt:'Restaurar torres de vigia exige deslocamento até locais distantes. Uma vez ativas, melhoram a comunicação da cidade.',rew:'Contato com Olho Âmbar por 1 PE, reduzindo em 1 o custo de PE da semana seguinte. Heróis podem auxiliar outros pilares por 2 PE. Herói da Moral pode gastar 2 PE para forçar evento de Moral.'},
 {pe:1,name:'Rede Hídrica Avançada',tag:'⭐ Infraestrutura Restituída',hab:'INT (Investigação) CD 60 · SAB (Percepção) CD 40',txt:'Uma cidade que se preze precisa de hidráulica excepcional: canos bem projetados, dutos sem gargalos, conduítes fechados e cuidado arcano. Exige mente afiadíssima.',rew:'Reduz em 30% a chance de Doença. Upgrades de todos os pilares custam 1 PE a menos. Alquimia e poções tornam-se mais poderosas.'}]},
 comando:{name:'Salão de Comando',icon:'🗺️',c:'ca',a:'var(--amber)',p:'amber',levels:[
-{pe:1,name:'Salão Limpo e Operacional',tag:'Análise Operacional',hab:'INT (Investigação) CD 15',txt:'Com um lugar limpo e bem estruturado é possível planejar bem o próximo passo.',rew:'O próximo nível de cada pilar passa a ser visível para todos — jogadores podem ver o upgrade seguinte além do atual disponível.'},
+{pe:1,name:'Salão Limpo e Operacional',tag:'Análise Operacional',hab:'INT (Investigação) CD 15',txt:'Com um lugar limpo e bem estruturado é possível planejar bem o próximo passo.',rew:'Com o lugar organizado podemos analisar melhor o que temos que fazer — jogadores podem ver o upgrade seguinte além do atual disponível, e o Senhor do Salão poderá analisar todos os pilares.'},
 {pe:2,name:'Mesa de Planejamento',tag:'Mesa de Planejamento',hab:'INT (Investigação) CD 10 · SAB (Atletismo) CD 15',txt:'Há muitos papéis de relatório chegando dos pilares. Sem organização não é fácil distribuir corretamente os esforços.',rew:'O herói do Salão pode redistribuir até 3 PE não gastos de um herói para outro, uma vez por semana. O texto completo e os efeitos mecânicos de todos os upgrades visíveis são revelados a todos.'},
 {pe:4,name:'Arquivo Histórico',tag:'Planta Baixa',hab:'SAB (História) CD 20',txt:'Com certeza nessa papelada há uma planta baixa da cidade, construções, túneis e informações que ajudam a entender melhor em qual pilar focar.',rew:'Reduz em 2 a CD de todos os testes de melhoria. Habilidades exigidas, CDs e recompensa final de cada pilar são revelados antes mesmo de iniciar o próximo upgrade.'},
 {pe:3,name:'Análise Probabilística',tag:'Previsão Estratégica',hab:'SAB (Percepção) CD 30',txt:'As coisas não acontecem aleatoriamente — é possível prevê-las. O cheiro de orvalho antes de uma chuva, o tremor de um exército marchando.',rew:'Por 1 PE, o herói pode prever os eventos da próxima semana. Se qualquer pilar encerrar a semana com 1 PE ou mais sobrando, inicia a próxima com 8 PE.'},
@@ -368,30 +440,51 @@ moral:{
 const ML={2:'Excelente',1:'Boa',0:'Neutra','-1':'Insatisfeita','-2':'Ruim','-3':'Péssima','-4':'Nula'};
 const OR=['muralhas','aqueduto','comando','moral'];
 const CH={Magne:{cls:'Bárbaro',col:'var(--blue)'},André:{cls:'Guerreiro',col:'var(--amber)'},Klaus:{cls:'Monge',col:'var(--teal)'},Barunt:{cls:'Clérigo de Moradin',col:'var(--rose)'},GM:{cls:'Mestre da Campanha',col:'var(--rose)'}};
-const SV={
-Magne:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="32" y1="9" x2="32" y2="55"/><path d="M32 15 Q21 19 17 25 Q21 30 32 27"/><path d="M32 15 Q43 19 47 25 Q43 30 32 27"/><path d="M32 38 Q21 36 17 43 Q21 49 32 47"/><path d="M32 38 Q43 36 47 43 Q43 49 32 47"/><circle cx="32" cy="32" r="3.5" fill="currentColor" stroke="none"/></svg>`,
-André:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="32" y1="7" x2="32" y2="46"/><line x1="19" y1="19" x2="45" y2="19"/><path d="M27 46 Q32 55 37 46"/><rect x="13" y="28" width="15" height="18" rx="3"/><path d="M13 37 Q20.5 43 28 37"/></svg>`,
-Klaus:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="21"/><circle cx="32" cy="32" r="11"/><line x1="32" y1="21" x2="32" y2="11"/><line x1="32" y1="53" x2="32" y2="43"/><line x1="21" y1="32" x2="11" y2="32"/><line x1="53" y1="32" x2="43" y2="32"/><circle cx="32" cy="32" r="3.5" fill="currentColor" stroke="none" opacity=".75"/></svg>`,
-Barunt:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="11" y="36" width="42" height="15" rx="3"/><rect x="15" y="27" width="34" height="11" rx="2"/><rect x="20" y="18" width="14" height="11" rx="2"/><line x1="32" y1="51" x2="32" y2="58"/><line x1="43" y1="17" x2="53" y2="9"/><rect x="49" y="5" width="11" height="7" rx="1.5" transform="rotate(12 49 5)" fill="currentColor" stroke="none" opacity=".85"/></svg>`,
-GM:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 42 L15 20 L26 34 L32 13 L38 34 L49 20 L55 42 Z"/><line x1="9" y1="46" x2="55" y2="46"/><line x1="9" y1="51" x2="55" y2="51"/><circle cx="32" cy="13" r="3" fill="currentColor" stroke="none"/><circle cx="15" cy="20" r="2.5" fill="currentColor" stroke="none"/><circle cx="49" cy="20" r="2.5" fill="currentColor" stroke="none"/></svg>`};
+const PICON={Magne:'🪓',André:'🛡️',Klaus:'☯️',Barunt:'⚒️',GM:'📜'};
+const PILLAR_TITLE={muralhas:'Senhor das Muralhas',aqueduto:'Senhor da Infraestrutura',comando:'Senhor do Salão de Comando',moral:'Guardião da Moral'};
 
 // ═══════════════ ESTADO ═══════════════
-const KEY='acidade_v6';
-function mkFront(){return{level:0,pending:null,peUsed:0,peMod:0,peGifted:0,status:'normal',enfermoWeek:null,discursoBuff:false,resistenciaBuff:false,discourseUsed:false,mesaUsed:false,oAmbarUsed:false,forcarMoralUsed:false,ajudado:false}}
-function fresh(){return{week:1,peTotal:7,moral:0,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,assignments:{},fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
-function load(){try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s),f=fresh();f.week=d.week||1;f.peTotal=d.peTotal||7;f.moral=d.moral||0;f.nevoa=!!d.nevoa;f.oAmbarBuff=!!d.oAmbarBuff;f.oAmbarNextWeek=!!d.oAmbarNextWeek;f.assignments=d.assignments||{};f.log=d.log||[];if(d.fronts)OR.forEach(k=>{if(d.fronts[k])f.fronts[k]={...f.fronts[k],...d.fronts[k]}});return f}}catch(e){}return fresh()}
+const KEY='acidade_v7';
+function mkFront(){return{level:0,pending:null,peUsed:0,peMod:0,peGifted:0,status:'normal',enfermoWeek:null,discursoBuff:false,resistenciaBuff:false,discourseUsed:false,mesaUsed:false,oAmbarUsed:false,forcarMoralUsed:false,ajudado:false,ajudadoPor:null,seenTests:[]}}
+function fresh(){return{week:1,day:0,peTotal:7,moral:0,moralHalf:false,moralEvent:false,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,gameReleased:false,weekEventShown:false,eventProbs:{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50},assignments:{},fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
+function load(){try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s),f=fresh();f.week=d.week||1;f.day=d.day||0;f.peTotal=d.peTotal||7;f.moral=d.moral||0;f.nevoa=!!d.nevoa;f.oAmbarBuff=!!d.oAmbarBuff;f.oAmbarNextWeek=!!d.oAmbarNextWeek;f.gameReleased=!!d.gameReleased;f.weekEventShown=!!d.weekEventShown;f.moralEvent=!!d.moralEvent;f.moralHalf=!!d.moralHalf;f.eventProbs=d.eventProbs||{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50};f.assignments=d.assignments||{};f.log=d.log||[];if(d.fronts)OR.forEach(k=>{if(d.fronts[k])f.fronts[k]={...f.fronts[k],...d.fronts[k]}});return f}}catch(e){}return fresh()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
 let G=load(),P=null,SF=null,TT=null,PPending=null,CrossPopup=null;
+
+// ── SYNC ENTRE ABAS ──────────────────────────────
+// Dispara quando OUTRA aba altera o localStorage
+window.addEventListener('storage',e=>{
+  if(e.key!==KEY)return;
+  G=load();
+  if(P)render();
+});
+// Poll de segurança a cada 2s (cobre edge cases de mesmo domínio)
+let _lastSaved='';
+setInterval(()=>{
+  try{
+    const s=localStorage.getItem(KEY)||'';
+    if(s!==_lastSaved){_lastSaved=s;G=load();if(P)render()}
+  }catch(e){}
+},2000);
 
 // ═══════════════ HELPERS ═══════════════
 function myPillar(){return G.assignments[P]||null}
 function pillarOwner(fid){return Object.keys(G.assignments).find(k=>G.assignments[k]===fid)||null}
+// Salão (comando) com Análise Operacional pode VER todos os pilares (só leitura)
+function canViewPillar(fid){return P==='GM'||isOwner(fid)||(G.assignments[P]==='comando'&&hasAnalise())}
 function isOwner(fid){return P==='GM'||G.assignments[P]===fid}
 function salaoLv(){return G.fronts.comando.level}
 function hasAnalise(){return salaoLv()>=1}   // vê próximo upgrade
 function hasMesa()  {return salaoLv()>=2}    // vê texto completo
 function hasArquivo(){return salaoLv()>=3}   // vê hab + CD
 // PE total para um pilar específico (base + modificador)
+function reduceHab(habStr){
+  if(!hasArquivo()||P==='GM')return habStr; // GM vê o original, já que conhece tudo
+  return habStr.replace(/CD\s*(\d+)/g,(m,n)=>{
+    const orig=parseInt(n),red=orig-2;
+    return`CD <b style="color:var(--teal)">${red}</b> <s style="color:var(--t3);font-size:10px">CD ${orig}</s>`;
+  });
+}
 function pillarTotalPE(fid){return Math.max(1,G.peTotal+(G.fronts[fid].peMod||0))}
 function myAvailPE(){if(P==='GM')return G.peTotal;const mp=myPillar();if(!mp)return 0;return Math.max(0,pillarTotalPE(mp)-(G.fronts[mp].peUsed||0)+(G.fronts[mp].peGifted||0))}
 function efectivePE(base,fid){let c=base;if(G.nevoa)c+=1;if(G.moral>=1)c=Math.max(1,c-1);if(G.moral<=-1)c+=1;if(G.oAmbarBuff)c=Math.max(1,c-1);if(fid&&G.fronts[fid].discursoBuff)c=Math.max(1,c-1);return Math.max(1,c)}
@@ -402,10 +495,10 @@ function alog(who,msg){G.log.unshift({w:G.week,who,msg});if(G.log.length>80)G.lo
 // INFRA: Esforços Médicos — doença OU enfermo, mostra popup mesmo sem nível 2
 function canShowEsforcos(targetFid){return G.assignments[P]==='aqueduto'&&(G.fronts[targetFid].status==='doenca'||G.fronts[targetFid].status==='enfermo')&&targetFid!=='aqueduto'}
 function canUseEsforcosMedicos(targetFid){return canShowEsforcos(targetFid)&&G.fronts.aqueduto.level>=2}
-// INFRA: Olho Âmbar — Rede de Mensageiros (nível 4), clica no Salão
-function canShowOAmbar(targetFid){return G.assignments[P]==='aqueduto'&&G.fronts.aqueduto.level>=4&&!G.fronts.aqueduto.oAmbarUsed&&targetFid==='comando'}
-// INFRA: Auxiliar (Rede) — qualquer pilar pode receber ajuda, 2 PE, 1x/semana por pilar
-function canShowAjuda(targetFid){return G.fronts.aqueduto.level>=4&&!isOwner(targetFid)&&!G.fronts[targetFid].ajudado&&myAvailPE()>=2}
+// SALÃO: Olho Âmbar — apenas o jogador do Salão pode usar, aparece no próprio card do Salão
+function canShowOAmbar(targetFid){return G.assignments[P]==='comando'&&G.fronts.aqueduto.level>=4&&!G.fronts.aqueduto.oAmbarUsed&&targetFid==='aqueduto'}
+// INFRA: Auxiliar (Rede) — qualquer player pode gastar 2 PE para poder participar do próximo teste de upgrade de outro pilar
+function canShowAjuda(targetFid){return G.fronts.aqueduto.level>=4&&P!=='GM'&&!isOwner(targetFid)&&!G.fronts[targetFid].ajudado&&myAvailPE()>=2}
 // MORAL: Discurso de Propósito
 function canShowDiscurso(targetFid){return G.assignments[P]==='moral'&&G.fronts.moral.level>=2&&!G.fronts.moral.discourseUsed&&targetFid!=='moral'}
 // MORAL: Cultura de Resistência
@@ -418,7 +511,41 @@ function canShowMesa(targetFid){return G.assignments[P]==='comando'&&G.fronts.co
 function hasCross(targetFid){return canShowEsforcos(targetFid)||canShowOAmbar(targetFid)||canShowAjuda(targetFid)||canShowDiscurso(targetFid)||canShowResistencia(targetFid)||canShowMesa(targetFid)}
 
 // ═══════════════ LOGIN / PICK ═══════════════
-function L(n){P=n;document.getElementById('login').style.display='none';const ch=CH[n],av=document.getElementById('hav');av.innerHTML=SV[n]||SV.GM;av.style.color=ch.col;document.getElementById('hnm').textContent=n;document.getElementById('hcls').textContent=ch.cls;if(n==='GM'){document.getElementById('gmtog').style.display='block';document.getElementById('app').style.display='block';render()}else showPillarPick(n)}
+function L(n){
+  P=n;document.getElementById('login').style.display='none';
+  const ch=CH[n];
+  // Avatar: emoji
+  const av=document.getElementById('hav');
+  av.textContent=PICON[n]||'?';
+  av.style.color=ch.col;av.style.fontSize='22px';
+  // Nome e título de pilar (ou classe para GM)
+  document.getElementById('hnm').textContent=n;
+  if(n==='GM'){
+    document.getElementById('hcls').textContent='Mestre da Campanha';
+  } else {
+    const mp=G.assignments[n];
+    document.getElementById('hcls').textContent=mp?PILLAR_TITLE[mp]||ch.cls:ch.cls;
+  }
+  if(n==='GM'){
+    document.getElementById('gmtog').style.display='block';
+    document.getElementById('app').style.display='block';
+    document.getElementById('waitoverlay').className='';
+    render();
+  } else {
+    if(G.assignments[n]){
+      SF=G.assignments[n];
+      document.getElementById('app').style.display='block';
+      if(!G.gameReleased){
+        document.getElementById('wait-icon').textContent=PICON[n]||'⚔️';
+        document.getElementById('wait-icon').style.color=ch.col;
+        document.getElementById('waitoverlay').className='on';
+      }
+      render();
+    } else {
+      showPillarPick(n);
+    }
+  }
+}
 function showPillarPick(name){
   document.getElementById('ppname').textContent=name;
   const grid=document.getElementById('ppgrid');grid.innerHTML='';
@@ -444,41 +571,54 @@ function openPSum(fid){
   document.getElementById('pstxt').style.display='block';
   document.getElementById('pstxt2').style.display='none';
   document.getElementById('psbtns').innerHTML=`
-    <button class="btn" onclick="expandPSum()">📖 Ler descrição completa</button>
     <button class="btn" onclick="confirmPillar()">✦ Assumir este Pilar</button>
     <button class="btn" onclick="closePSum()">← Voltar</button>`;
   document.querySelectorAll('.ppc').forEach(el=>{el.classList.remove('psel');if(el.dataset.fid===fid)el.classList.add('psel')});
   document.getElementById('psum').classList.add('open');
 }
-function expandPSum(){
-  document.getElementById('pssub').textContent='Descrição Completa';
-  document.getElementById('pstxt').style.display='none';
-  document.getElementById('pstxt2').style.display='block';
-  document.getElementById('psbtns').innerHTML=`
-    <button class="btn" onclick="confirmPillar()">✦ Confirmar e jogar</button>
-    <button class="btn" onclick="backPSum()">← Voltar ao resumo</button>`;
+function confirmPillar(){
+  if(!PPending)return;
+  const pf=PFULL[PPending];
+  // Se ainda não mostrou o texto completo, mostra primeiro
+  if(document.getElementById('pstxt2').style.display==='none'){
+    document.getElementById('pssub').textContent='Descrição Completa';
+    document.getElementById('pstxt').style.display='none';
+    document.getElementById('pstxt2').style.display='block';
+    document.getElementById('psbtns').innerHTML=`
+      <button class="btn" onclick="doConfirmPillar()">✦ Confirmar e jogar</button>`;
+    return;
+  }
+  doConfirmPillar();
+}
+function doConfirmPillar(){
+  G.assignments[P]=PPending;
+  if(!G.fronts[PPending].peUsed)G.fronts[PPending].peUsed=0;
+  save();
+  document.getElementById('psum').classList.remove('open');
+  document.getElementById('ppick').classList.remove('open');
+  SF=PPending;
+  document.getElementById('app').style.display='block';
+  // Mostra overlay de espera com ícone do personagem
+  const ico=PICON[P]||'⚔️';
+  document.getElementById('wait-icon').textContent=ico;
+  // Cor do personagem no brilho
+  const col=CH[P]?CH[P].col:'var(--gold)';
+  document.getElementById('wait-icon').style.color=col;
+  // Só mostra overlay se o jogo ainda não foi liberado
+  if(!G.gameReleased){
+    document.getElementById('waitoverlay').className='on';
+  }
+  render();
 }
 function backPSum(){
   document.getElementById('pssub').textContent='Visão Geral';
   document.getElementById('pstxt').style.display='block';
   document.getElementById('pstxt2').style.display='none';
   document.getElementById('psbtns').innerHTML=`
-    <button class="btn" onclick="expandPSum()">📖 Ler descrição completa</button>
     <button class="btn" onclick="confirmPillar()">✦ Assumir este Pilar</button>
     <button class="btn" onclick="closePSum()">← Voltar</button>`;
 }
 function closePSum(){document.getElementById('psum').classList.remove('open');document.getElementById('pstxt2').style.display='none';document.getElementById('pstxt').style.display='block'}
-function confirmPillar(){
-  if(!PPending)return;
-  G.assignments[P]=PPending;
-  if(!G.fronts[PPending].peUsed)G.fronts[PPending].peUsed=0;
-  save();
-  document.getElementById('psum').classList.remove('open');
-  document.getElementById('ppick').classList.remove('open');
-  SF=PPending; // auto-abre o pilar do jogador
-  document.getElementById('app').style.display='block';
-  render();
-}
 
 // ═══════════════ GM AUTH ═══════════════
 function oGM(){document.getElementById('gmm').classList.add('open');document.getElementById('gpwd').value='';document.getElementById('gerr').textContent='';setTimeout(()=>document.getElementById('gpwd').focus(),40)}
@@ -490,7 +630,45 @@ function tGMP(){document.getElementById('gmp').classList.toggle('open')}
 // ═══════════════ RENDER ═══════════════
 function render(){
   if(!P)return;
+  // Overlay de evento moral para o jogador da moral
+  if(P&&P!=='GM'&&G.gameReleased){
+    const isMoralPlayer=G.assignments[P]==='moral';
+    const mov=document.getElementById('moraloverlay');
+    if(isMoralPlayer&&G.moralEvent){mov.style.display='flex'}
+    else if(mov.style.display==='flex'){mov.style.display='none'}
+  }
+  if(P&&P!=='GM'&&G.gameReleased){
+    const mp=myPillar();
+    if(mp){
+      const fs=G.fronts[mp];
+      const ov=document.getElementById('testoverlay');
+      if(fs.pending&&fs.pending.testReady&&!fs.pending.testResult){
+        // Mostra overlay de teste
+        const lv=FD[mp].levels[fs.pending.lv-1];
+        ov.style.display='flex';
+        document.getElementById('test-icon').textContent=PICON[P]||'⚔️';
+        document.getElementById('test-icon').style.color=CH[P]?CH[P].col:'var(--gold)';
+        document.getElementById('test-upgrade-name').textContent=lv?lv.tag:'';
+        document.getElementById('test-skill-val').textContent=lv?lv.hab:'—';
+      } else {
+        if(ov.style.display==='flex')ov.style.display='none';
+      }
+    }
+  }
+  if(G.gameReleased&&P!=='GM'){
+    const ov=document.getElementById('waitoverlay');
+    if(ov.classList.contains('on')&&!ov.classList.contains('releasing')){
+      ov.classList.add('releasing');
+      setTimeout(()=>{ov.className=''},950);
+    }
+  }
   document.getElementById('hwk').textContent='Semana '+G.week;
+  document.getElementById('hday').textContent='Dia '+G.day;
+  // Atualiza título do pilar no header
+  if(P&&P!=='GM'){
+    const mp=myPillar();
+    document.getElementById('hcls').textContent=mp?PILLAR_TITLE[mp]||CH[P].cls:CH[P].cls;
+  }
   const mv=G.moral,mc=mv>=1?'var(--teal)':mv<=-1?'var(--rose)':'var(--gold)';
   const hm=document.getElementById('hmoralv');hm.textContent=`${mv>=0?'+':''}${mv} ${mlabel()}`;hm.style.color=mc;
   const mp=myPillar(),ptotal=mp?pillarTotalPE(mp):G.peTotal;
@@ -500,10 +678,17 @@ function render(){
   document.getElementById('dttot').textContent=ptotal+(G.fronts[mp||'muralhas'].peMod?` (base ${G.peTotal} ${G.fronts[mp||'muralhas'].peMod>0?'+':''}${G.fronts[mp||'muralhas'].peMod})`:'');
   document.getElementById('nevbanner').className=G.nevoa?'on':'';
   if(P==='GM'){
-    document.getElementById('gdtt').value=G.peTotal;document.getElementById('gwk').value=G.week;document.getElementById('gmoralinp').value=G.moral;
+    document.getElementById('gdtt').value=G.peTotal;document.getElementById('gmoralinp').value=G.moral;
     document.getElementById('gmoraldisp').textContent=`${mv>=0?'+':''}${mv} — ${mlabel()}`;document.getElementById('gmoraldisp').style.color=mc;
     document.getElementById('gnevbtn').textContent=G.nevoa?'🌫️ Desativar Névoa':'🌫️ Ativar Névoa';
-    rGMPillarGrid();
+    // Botão de liberar jogo
+    const assigned=OR.filter(k=>pillarOwner(k)).length,allReady=assigned===4;
+    const btn=document.getElementById('gm-release-btn'),st=document.getElementById('gm-release-status');
+    if(G.gameReleased){btn.textContent='✓ Jogo liberado';btn.disabled=true;st.textContent='Todos os jogadores foram liberados';st.style.color='var(--teal)'}
+    else{btn.disabled=!allReady;btn.textContent='▶ Liberar Jogo para os Jogadores';st.textContent=allReady?'Todos prontos — pode liberar!':` ${assigned}/4 jogadores escolheram pilar`;st.style.color=allReady?'var(--teal)':'var(--t2)'}
+    // Abre modal de eventos no início de semana se não foi mostrado ainda
+    if(G.gameReleased&&!G.weekEventShown){openWeekModal()}
+    rGMPillarGrid();rGMProbs();
   }
   rFronts();if(SF)rDet(SF);rLog();
 }
@@ -511,17 +696,35 @@ function render(){
 // ═══════════════ GM PILAR GRID ═══════════════
 function rGMPillarGrid(){
   const el=document.getElementById('gmpilar-grid');el.innerHTML='';
+  // Barra de PE por jogador no topo
+  const pebar=document.createElement('div');
+  pebar.style.cssText='grid-column:1/-1;display:flex;gap:12px;flex-wrap:wrap;margin-bottom:4px';
+  Object.entries(G.assignments).forEach(([name,fid])=>{
+    const total=pillarTotalPE(fid),used=G.fronts[fid].peUsed||0,av=Math.max(0,total-used+(G.fronts[fid].peGifted||0));
+    const pct=total>0?Math.round(av/total*100):0;
+    const col=CH[name]?CH[name].col:'var(--gold)';
+    pebar.innerHTML+=`<div style="flex:1;min-width:130px;background:var(--bg3);border:1px solid var(--t3);border-radius:6px;padding:8px 10px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-family:'Cinzel',serif;font-size:10px;color:${col}">${PICON[name]} ${name}</span><span style="font-family:'Cinzel',serif;font-size:11px;color:var(--gold)">${av}/${total} PE</span></div><div style="height:5px;background:var(--bg4);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${col};border-radius:3px;transition:width .4s"></div></div></div>`;
+  });
+  if(Object.keys(G.assignments).length)el.appendChild(pebar);
   OR.forEach(fid=>{
     const fd=FD[fid],fs=G.fronts[fid],owner=pillarOwner(fid)||'—';
     const sico=fs.status==='doenca'?'🦠':fs.status==='enfermo'?'☠️':'✅';
     const mod=fs.peMod||0;
     const modStr=mod>0?`+${mod}`:mod<0?`${mod}`:'0';
     const d=document.createElement('div');d.className='gmpc';
-    const pendBtns=fs.pending?`<button class="btn btn-gm btn-sm" onclick="fc('${fid}')">✓ Completar</button><button class="btn btn-danger btn-sm" onclick="cu('${fid}')">✕ Cancelar</button>`:'';
+    const testReady=fs.pending&&fs.pending.testReady;
+    const moralEventBtn=(fid==='moral'&&G.moralEvent)
+      ?`<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:10px;color:var(--rose);width:100%;margin-bottom:2px">🫂 Evento Moral aguardando:</span><button class="btn btn-sm" style="border-color:#1a7a50;color:var(--teal)" onclick="gmMoralPass()">✓ Passou no Teste</button><button class="btn btn-danger btn-sm" onclick="gmMoralFail()">✗ Não Passou</button></div>`
+      :'';
+    const daysLeft=fs.pending&&!testReady?Math.max(0,(fs.pending.startDay+fs.pending.peSpent)-G.day):0;
+    const pendBtns=testReady
+      ?`<button class="btn btn-sm" style="border-color:#1a7a50;color:var(--teal);background:rgba(62,207,160,.08)" onclick="gmApprove('${fid}')">✓ Aprovar Teste</button><button class="btn btn-danger btn-sm" onclick="gmReject('${fid}')">✗ Reprovar Teste</button>`
+      :fs.pending?`<div style="font-size:10px;color:var(--t2);padding:4px 0">⏳ Teste em ${daysLeft} dia${daysLeft!==1?'s':''}</div><button class="btn btn-gm btn-sm" onclick="fc('${fid}')">✓ Completar</button><button class="btn btn-danger btn-sm" onclick="cu('${fid}')">✕ Cancelar</button>`
+      :'';
     const lvBtns=(fs.level>0?`<button class="btn btn-danger btn-sm" onclick="gmDn('${fid}')">▼ Nível</button>`:'')+(fs.level<5&&!fs.pending?`<button class="btn btn-gm btn-sm" onclick="gmUp('${fid}')">▲ Nível</button>`:'');
     d.innerHTML=`<div class="gmpc-name">${fd.icon} ${fd.name} <span>${sico}</span></div>
 <div class="gmpc-sub">Nível ${fs.level}/5 · <b>${owner}</b> · PE efetivo: ${pillarTotalPE(fid)}</div>
-<div class="gmpc-btns"><button class="btn btn-sick btn-sm" onclick="gmSt('${fid}','doenca')">🦠 Doença</button><button class="btn btn-danger btn-sm" onclick="gmSt('${fid}','enfermo')">☠️ Enfermo</button><button class="btn btn-sm" onclick="gmSt('${fid}','normal')">✅ Curar</button>${lvBtns}${pendBtns}</div>
+<div class="gmpc-btns"><button class="btn btn-sick btn-sm" onclick="gmSt('${fid}','doenca')">🦠 Doença</button><button class="btn btn-danger btn-sm" onclick="gmSt('${fid}','enfermo')">☠️ Enfermo</button><button class="btn btn-sm" onclick="gmSt('${fid}','normal')">✅ Curar</button>${lvBtns}${pendBtns}</div>${moralEventBtn}
 <div class="gmpc-pemod"><span class="gmpc-pemod-lbl">Mod PE:</span><button class="btn btn-sm" style="padding:3px 8px;font-size:10px" onclick="gmPeMod('${fid}',-1)">−</button><span class="gmpc-pemod-val" id="pemod_${fid}">${modStr}</span><button class="btn btn-sm" style="padding:3px 8px;font-size:10px" onclick="gmPeMod('${fid}',1)">+</button><button class="btn btn-sm" style="padding:3px 8px;font-size:10px" onclick="gmPeModSet('${fid}',0)">↺</button><span style="font-size:10px;color:var(--t2);margin-left:4px">PE total: ${pillarTotalPE(fid)}</span></div>`;
     el.appendChild(d);
   });
@@ -532,6 +735,7 @@ function rFronts(){
   const g=document.getElementById('fg');g.innerHTML='';
   OR.forEach(fid=>{
     const fd=FD[fid],fs=G.fronts[fid],sel=SF===fid,own=isOwner(fid);
+    const isSalaoViewer=!own&&P!=='GM'&&G.assignments[P]==='comando'&&hasAnalise();
     const sick=fs.status==='doenca',dead=fs.status==='enfermo';
     // Verifica habilidades cross-pilar disponíveis para este card
     const crossEsforcos=P!=='GM'&&!own&&canShowEsforcos(fid);
@@ -549,7 +753,8 @@ function rFronts(){
     let cls=`fc ${fd.c}`;
     if(own)cls+=' fc-own';
     if(hasCrossAction)cls+=' fc-cross';
-    if(sel&&own)cls+=' sel';
+    if(isSalaoViewer&&!hasCrossAction)cls+=' fc-salao-view';
+    if(sel&&(own||isSalaoViewer||P==='GM'))cls+=' sel';
     if(fs.pending&&own)cls+=' glow';
     if(sick)cls+=' fc-sick';if(dead)cls+=' fc-dead';
 
@@ -557,20 +762,28 @@ function rFronts(){
     const sbadge=sick?`<span class="stk stk-sick">🦠 Doença</span>`:dead?`<span class="stk stk-dead">☠️ Enfermo</span>`:'';
     const dbuff=fs.discursoBuff?`<span class="stk stk-buff">📣 −1 PE</span>`:'';
     const rbuff=fs.resistenciaBuff?`<span class="stk stk-buff">🎯 Vantagem</span>`:'';
+    const abuff=fs.ajudado&&fs.ajudadoPor?`<span class="stk stk-buff">🤝 ${fs.ajudadoPor}</span>`:'';
     const ownerBadge=P==='GM'?`<div class="fown">${pillarOwner(fid)||'Sem responsável'}</div>`:(!own?`<div class="fown">${pillarOwner(fid)||'Sem responsável'}</div>`:'');
     let st='';
     if(fs.level>=5)st='<div class="fst sd">✦ Completo</div>';
     else if(dead)st='<div class="fst se">☠️ Inoperante — aguardar recuperação</div>';
     else if(sick&&own)st='<div class="fst" style="border-color:var(--sick);color:var(--sick)">🦠 Custo PE dobrado se investir</div>';
     else if(sick&&hasCrossAction)st='<div class="fst" style="border-color:var(--teal);color:var(--teal)">⚕ Clique para usar habilidade</div>';
-    else if(fs.pending&&own){const lv=fd.levels[fs.pending.lv-1];st=`<div class="fst sp"><b>⚒ Nível ${fs.pending.lv}</b> — ${lv?lv.name:''}<div style="font-size:10px;color:var(--gold-lo);margin-top:2px">por ${fs.pending.by}</div></div>`}
+    else if(fs.pending&&own){
+      const lv=fd.levels[fs.pending.lv-1];
+      const tr=fs.pending.testReady;
+      const dLeft=!tr?Math.max(0,(fs.pending.startDay+fs.pending.peSpent)-G.day):0;
+      if(tr){st=`<div class="fst" style="border-color:var(--gold);color:var(--gold-hi);background:rgba(201,168,76,.1)">⚔️ Hora do teste! Aguardando o Mestre</div>`}
+      else{st=`<div class="fst sp"><b>⚒ Nível ${fs.pending.lv}</b> — ${lv?lv.name:''}<div style="font-size:10px;color:var(--gold-lo);margin-top:2px">Teste em ${dLeft} dia${dLeft!==1?'s':''}</div></div>`}
+    }
     else if(fs.pending&&!own){const lv=fd.levels[fs.pending.lv-1];st=`<div class="fst sp" style="font-size:11px">⚒ ${lv?lv.name:'Em andamento'}</div>`}
     else if(hasCrossAction&&!sick)st='<div class="fst" style="border-color:var(--teal);color:var(--teal)">⚕ Clique para usar habilidade</div>';
 
     const c=document.createElement('div');c.className=cls;
     if(own){c.onclick=()=>tog(fid)}
     else if(hasCrossAction){c.onclick=()=>togCross(fid)}
-    c.innerHTML=`<div class="acc"></div><div class="ftop"><div class="fico">${fd.icon}</div><div><div class="fnm">${fd.name}${sbadge}${dbuff}${rbuff}</div><div class="flv">Nível ${fs.level} / 5</div></div></div>${ownerBadge}<div class="fpips"><div class="pips">${pips}</div></div>${st}`;
+    else if(isSalaoViewer){c.onclick=()=>tog(fid)}
+    c.innerHTML=`<div class="acc"></div><div class="ftop"><div class="fico">${fd.icon}</div><div><div class="fnm">${fd.name}${sbadge}${dbuff}${rbuff}${abuff}</div><div class="flv">Nível ${fs.level} / 5</div></div></div>${ownerBadge}<div class="fpips"><div class="pips">${pips}</div></div>${st}`;
     wrap.appendChild(c);
 
     // Cross-pillar popup
@@ -592,7 +805,7 @@ function rFronts(){
       }
       if(crossAjuda){
         const avMy=myAvailPE(),can=avMy>=2;
-        pc+=`<div class="cross-popup-desc" style="margin-top:8px">🤝 <b>Auxiliar</b> (Rede) — Transfere 2 PE seus para este pilar. Uma vez por pilar/semana.</div><div class="cross-popup-btns"><button class="btn btn-sm" onclick="useAjuda('${fid}')" ${can?'':'disabled'}>🤝 Auxiliar · 2 PE</button></div>`;
+        pc+=`<div class="cross-popup-desc" style="margin-top:8px">🤝 <b>Auxiliar no Teste</b> (Rede de Mensageiros) — Gaste 2 PE de deslocamento para participar do próximo teste de upgrade deste pilar junto com seu responsável. Uma vez por pilar/semana.</div><div class="cross-popup-btns"><button class="btn btn-sm" onclick="useAjuda('${fid}')" ${can?'':'disabled'}>🤝 Deslocar-se · 2 PE</button></div>`;
       }
       if(crossDiscurso){
         const used=G.fronts.moral.discourseUsed;
@@ -613,9 +826,8 @@ function rFronts(){
 
 // ═══════════════ TOG DETAIL ═══════════════
 function tog(fid){
-  if(!isOwner(fid))return;
+  if(!canViewPillar(fid))return;
   const mp=myPillar();
-  // Próprio pilar: não pode ser desselecionado pelo jogador (só GM pode fechar)
   if(P!=='GM'&&fid===mp){SF=fid;rFronts();rDet(fid);return}
   if(SF===fid&&P==='GM'){SF=null;document.getElementById('det').classList.remove('open');rFronts();return}
   SF=fid;rFronts();rDet(fid);
@@ -627,6 +839,7 @@ function rDet(fid){
   const panel=document.getElementById('det'),fd=FD[fid],fs=G.fronts[fid];
   panel.classList.add('open');
   const av=myAvailPE(),sick=fs.status==='doenca',dead=fs.status==='enfermo';
+  const isSalaoViewer=!isOwner(fid)&&P!=='GM'&&G.assignments[P]==='comando'&&hasAnalise();
   // GM vê tudo; jogadores: texto controlado por Salão
   const showFull=P==='GM'||hasMesa();
   const showHab =P==='GM'||hasArquivo();
@@ -641,12 +854,24 @@ function rDet(fid){
     if(done){ic+='ld';bc+='bd';bt='✓'}else if(pend){ic+='lp';bc+='bp';bt='⚒'}else if(next){ic+='ln';bc+='bn'}else{ic+='ll';bc+='bl'}
     const cr=efectivePE(lv.pe,fid);
     const cLabel=cr!==lv.pe?`${cr} PE <s style="color:var(--t2);font-size:10px">${lv.pe}</s>`:cr+' PE';
-    // GM sempre vê texto completo; jogadores dependem de Mesa/Arquivo
-    const desc=P==='GM'||showFull?lv.rew:lv.txt;
-    const habLine=P==='GM'||showHab?`<div class="lvcost">Custo: ${cLabel} &nbsp;|&nbsp; <span style="color:var(--t2)">${lv.hab}</span></div>`:`<div class="lvcost">Custo: ${cLabel}</div>`;
+    // GM e Mesa de Planejamento: txt + rew juntos. Sem Mesa: só txt.
+    const desc=(P==='GM'||showFull)
+      ?`${lv.txt}<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--t3);color:var(--t0);font-size:13px">${lv.rew}</div>`
+      :lv.txt;
+    const levelSeen=(fs.seenTests||[]).includes(n);
+    const habRaw=lv.hab,habDisplay=(P==='GM'||showHab||(pend&&fs.pending&&fs.pending.testReady)||levelSeen)?reduceHab(habRaw):null;
+    const habLine=habDisplay?`<div class="lvcost">Custo: ${cLabel} &nbsp;|&nbsp; <span style="color:var(--t2)">${habDisplay}</span></div>`:`<div class="lvcost">Custo: ${cLabel}</div>`;
     let acts='';
-    if(pend&&P==='GM')acts=`<div class="lvacts"><button class="btn btn-gm btn-sm" onclick="fc('${fid}')">✓ Completar</button><button class="btn btn-danger btn-sm" onclick="cu('${fid}')">✕ Cancelar</button></div>`;
-    else if(pend)acts=`<div class="lvacts"><span style="color:var(--gold);font-size:13px">⏳ Em andamento · por ${fs.pending.by}</span></div>`;
+    if(isSalaoViewer){
+      // Salão só lê — mostra estado mas sem botões de ação
+      if(pend){const tr=fs.pending&&fs.pending.testReady,dLeft=!tr?Math.max(0,(fs.pending.startDay+fs.pending.peSpent)-G.day):0;acts=`<div class="lvacts"><span style="color:var(--gold);font-size:12px">${tr?'⚔️ Aguardando teste':'⏳ Teste em '+dLeft+' dia'+(dLeft!==1?'s':'')}</span></div>`}
+    } else if(pend&&P==='GM')acts=`<div class="lvacts"><button class="btn btn-gm btn-sm" onclick="fc('${fid}')">✓ Completar</button><button class="btn btn-danger btn-sm" onclick="cu('${fid}')">✕ Cancelar</button></div>`;
+    else if(pend){
+      const tr=fs.pending&&fs.pending.testReady;
+      const dLeft=fs.pending&&!tr?Math.max(0,(fs.pending.startDay+fs.pending.peSpent)-G.day):0;
+      if(tr){acts=`<div class="lvacts"><span style="color:var(--gold-hi);font-size:13px;font-weight:600">⚔️ Hora do teste! Aguardando o Mestre</span></div>`}
+      else{acts=`<div class="lvacts"><span style="color:var(--gold);font-size:13px">⏳ Teste em <b>${dLeft}</b> dia${dLeft!==1?'s':''} — iniciado por ${fs.pending.by}</span></div>`}
+    }
     else if(next){
       if(dead)acts=`<div class="lvacts"><span style="color:var(--dead);font-size:13px">☠️ Pilar inoperante — aguardar recuperação</span></div>`;
       else if(sick){const cs=Math.min(pillarTotalPE(fid),cr*2),can=av>=cs;acts=`<div class="lvacts"><button class="btn btn-sick btn-sm" onclick="suSick('${fid}',${n})" ${can?'':'disabled'}>🦠 Trabalhar doente · ${cs} PE → ficará Enfermo</button></div>`}
@@ -656,7 +881,7 @@ function rDet(fid){
   }).join('');
 
   // Botão fechar: GM pode sempre fechar; jogador não pode fechar seu próprio pilar
-  const closeBtn=P==='GM'?`<button class="dtcl" onclick="tog('${fid}')">✕</button>`:'';
+  const closeBtn=(P==='GM'||isSalaoViewer)?`<button class="dtcl" onclick="tog('${fid}')">✕</button>`:'';
   // Aviso de oAmbar ativo
   const oAmbarActive=G.oAmbarBuff?`<div style="padding:8px 12px;margin-bottom:12px;background:rgba(62,207,160,.08);border:1px solid rgba(62,207,160,.3);border-radius:6px;font-size:12px;color:var(--teal)">📡 <b>Olho Âmbar ativo</b> — todos os upgrades custam 1 PE a menos esta semana</div>`:'';
   // peGifted (PE recebido por Mesa/Rede)
@@ -676,9 +901,9 @@ function su(fid,n){
   if(fs.level!==n-1)return toast('Complete o nível anterior primeiro.',true);
   if(fs.status==='enfermo')return toast('Pilar enfermo — não pode receber PE.',true);
   const cr=efectivePE(lv.pe,fid),av=myAvailPE();
-  if(av<cr)return toast(`PE insuficiente. Precisa: ${cr}, disponível: ${av}.`,true);
-  G.fronts[fid].peUsed=(G.fronts[fid].peUsed||0)+cr;
-  fs.pending={lv:n,by:P,peSpent:cr};
+  if(P!=='GM'&&av<cr)return toast(`PE insuficiente. Precisa: ${cr}, disponível: ${av}.`,true);
+  if(P!=='GM') G.fronts[fid].peUsed=(G.fronts[fid].peUsed||0)+cr;
+  fs.pending={lv:n,by:P,peSpent:cr,startDay:G.day,testReady:false,testResult:null};
   alog(P,`iniciou <b>${FD[fid].name}</b> nível ${n} (${cr} PE)`);
   save();render();
 }
@@ -688,11 +913,11 @@ function suSick(fid,n){
   const cr=efectivePE(lv.pe,fid),cs=Math.min(pillarTotalPE(fid),cr*2),av=myAvailPE();
   if(av<cs)return toast(`PE insuficiente para trabalhar doente. Precisa: ${cs}.`,true);
   G.fronts[fid].peUsed=(G.fronts[fid].peUsed||0)+cs;
-  fs.pending={lv:n,by:P,peSpent:cs};fs.status='enfermo';fs.enfermoWeek=G.week;
+  fs.pending={lv:n,by:P,peSpent:cs,startDay:G.day,testReady:false,testResult:null};fs.status='enfermo';fs.enfermoWeek=G.week;
   alog(P,`forçou <b>${FD[fid].name}</b> nível ${n} com doença (${cs} PE) → <b>Enfermo</b>`);
   save();render();toast('⚠️ Pilar agora Enfermo — bloqueado nesta semana e na próxima.','w');
 }
-function cu(fid){const fs=G.fronts[fid];if(!fs.pending)return;const r=Math.floor((fs.pending.peSpent||0)/2);G.fronts[fid].peUsed=Math.max(0,(G.fronts[fid].peUsed||0)-r);alog(P,`cancelou <b>${FD[fid].name}</b> (${r} PE reembolsados)`);fs.pending=null;save();render()}
+function cu(fid){const fs=G.fronts[fid];if(!fs.pending)return;const r=fs.pending.peSpent||0;G.fronts[fid].peUsed=Math.max(0,(G.fronts[fid].peUsed||0)-r);alog(P,`cancelou <b>${FD[fid].name}</b> (${r} PE reembolsados)`);fs.pending=null;save();render()}
 function fc(fid){const fs=G.fronts[fid];if(!fs.pending)return;fs.level=fs.pending.lv;alog(P,`completou <b>${FD[fid].name}</b> — nível ${fs.level}`);fs.pending=null;save();render()}
 
 // ═══════════════ AÇÕES CROSS-PILAR ═══════════════
@@ -722,14 +947,15 @@ function useOAmbar(){
   save();render();toast('📡 Olho Âmbar contactado — custo −1 PE na próxima semana!');
 }
 function useAjuda(targetFid){
-  const av=myAvailPE();if(av<2)return toast('PE insuficiente para auxiliar.',true);
-  if(G.fronts[targetFid].ajudado)return toast('Este pilar já recebeu ajuda esta semana.',true);
+  const av=myAvailPE();if(av<2)return toast('PE insuficiente para se deslocar.',true);
+  if(G.fronts[targetFid].ajudado)return toast('Este pilar já tem um herói auxiliar esta semana.',true);
   const mp=myPillar();
   G.fronts[mp].peUsed=(G.fronts[mp].peUsed||0)+2;
-  G.fronts[targetFid].peGifted=(G.fronts[targetFid].peGifted||0)+2;
-  G.fronts[targetFid].ajudado=true;CrossPopup=null;
-  alog(P,`🤝 <b>Auxiliar</b>: 2 PE transferido para <b>${FD[targetFid].name}</b> via Rede de Mensageiros`);
-  save();render();toast(`🤝 ${FD[targetFid].name} recebeu 2 PE de ajuda!`);
+  G.fronts[targetFid].ajudado=true;
+  G.fronts[targetFid].ajudadoPor=P;
+  CrossPopup=null;
+  alog(P,`🤝 <b>${P}</b> se deslocou para auxiliar no próximo teste de <b>${FD[targetFid].name}</b> (2 PE)`);
+  save();render();toast(`🤝 ${P} estará presente no próximo teste de ${FD[targetFid].name}!`);
 }
 function useDiscurso(targetFid){
   if(G.fronts.moral.discourseUsed)return toast('Discurso já usado esta semana.',true);
@@ -754,23 +980,237 @@ function useForcarMoral(){
   save();render();toast('🔔 Evento de Moral forçado — aguarde o GM!','w');
 }
 
-// ═══════════════ GM AÇÕES ═══════════════
-function gmWk(){
-  const w=Math.max(1,parseInt(document.getElementById('gwk').value)||1);G.week=w;
-  // Aplicar Olho Âmbar: se foi ativado semana passada, aplica agora; depois limpa
-  G.oAmbarBuff=G.oAmbarNextWeek;G.oAmbarNextWeek=false;
-  OR.forEach(k=>{
-    G.fronts[k].peUsed=0;G.fronts[k].peGifted=0;
-    G.fronts[k].discursoBuff=false;G.fronts[k].resistenciaBuff=false;
-    G.fronts[k].ajudado=false;G.fronts[k].mesaUsed=false;
-    G.fronts[k].oAmbarUsed=false;G.fronts[k].forcarMoralUsed=false;
-  });
-  G.fronts.moral.discourseUsed=false;
-  OR.forEach(k=>{const fs=G.fronts[k];if(fs.status==='enfermo'&&fs.enfermoWeek!==null&&G.week>fs.enfermoWeek+1){fs.status='normal';fs.enfermoWeek=null;alog('Sistema',`<b>${FD[k].name}</b> recuperou de Enfermidade`)}});
-  alog(P,`→ <b>Semana ${G.week}</b> — PE e buffs resetados${G.oAmbarBuff?' · 📡 Olho Âmbar ativo (−1 PE todos os upgrades)':''}`)
-  ;save();render();
+// ── MODAL DE EVENTOS SEMANAIS ─────────────────────
+const EV_META={
+  doenca:{label:'🦠 Doença',icon:'🦠',color:'var(--sick)',info:'Afeta 1 pilar (d4). Custo de PE dobrado naquele pilar.'},
+  chuva: {label:'🌧️ Chuva Forte',icon:'🌧️',color:'var(--blue)',info:'Afeta 1 pilar (d4). Desfaz o último upgrade realizado.'},
+  ataque:{label:'⚔️ Ataque',icon:'⚔️',color:'var(--rose)',info:'Muralhas gasta 3 PE e faz teste de defesa. Falha: pilares perdem 1 nível.'},
+  nevoa: {label:'🌫️ Névoa de Cinzas',icon:'🌫️',color:'var(--t1)',info:'Upgrades +1 PE. Testes com desvantagem. Não pode ser mitigada.'},
+  moral: {label:'🫂 Evento Moral',icon:'🫂',color:'var(--rose)',info:'Herói da Moral faz teste de Carisma. Falha −1 nível, sucesso +½ nível.'}
+};
+// Probabilidades ajustadas pelos upgrades (modificadores sobre a base)
+function getEffectiveProb(key){
+  let base=G.eventProbs[key];
+  const aquaLv=G.fronts.aqueduto.level;
+  if(key==='doenca'){if(aquaLv>=1)base-=10;if(aquaLv>=3)base-=10;if(aquaLv>=5)base-=30;}
+  if(key==='chuva'&&aquaLv>=3)base=0;
+  return Math.max(0,Math.min(100,base));
 }
+// Probs locais do modal (podem ser ajustadas antes de rolar)
+let wmLocalProbs={};
+
+function rGMProbs(){
+  const el=document.getElementById('gm-probs-grid');if(!el)return;
+  el.innerHTML='';
+  Object.entries(EV_META).forEach(([key,ev])=>{
+    const base=G.eventProbs[key];
+    const eff=getEffectiveProb(key);
+    const d=document.createElement('div');
+    d.style.cssText='background:var(--bg2);border:1px solid var(--t3);border-radius:6px;padding:10px 12px';
+    d.innerHTML=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span>${ev.icon}</span><span style="font-family:'Cinzel',serif;font-size:11px;color:${ev.color}">${ev.label.replace(/[^\w\s\u00C0-\u024F]/g,'').trim()}</span></div>
+<div style="display:flex;align-items:center;gap:6px">
+<button class="btn btn-sm" style="padding:3px 8px;font-size:11px" onclick="gmProbAdj('${key}',-10)">−10</button>
+<button class="btn btn-sm" style="padding:3px 8px;font-size:11px" onclick="gmProbAdj('${key}',-5)">−5</button>
+<span style="font-family:'Cinzel',serif;font-size:13px;color:var(--gold);min-width:36px;text-align:center">${base}%</span>
+<button class="btn btn-sm" style="padding:3px 8px;font-size:11px" onclick="gmProbAdj('${key}',5)">+5</button>
+<button class="btn btn-sm" style="padding:3px 8px;font-size:11px" onclick="gmProbAdj('${key}',10)">+10</button>
+</div>${eff!==base?`<div style="font-size:10px;color:var(--t2);margin-top:4px">Efetivo c/ upgrades: ${eff}%</div>`:''}`;
+    el.appendChild(d);
+  });
+}
+function gmProbAdj(key,delta){
+  G.eventProbs[key]=Math.max(0,Math.min(100,(G.eventProbs[key]||0)+delta));
+  save();rGMProbs();
+}
+function gmResetProbs(){G.eventProbs={doenca:10,chuva:40,ataque:0,nevoa:30,moral:50};save();rGMProbs();toast('Probabilidades restauradas para o padrão do PDF.')}
+
+function openWeekModal(){
+  // Copia probs efetivas para o modal (ajustáveis localmente)
+  wmLocalProbs={};
+  Object.keys(EV_META).forEach(k=>wmLocalProbs[k]=getEffectiveProb(k));
+  document.getElementById('wm-title').textContent=`INÍCIO DA SEMANA ${G.week}`;
+  const el=document.getElementById('wm-events');el.innerHTML='';
+  Object.entries(EV_META).forEach(([key,ev])=>{
+    const row=document.createElement('div');
+    row.style.cssText='background:var(--bg2);border:1px solid var(--t3);border-radius:8px;padding:14px 16px';
+    row.id=`wm-row-${key}`;
+    row.innerHTML=`
+<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+  <span style="font-size:22px">${ev.icon}</span>
+  <div style="flex:1;min-width:0">
+    <div style="font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:${ev.color}">${ev.label}</div>
+    <div style="font-size:11px;color:var(--t2);margin-top:2px">${ev.info}</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+    <div style="display:flex;align-items:center;gap:4px">
+      <button class="btn btn-sm" style="padding:3px 7px;font-size:11px" onclick="wmAdjProb('${key}',-10)">−</button>
+      <span id="wm-pct-${key}" style="font-family:'Cinzel',serif;font-size:13px;color:var(--gold);min-width:36px;text-align:center">${wmLocalProbs[key]}%</span>
+      <button class="btn btn-sm" style="padding:3px 7px;font-size:11px" onclick="wmAdjProb('${key}',10)">+</button>
+    </div>
+    <button class="btn btn-sm" style="padding:6px 10px" onclick="wmRoll('${key}')" id="wm-roll-${key}">🎲 Auto</button>
+    <button class="btn btn-sm" style="padding:6px 10px;border-color:rgba(62,207,160,.4);color:var(--teal)" onclick="wmManual('${key}',true)">✓ Ativar</button>
+    <button class="btn btn-sm" style="padding:6px 10px" onclick="wmManual('${key}',false)">✗ Não</button>
+  </div>
+</div>
+<div id="wm-die-${key}" style="margin-top:8px;display:none;align-items:center;gap:12px"></div>
+<div id="wm-action-${key}" style="margin-top:8px;display:none"></div>`;
+    el.appendChild(row);
+  });
+  document.getElementById('weekmodal').style.display='flex';
+}
+
+function wmAdjProb(key,delta){
+  wmLocalProbs[key]=Math.max(0,Math.min(100,(wmLocalProbs[key]||0)+delta));
+  document.getElementById(`wm-pct-${key}`).textContent=wmLocalProbs[key]+'%';
+}
+
+function wmD10SVG(color){
+  return`<svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+<polygon points="28,2 52,18 52,38 28,54 4,38 4,18" fill="var(--bg3)" stroke="${color}" stroke-width="1.5"/>
+<polygon points="28,2 52,18 28,28" fill="${color}" opacity=".12"/>
+<polygon points="4,18 28,28 28,54" fill="${color}" opacity=".08"/>
+</svg>`;
+}
+
+function wmRoll(key){
+  const pct=wmLocalProbs[key];
+  const btn=document.getElementById(`wm-roll-${key}`);btn.disabled=true;
+  const dieEl=document.getElementById(`wm-die-${key}`);dieEl.style.display='flex';
+  const ev=EV_META[key];
+  // Animação de rolagem
+  let frame=0;const frames=12;
+  const interval=setInterval(()=>{
+    const fake=Math.floor(Math.random()*10)+1;
+    dieEl.innerHTML=`<div class="d10wrap rolling" style="color:${ev.color}">${wmD10SVG(ev.color)}<span style="color:${ev.color}">${fake}</span></div>`;
+    frame++;
+    if(frame>=frames){
+      clearInterval(interval);
+      const roll=Math.floor(Math.random()*10)+1;
+      const threshold=pct/10;
+      const occurred=roll<=threshold;
+      dieEl.innerHTML=`<div class="d10wrap" style="color:${occurred?ev.color:'var(--t2)'}">${wmD10SVG(occurred?ev.color:'var(--t2)')}<span style="color:${occurred?ev.color:'var(--t2)'}">${roll}</span></div>
+<span style="font-family:'Cinzel',serif;font-size:13px;color:${occurred?ev.color:'var(--t2)'}">d10 = ${roll} (precisa ≤${threshold|0}) — <b>${occurred?'OCORRE':'Não ocorre'}</b></span>`;
+      const row=document.getElementById(`wm-row-${key}`);
+      if(occurred){row.style.borderColor=ev.color;wmShowAction(key,true);}
+    }
+  },55);
+}
+
+function wmManual(key,activate){
+  const ev=EV_META[key];
+  const dieEl=document.getElementById(`wm-die-${key}`);dieEl.style.display='flex';
+  dieEl.innerHTML=`<span style="font-size:12px;color:${activate?ev.color:'var(--t2)'}">Manual: ${activate?'<b>ATIVAR</b>':'Não ocorre'}</span>`;
+  if(activate){
+    const row=document.getElementById(`wm-row-${key}`);
+    row.style.borderColor=ev.color;
+    wmShowAction(key,true);
+  }
+  document.getElementById(`wm-roll-${key}`).disabled=true;
+}
+
+function wmShowAction(key,show){
+  if(!show)return;
+  const ev=EV_META[key];
+  const act=document.getElementById(`wm-action-${key}`);act.style.display='block';
+  if(key==='nevoa'){
+    act.innerHTML=`<button class="btn btn-sm" onclick="wmApply('nevoa')">🌫️ Ativar Névoa de Cinzas</button>`;
+  } else if(key==='moral'){
+    act.innerHTML=`<button class="btn btn-sm" onclick="wmApply('moral')">🫂 Registrar Evento Moral</button>`;
+  } else if(key==='ataque'){
+    const mags=['Fácil (CD15)','Normal (CD20)','Difícil (CD25)','Muito Difícil (CD30)'];
+    const idx=G.fronts.muralhas.level>=1?Math.floor(Math.random()*4):Math.floor(Math.random()*3)+1;
+    act.innerHTML=`<div style="font-size:12px;color:var(--rose);margin-bottom:6px">Magnitude: <b>${mags[Math.min(idx,3)]}</b></div><button class="btn btn-danger btn-sm" onclick="wmApply('ataque')">⚔️ Registrar Ataque</button>`;
+  } else {
+    const pilarNames=['Muralhas','Infraestrutura','Salão de Comando','Moral'];
+    const pilarKeys=['muralhas','aqueduto','comando','moral'];
+    const pd=Math.floor(Math.random()*4);
+    act.innerHTML=`<div style="font-size:12px;color:${ev.color};margin-bottom:6px">Pilar afetado (d4=${pd+1}): <b>${pilarNames[pd]}</b></div>
+<button class="btn btn-sick btn-sm" onclick="wmApplyPilar('${key}','${pilarKeys[pd]}')">${ev.icon} Aplicar em ${pilarNames[pd]}</button>
+<button class="btn btn-sm" style="margin-left:6px" onclick="wmReSortPilar('${key}')">🎲 Ressortear pilar</button>`;
+  }
+}
+
+function wmReSortPilar(key){
+  const ev=EV_META[key];
+  const act=document.getElementById(`wm-action-${key}`);
+  const pilarNames=['Muralhas','Infraestrutura','Salão de Comando','Moral'];
+  const pilarKeys=['muralhas','aqueduto','comando','moral'];
+  const pd=Math.floor(Math.random()*4);
+  act.innerHTML=`<div style="font-size:12px;color:${ev.color};margin-bottom:6px">Pilar afetado (d4=${pd+1}): <b>${pilarNames[pd]}</b></div>
+<button class="btn btn-sick btn-sm" onclick="wmApplyPilar('${key}','${pilarKeys[pd]}')">${ev.icon} Aplicar em ${pilarNames[pd]}</button>
+<button class="btn btn-sm" style="margin-left:6px" onclick="wmReSortPilar('${key}')">🎲 Ressortear pilar</button>`;
+}
+
+function wmApply(key){
+  if(key==='nevoa'){G.nevoa=true;alog(P,`🌫️ <b>Névoa de Cinzas</b> ativada — Semana ${G.week}`)}
+  else if(key==='moral'){G.moralEvent=true;alog(P,`🫂 <b>Evento Moral</b> — herói da Moral deve agir`)}
+  else if(key==='ataque'){alog(P,`⚔️ <b>Ataque</b> registrado — Semana ${G.week}`)}
+  document.getElementById(`wm-action-${key}`).innerHTML+='<span style="color:var(--teal);font-size:12px;margin-left:8px">✓ Aplicado</span>';
+  save();render();
+}
+function wmApplyPilar(key,fid){
+  if(key==='doenca'){G.fronts[fid].status='doenca';alog(P,`🦠 <b>Doença</b> → <b>${FD[fid].name}</b>`)}
+  else if(key==='chuva'){
+    if(G.fronts[fid].level>0&&G.fronts.aqueduto.level<3){G.fronts[fid].level--;G.fronts[fid].pending=null;alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[fid].name}</b> nível ${G.fronts[fid].level}`)}
+    else{alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[fid].name}</b> — resistiu`)}
+  }
+  document.getElementById(`wm-action-${key}`).innerHTML+='<span style="color:var(--teal);font-size:12px;margin-left:8px">✓ Aplicado</span>';
+  save();render();
+}
+function closeWeekModal(){G.weekEventShown=true;document.getElementById('weekmodal').style.display='none';save();render()}
+function _hasPendingTest(){return OR.some(k=>G.fronts[k].pending&&G.fronts[k].pending.testReady)}
+function _checkTestReady(){OR.forEach(k=>{const fs=G.fronts[k];if(fs.pending&&!fs.pending.testReady&&fs.pending.testResult===null&&G.day>=(fs.pending.startDay+fs.pending.peSpent)){fs.pending.testReady=true;if(!fs.seenTests)fs.seenTests=[];if(!fs.seenTests.includes(fs.pending.lv))fs.seenTests.push(fs.pending.lv);alog('Sistema',`⚔️ <b>${FD[k].name}</b> pronto para o teste! (Dia ${G.day})`);}})}
+function _updateWeekFromDay(){G.week=Math.max(1,Math.ceil(Math.max(G.day,1)/7))}
+function _resetWeek(){
+  OR.forEach(k=>{G.fronts[k].peUsed=0;G.fronts[k].peGifted=0;G.fronts[k].discursoBuff=false;G.fronts[k].resistenciaBuff=false;G.fronts[k].ajudado=false;G.fronts[k].ajudadoPor=null;G.fronts[k].mesaUsed=false;G.fronts[k].oAmbarUsed=false;G.fronts[k].forcarMoralUsed=false});
+  G.fronts.moral.discourseUsed=false;G.oAmbarBuff=G.oAmbarNextWeek;G.oAmbarNextWeek=false;
+  G.weekEventShown=false; // reseta modal de eventos para a nova semana
+  OR.forEach(k=>{const fs=G.fronts[k];if(fs.status==='enfermo'&&fs.enfermoWeek!==null&&G.week>fs.enfermoWeek+1){fs.status='normal';fs.enfermoWeek=null;alog('Sistema',`<b>${FD[k].name}</b> recuperou`)}});
+}
+function gmAdvDay(){
+  if(_hasPendingTest())return toast('Há um teste aguardando — resolva antes de avançar o dia.',true);
+  const prevWeek=G.week;G.day+=1;_updateWeekFromDay();
+  if(G.week>prevWeek){_resetWeek();alog(P,`→ <b>Semana ${G.week}</b> — PE resetados (Dia ${G.day})`)}
+  else{alog(P,`+1 dia → <b>Dia ${G.day}</b> (Semana ${G.week})`)}
+  _checkTestReady();save();render();
+}
+function gmNextWeek(){
+  if(_hasPendingTest())return toast('Há um teste aguardando — resolva antes de avançar.',true);
+  const nextStart=Math.ceil(Math.max(G.day,1)/7)*7+1;const skip=nextStart-G.day;
+  G.day=nextStart;_updateWeekFromDay();_resetWeek();_checkTestReady();
+  alog(P,`→ <b>Semana ${G.week}</b> (Dia ${G.day}, +${skip} dias) — PE resetados`);
+  save();render();
+}
+
+// ═══════════════ GM AÇÕES ═══════════════
 function gmPE(){G.peTotal=Math.max(1,parseInt(document.getElementById('gdtt').value)||7);alog(P,`PE base/jogador → <b>${G.peTotal}</b>`);save();render()}
+function gmApprove(fid){
+  const fs=G.fronts[fid];if(!fs.pending||!fs.pending.testReady)return;
+  const lv=fs.pending.lv,owner=pillarOwner(fid)||'?';
+  fs.level=lv;fs.pending=null;
+  alog(P,`✓ <b>${FD[fid].name}</b> — teste <b>APROVADO</b> · nível ${fs.level} concluído por ${owner}`);
+  save();render();toast(`✓ ${FD[fid].name} avançou para nível ${fs.level}!`);
+}
+function gmReject(fid){
+  const fs=G.fronts[fid];if(!fs.pending||!fs.pending.testReady)return;
+  const owner=pillarOwner(fid)||'?';
+  fs.pending=null;
+  alog(P,`✗ <b>${FD[fid].name}</b> — teste <b>REPROVADO</b> por ${owner}`);
+  save();render();toast(`✗ Teste reprovado. ${FD[fid].name} não avançou.`,true);
+}
+function gmMoralPass(){
+  G.moralEvent=false;
+  // Sucesso: +0.5 nível de moral. Dois sucessos = +1 nível
+  if(G.moralHalf){G.moral=Math.min(2,G.moral+1);G.moralHalf=false;alog(P,`🫂 Evento Moral <b>PASSOU</b> — Moral subiu para <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b>`)}
+  else{G.moralHalf=true;alog(P,`🫂 Evento Moral <b>PASSOU</b> — meio nível acumulado (passe mais 1 vez para subir)`)}
+  save();render();toast('✓ Teste de moral passou!');
+}
+function gmMoralFail(){
+  G.moralEvent=false;G.moralHalf=false;
+  G.moral=Math.max(-4,G.moral-1);
+  alog(P,`🫂 Evento Moral <b>NÃO PASSOU</b> — Moral caiu para <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b>`);
+  save();render();toast('✗ Teste de moral falhou.',true);
+}
 function gmMoral(d){G.moral=Math.max(-4,Math.min(2,G.moral+d));document.getElementById('gmoralinp').value=G.moral;alog(P,`Moral → <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b>`);save();render()}
 function gmSetMoral(){const v=Math.max(-4,Math.min(2,parseInt(document.getElementById('gmoralinp').value)||0));G.moral=v;alog(P,`Moral definida → <b>${v>=0?'+':''}${v} ${mlabel()}</b>`);save();render()}
 function gmToggleNevoa(){G.nevoa=!G.nevoa;alog(P,G.nevoa?'🌫️ Névoa ativada':'🌫️ Névoa desativada');save();render()}
@@ -779,6 +1219,13 @@ function gmDn(fid){if(!confirm(`Reduzir ${FD[fid].name}?`))return;const fs=G.fro
 function gmUp(fid){if(!confirm(`Forçar ${FD[fid].name} para nível ${G.fronts[fid].level+1}?`))return;const fs=G.fronts[fid];if(fs.level>=5)return toast('Já completo.',true);fs.level++;fs.pending=null;alog(P,`▲ <b>${FD[fid].name}</b> → nível ${fs.level}`);save();render()}
 function gmPeMod(fid,d){G.fronts[fid].peMod=(G.fronts[fid].peMod||0)+d;const m=G.fronts[fid].peMod;document.getElementById('pemod_'+fid).textContent=m>0?`+${m}`:m<0?`${m}`:'0';alog(P,`Mod PE <b>${FD[fid].name}</b> → ${m>=0?'+':''}${m} (total ${pillarTotalPE(fid)} PE)`);save();render()}
 function gmPeModSet(fid,v){G.fronts[fid].peMod=v;document.getElementById('pemod_'+fid).textContent='0';alog(P,`Mod PE <b>${FD[fid].name}</b> resetado`);save();render()}
+function gmReleaseGame(){
+  if(G.gameReleased)return;
+  if(OR.filter(k=>pillarOwner(k)).length<4)return toast('Aguarde todos os 4 jogadores escolherem seus pilares.',true);
+  G.gameReleased=true;
+  alog(P,'▶ <b>Jogo liberado!</b> Todos os jogadores podem jogar agora.');
+  save();render();toast('▶ Jogo liberado para todos os jogadores!');
+}
 function gmReset(){G=fresh();save();alog('Sistema','↺ Reset total');render()}
 function gmClearPE(){OR.forEach(k=>G.fronts[k].peUsed=0);alog(P,'🔄 PE resetados');save();render()}
 function gmClearAssignments(){if(!confirm('Limpar atribuições?'))return;G.assignments={};alog(P,'✕ Atribuições limpas');save();render()}
