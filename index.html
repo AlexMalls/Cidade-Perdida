@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pilares da Cidade Perdida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg0:#04050d;--bg1:#07091a;--bg2:#0b0e22;--bg3:#10142e;--bg4:#161c3a;--gold:#c9a84c;--gold-hi:#ecd878;--gold-lo:#6b4f18;--ga:rgba(201,168,76,.08);--gb:rgba(201,168,76,.16);--t0:#f0e6cc;--t1:#a89870;--t2:#4a5068;--t3:#252a40;--blue:#5aaaf0;--blue-d:#07162e;--teal:#3ecfa0;--teal-d:#051a10;--amber:#e0a030;--amber-d:#1a0e02;--rose:#e06090;--rose-d:#1e0614;--sick:#e07020;--dead:#c83232;--r:8px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html,body{height:100%}
+body{font-family:'Crimson Pro',Georgia,serif;background:var(--bg0);color:var(--t0);font-size:16px;line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(201,168,76,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.018) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 60% at 10% 50%,rgba(10,20,60,.4) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 90% 10%,rgba(201,168,76,.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+.orn{display:flex;align-items:center;gap:12px;color:var(--gold);margin:6px 0}
+.orn::before,.orn::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-lo),var(--gold),var(--gold-lo),transparent)}
+.orn span{font-size:13px;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;border:1px solid var(--gold-lo);background:var(--ga);color:var(--gold);border-radius:4px;cursor:pointer;transition:all .18s;text-transform:uppercase}
+.btn:hover{background:var(--gb);border-color:var(--gold);box-shadow:0 0 20px rgba(201,168,76,.12)}
+.btn:disabled{opacity:.3;cursor:not-allowed;box-shadow:none}
+.btn-sm{padding:6px 14px;font-size:11px}
+.btn-danger{border-color:#7a1818;color:#e05050;background:rgba(200,40,40,.06)}.btn-danger:hover{background:rgba(200,40,40,.14);border-color:#e05050}
+.btn-gm{border-color:#6a1840;color:var(--rose);background:rgba(224,96,144,.06)}.btn-gm:hover{background:rgba(224,96,144,.14);border-color:var(--rose)}
+.btn-sick{border-color:#7a4010;color:var(--sick);background:rgba(224,112,32,.06)}.btn-sick:hover{background:rgba(224,112,32,.14);border-color:var(--sick)}
+.btn-teal{border-color:#1a7a50;color:var(--teal);background:rgba(62,207,160,.06)}.btn-teal:hover{background:rgba(62,207,160,.14);border-color:var(--teal)}
+.pips{display:flex;gap:5px}
+.pip{width:20px;height:8px;border-radius:3px;background:var(--bg4);border:1px solid var(--t3);transition:all .3s}
+.pip.blue{background:var(--blue);border-color:var(--blue);box-shadow:0 0 8px rgba(90,170,240,.4)}
+.pip.teal{background:var(--teal);border-color:var(--teal);box-shadow:0 0 8px rgba(62,207,160,.4)}
+.pip.amber{background:var(--amber);border-color:var(--amber);box-shadow:0 0 8px rgba(224,160,48,.4)}
+.pip.rose{background:var(--rose);border-color:var(--rose);box-shadow:0 0 8px rgba(224,96,144,.4)}
+.pip.pend{background:rgba(201,168,76,.25);border-color:var(--gold-lo)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,.5)}50%{box-shadow:0 0 0 8px rgba(201,168,76,0)}}
+@keyframes pulseSick{0%,100%{box-shadow:0 0 0 0 rgba(224,112,32,.55)}50%{box-shadow:0 0 0 10px rgba(224,112,32,0)}}
+@keyframes pulseDead{0%,100%{box-shadow:0 0 0 0 rgba(200,50,50,.65)}50%{box-shadow:0 0 0 10px rgba(200,50,50,0)}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dropIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.stk{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-family:'Cinzel',serif;vertical-align:middle;margin-left:6px}
+.stk-sick{background:rgba(224,112,32,.15);border:1px solid var(--sick);color:var(--sick)}
+.stk-dead{background:rgba(200,50,50,.18);border:1px solid var(--dead);color:var(--dead)}
+.stk-buff{background:rgba(62,207,160,.12);border:1px solid var(--teal);color:var(--teal)}
+/* PICK / SUMMARY */
+#ppick{display:none;position:fixed;inset:0;background:var(--bg0);z-index:90;align-items:flex-start;justify-content:center;padding:32px 20px;overflow-y:auto}
+#ppick.open{display:flex}
+.ppw{width:100%;max-width:920px;text-align:center;animation:rise .4s ease}
+.pptitle{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.25em;text-transform:uppercase;color:var(--t1);margin-bottom:6px}
+.ppname{font-family:'Cinzel Decorative',serif;font-size:clamp(20px,3.5vw,34px);color:var(--gold-hi);margin-bottom:6px}
+.ppask{font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);font-style:italic;margin-bottom:28px}
+.ppgrid{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+.ppc{width:186px;padding:28px 18px 22px;cursor:pointer;text-align:center;background:var(--bg2);border:1px solid var(--gold-lo);border-radius:var(--r);transition:all .22s;position:relative;overflow:hidden}
+.ppc::after{content:'';position:absolute;bottom:-5px;right:-5px;width:10px;height:10px;background:var(--gold-lo);transform:rotate(45deg);transition:background .2s}
+.ppc:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(0,0,0,.6),0 0 30px rgba(201,168,76,.12);border-color:var(--gold)}.ppc:hover::after{background:var(--gold)}
+.ppc.psel{border-color:var(--gold);background:var(--bg3)}.ppc.psel::after{background:var(--gold)}
+.ppc.pdis{opacity:.35;cursor:not-allowed;pointer-events:none}
+.ppc-icon{font-size:32px;margin-bottom:12px}
+.ppc-name{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--t0);margin-bottom:6px}
+.ppc-tag{font-size:11px;color:var(--t1);font-style:italic}
+.ppc-taken{font-size:11px;color:var(--rose);font-style:italic;margin-top:2px}
+/* FULL PILLAR MODAL */
+#psum{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:95;align-items:flex-start;justify-content:center;padding:24px 20px;overflow-y:auto}
+#psum.open{display:flex}
+.psbox{width:100%;max-width:640px;padding:40px;background:var(--bg2);border:1px solid var(--gold);border-radius:var(--r);animation:rise .22s ease;position:relative;margin:auto}
+.psbox::before{content:'';position:absolute;inset:3px;border:1px solid rgba(201,168,76,.06);border-radius:5px;pointer-events:none}
+.psi{font-size:44px;margin-bottom:8px;text-align:center}
+.psname{font-family:'Cinzel',serif;font-size:22px;font-weight:600;color:var(--gold-hi);text-align:center;margin-bottom:6px}
+.pssub{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--t2);text-align:center;margin-bottom:20px}
+.pstxt{font-size:16px;color:var(--t0);line-height:1.85;margin-bottom:18px;padding:18px 20px;background:var(--bg1);border-radius:6px;border-left:2px solid var(--gold-lo)}
+.pstxt2{font-size:17px;color:var(--t0);line-height:1.9;margin-bottom:24px;padding:20px 22px;background:var(--bg1);border-radius:6px;border-left:3px solid var(--gold);white-space:pre-line}
+.psbtns{display:flex;gap:12px;justify-content:center}
+/* LOGIN */
+#login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.lw{width:100%;max-width:920px;text-align:center;animation:rise .5s ease}
+.ltitle{font-family:'Cinzel Decorative',serif;font-size:clamp(26px,5vw,54px);color:var(--gold-hi);text-shadow:0 0 80px rgba(236,216,120,.2),0 2px 6px rgba(0,0,0,.9);letter-spacing:.05em;line-height:1.1;margin-bottom:6px}
+.lsub{font-family:'Cinzel',serif;font-size:12px;color:var(--t1);letter-spacing:.28em;text-transform:uppercase;margin-bottom:28px}
+.ldeco{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:24px}
+.ldeco::before{background:linear-gradient(90deg,transparent,var(--gold-lo))}.ldeco::after{background:linear-gradient(90deg,var(--gold-lo),transparent)}
+.ldeco::before,.ldeco::after{content:'';display:block;width:60px;height:1px}
+.gem{width:8px;height:8px;background:var(--gold-lo);transform:rotate(45deg)}
+.cgrid{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:8px}
+.cc{width:150px;padding:26px 16px 22px;cursor:pointer;text-align:center;background:var(--bg2);border:1px solid var(--gold-lo);border-radius:var(--r);transition:all .22s;position:relative;overflow:hidden}
+.cc::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.4),transparent)}
+.cc::after{content:'';position:absolute;top:-5px;right:-5px;width:10px;height:10px;background:var(--gold-lo);transform:rotate(45deg);transition:background .2s}
+.cc:hover{border-color:var(--gold);background:var(--bg3);transform:translateY(-6px);box-shadow:0 20px 50px rgba(0,0,0,.6),0 0 30px rgba(201,168,76,.1)}.cc:hover::after{background:var(--gold)}
+.cc.gm{border-color:#4a1030}.cc.gm::after{background:#4a1030}
+.cc.gm:hover{border-color:var(--rose);box-shadow:0 20px 50px rgba(0,0,0,.6),0 0 30px rgba(224,96,144,.1)}.cc.gm:hover::after{background:var(--rose)}
+.ci{width:60px;height:60px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center}
+.ci svg{width:100%;height:100%}
+.cn{font-family:'Cinzel',serif;font-size:15px;font-weight:600;color:var(--t0);margin-bottom:4px}
+.ccls{font-size:12px;color:var(--t1);font-style:italic}
+/* GM PASSWORD */
+#gmm{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;align-items:center;justify-content:center}
+#gmm.open{display:flex}
+.mbox{width:320px;padding:36px;background:var(--bg2);border:1px solid #4a1030;border-radius:var(--r);text-align:center;animation:rise .22s ease;position:relative}
+.mbox::before{content:'';position:absolute;inset:3px;border:1px solid rgba(224,96,144,.06);border-radius:5px;pointer-events:none}
+.mbox h3{font-family:'Cinzel',serif;font-size:15px;font-weight:600;color:var(--rose);margin-bottom:18px}
+.mbox input{width:100%;padding:10px 14px;background:var(--bg1);border:1px solid var(--gold-lo);border-radius:4px;color:var(--t0);font-size:18px;letter-spacing:.3em;text-align:center;font-family:monospace;margin-bottom:14px;outline:none;transition:border-color .2s}
+.mbox input:focus{border-color:var(--gold)}
+.merr{color:#e05050;font-size:13px;margin-bottom:12px;min-height:18px}
+.mbtns{display:flex;gap:10px;justify-content:center}
+/* APP */
+#app{display:none;min-height:100vh}
+#hdr{position:sticky;top:0;z-index:50;background:rgba(5,7,18,.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(201,168,76,.1);padding:0 24px;display:flex;align-items:center;gap:14px;height:62px}
+#hdr::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold-lo) 20%,var(--gold) 50%,var(--gold-lo) 80%,transparent)}
+.hav{width:36px;height:36px;border:1px solid var(--gold-lo);border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--bg3);flex-shrink:0}
+.hav svg{width:22px;height:22px}
+.hnm{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--t0)}
+.hcls{font-size:11px;color:var(--t1);font-style:italic}
+.hsep{width:1px;height:28px;background:rgba(201,168,76,.1);flex-shrink:0}
+.hwk{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:var(--gold);white-space:nowrap}
+.hmoralbox{display:flex;align-items:center;gap:6px}
+.hmoral-lbl{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--t2);white-space:nowrap}
+.hmoral-val{font-family:'Cinzel',serif;font-size:12px;font-weight:600;white-space:nowrap}
+.hr{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.bexit{background:none;border:1px solid var(--t3);color:var(--t2);font-family:'Cinzel',serif;font-size:11px;letter-spacing:.1em;padding:5px 10px;border-radius:4px;cursor:pointer;transition:all .18s}
+.bexit:hover{border-color:var(--t1);color:var(--t0)}
+#ct{max-width:1100px;margin:0 auto;padding:28px 24px 64px;position:relative;z-index:1}
+#rb{display:flex;align-items:center;gap:24px;flex-wrap:wrap;padding:16px 24px;margin-bottom:22px;background:linear-gradient(135deg,var(--bg2),var(--bg1));border:1px solid rgba(201,168,76,.1);border-radius:var(--r)}
+.dtw{min-width:200px}
+.dtl{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--t1);margin-bottom:6px}
+.dtt{height:10px;background:var(--bg4);border-radius:5px;border:1px solid var(--t3);overflow:hidden}
+.dtf{height:100%;background:linear-gradient(90deg,var(--gold-lo),var(--gold),var(--gold-hi));border-radius:5px;transition:width .5s ease}
+.dtn{font-family:'Cinzel',serif;font-size:14px;color:var(--t0);margin-top:4px}
+.dtn b{color:var(--gold);font-size:16px}
+#nevbanner{display:none;padding:9px 20px;margin-bottom:18px;background:rgba(74,80,104,.2);border:1px solid rgba(74,80,104,.5);border-radius:var(--r);font-family:'Cinzel',serif;font-size:11px;letter-spacing:.1em;color:var(--t2);text-align:center}
+#nevbanner.on{display:block}
+/* GM PANEL */
+#gmp{display:none;padding:22px 24px;margin-bottom:24px;background:linear-gradient(135deg,rgba(30,6,20,.9),var(--bg1));border:1px solid #4a1030;border-radius:var(--r)}
+#gmp.open{display:block;animation:rise .2s ease}
+.gmtitle{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--rose);margin-bottom:18px}
+.gmsec{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(224,96,144,.08)}
+.gmsec:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.gmslbl{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:rgba(224,96,144,.6);margin-bottom:8px}
+.gmrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.gmgrp{display:flex;align-items:center;gap:7px}
+.gmlbl{font-size:12px;color:var(--t1);white-space:nowrap}
+.gminp{width:60px;padding:6px 8px;background:var(--bg2);border:1px solid var(--gold-lo);border-radius:4px;color:var(--t0);font-size:13px;font-family:monospace;text-align:center;outline:none;transition:border-color .2s}
+.gminp:focus{border-color:var(--gold)}
+.gmpilar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-top:6px}
+.gmpc{background:var(--bg2);border:1px solid var(--t3);border-radius:6px;padding:12px 14px}
+.gmpc-name{font-family:'Cinzel',serif;font-size:11px;font-weight:600;color:var(--t0);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.gmpc-sub{font-size:10px;color:var(--t2);margin-bottom:8px;line-height:1.6}
+.gmpc-btns{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.gmpc-pemod{display:flex;align-items:center;gap:6px;margin-top:6px;padding-top:6px;border-top:1px solid var(--t3)}
+.gmpc-pemod-lbl{font-size:10px;color:var(--t2);white-space:nowrap}
+.gmpc-pemod-val{font-family:'Cinzel',serif;font-size:12px;font-weight:600;color:var(--gold);min-width:28px;text-align:center}
+/* FRONTS */
+#fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-bottom:22px}
+.fc-wrap{position:relative}
+.fc{padding:20px 18px 18px;cursor:default;position:relative;overflow:hidden;transition:border-color .22s,background .22s;border-radius:var(--r);border:1px solid var(--gold-lo);background:var(--bg2)}
+.fc::before{content:'';position:absolute;inset:3px;border:1px solid rgba(201,168,76,.05);border-radius:5px;pointer-events:none}
+.fc::after{content:'';position:absolute;bottom:-5px;right:-5px;width:10px;height:10px;transform:rotate(45deg);background:var(--gold-lo);transition:background .2s}
+.fc-own{cursor:pointer}.fc-own:hover{border-color:var(--gold);background:var(--bg3)}.fc-own:hover::after{background:var(--gold)}
+.fc-cross{cursor:pointer;border-color:rgba(62,207,160,.4)!important}.fc-cross:hover{border-color:var(--teal)!important;background:rgba(62,207,160,.04)}.fc-cross:hover::after{background:var(--teal)}
+.fc.sel{border-color:var(--gold);background:var(--bg3)}
+.fc.glow{animation:pulse 2s ease-in-out infinite}
+.fc.cb{background:linear-gradient(135deg,var(--blue-d),var(--bg2))}
+.fc.ct{background:linear-gradient(135deg,var(--teal-d),var(--bg2))}
+.fc.ca{background:linear-gradient(135deg,var(--amber-d),var(--bg2))}
+.fc.cr{background:linear-gradient(135deg,var(--rose-d),var(--bg2))}
+.fc-sick{border-color:var(--sick)!important;animation:pulseSick 2.2s ease-in-out infinite}
+.fc-dead{border-color:var(--dead)!important;animation:pulseDead 2.2s ease-in-out infinite}
+.acc{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:var(--r) 0 0 var(--r)}
+.cb .acc{background:linear-gradient(180deg,var(--blue),#1a3a80)}
+.ct .acc{background:linear-gradient(180deg,var(--teal),#0a5030)}
+.ca .acc{background:linear-gradient(180deg,var(--amber),#7a4410)}
+.cr .acc{background:linear-gradient(180deg,var(--rose),#6a1840)}
+.ftop{display:flex;align-items:center;gap:12px;margin-bottom:4px;padding-left:6px}
+.fico{font-size:20px;line-height:1}
+.fnm{font-family:'Cinzel',serif;font-size:14px;font-weight:600;color:var(--t0)}
+.flv{font-size:11px;color:var(--t1)}
+.fown{font-size:10px;color:var(--t2);font-style:italic;padding-left:6px;margin-bottom:4px}
+.fpips{padding-left:6px;margin:8px 0}
+.fst{margin-left:6px;padding:6px 10px;border-radius:4px;font-size:11px;background:var(--ga);border:1px solid rgba(201,168,76,.1)}
+.fst.sp{background:rgba(201,168,76,.05);color:var(--gold)}
+.fst.sd{background:rgba(62,207,160,.05);border-color:rgba(62,207,160,.18);color:var(--teal)}
+.fst.se{background:rgba(200,50,50,.06);border-color:rgba(200,50,50,.3);color:var(--dead)}
+/* CROSS-PILLAR POPUP */
+.cross-popup{margin-top:6px;padding:12px 14px;background:var(--bg1);border:1px solid rgba(62,207,160,.35);border-radius:6px;animation:dropIn .18s ease}
+.cross-popup-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:8px}
+.cross-popup-desc{font-size:12px;color:var(--t1);margin-bottom:8px;line-height:1.5}
+.cross-popup-btns{display:flex;gap:6px;flex-wrap:wrap}
+/* DETAIL PANEL */
+#det{display:none;padding:26px;margin-bottom:22px;background:var(--bg2);border:1px solid var(--gold-lo);border-radius:var(--r);position:relative}
+#det::before{content:'';position:absolute;inset:3px;border:1px solid rgba(201,168,76,.05);border-radius:5px;pointer-events:none}
+#det.open{display:block;animation:rise .2s ease}
+.dth{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.dttl{font-family:'Cinzel',serif;font-size:19px;font-weight:600;color:var(--t0)}
+.dtcl{margin-left:auto;background:none;border:none;color:var(--t2);font-size:22px;cursor:pointer;padding:4px;transition:color .18s}
+.dtcl:hover{color:var(--t0)}
+.status-warn{border-radius:6px;padding:10px 14px;font-size:13px;margin-bottom:14px;line-height:1.5}
+.status-warn.sick{background:rgba(224,112,32,.1);border:1px solid rgba(224,112,32,.4);color:var(--sick)}
+.status-warn.dead{background:rgba(200,50,50,.1);border:1px solid rgba(200,50,50,.4);color:var(--dead)}
+.lvlist{display:flex;flex-direction:column;gap:10px}
+.lv{display:flex;gap:14px;padding:13px 15px;background:var(--bg1);border:1px solid var(--t3);border-radius:6px;transition:all .2s}
+.lv.ld{border-color:rgba(62,207,160,.18);background:rgba(62,207,160,.025)}
+.lv.ln{border-color:var(--gold-lo);background:var(--ga)}
+.lv.lp{border-color:rgba(201,168,76,.28);background:var(--ga);animation:pulse 2s ease-in-out infinite}
+.lv.ll{opacity:.2}
+.lvb{min-width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:11px;font-weight:600;flex-shrink:0;margin-top:2px}
+.bd{background:rgba(62,207,160,.2);color:var(--teal)}.bn{background:rgba(201,168,76,.2);color:var(--gold)}.bp{background:rgba(224,160,48,.2);color:var(--amber)}.bl{background:var(--bg4);color:var(--t2)}
+.lvbody{flex:1}
+.lvnm{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--t0);margin-bottom:3px}
+.lvrew{font-size:14px;color:var(--t1);margin-bottom:6px;line-height:1.5}
+.lvtag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-family:'Cinzel',serif;letter-spacing:.06em;border:1px solid currentColor;margin-bottom:6px}
+.lvcost{font-size:11px;color:var(--t2)}
+.lvacts{margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* LOG */
+#logp{margin-bottom:32px}
+.logh{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--t1);margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.logh::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.2),transparent)}
+.logi{display:flex;gap:12px;padding:7px 12px;border-left:2px solid var(--t3);margin-bottom:4px;font-size:13px}
+.logi:first-child{border-left-color:var(--gold-lo)}
+.logts{font-family:'Cinzel',serif;font-size:10px;color:var(--t2);white-space:nowrap;padding-top:2px;min-width:36px}
+.logmsg{color:var(--t1);line-height:1.5}
+.logwho{font-family:'Cinzel',serif;font-size:10px;color:var(--gold)}
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--bg3);border:1px solid var(--gold-lo);color:var(--t0);font-size:14px;font-family:'Cinzel',serif;padding:10px 26px;border-radius:6px;opacity:0;pointer-events:none;transition:all .28s;z-index:300;white-space:nowrap;box-shadow:0 8px 40px rgba(0,0,0,.7)}
+#toast.e{border-color:#7a1818;color:#e05050}#toast.w{border-color:var(--sick);color:var(--sick)}#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:600px){#hdr{padding:0 12px;gap:8px}#ct{padding:12px 12px 48px}.cgrid{gap:10px}.cc{width:128px;padding:18px 10px 16px}.ltitle{font-size:26px}.hwk,.hmoralbox{display:none}}
+</style>
+</head>
+<body>
+
+<div id="login"><div class="lw">
+<h1 class="ltitle">Pilares da Cidade Perdida</h1>
+<p class="lsub">Campanha · Registro de Progressos</p>
+<div class="ldeco"><div class="gem"></div><div class="orn" style="flex:1;max-width:320px"><span>◆</span></div><div class="gem"></div></div>
+<p style="font-family:'Cinzel',serif;font-size:12px;color:var(--t1);letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px">Escolha seu aventureiro</p>
+<div class="cgrid">
+<div class="cc" onclick="L('Magne')"><div class="ci" style="color:var(--blue)"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="32" y1="9" x2="32" y2="55"/><path d="M32 15 Q21 19 17 25 Q21 30 32 27"/><path d="M32 15 Q43 19 47 25 Q43 30 32 27"/><path d="M32 38 Q21 36 17 43 Q21 49 32 47"/><path d="M32 38 Q43 36 47 43 Q43 49 32 47"/><circle cx="32" cy="32" r="3.5" fill="currentColor" stroke="none"/></svg></div><div class="cn">Magne</div><div class="ccls">Bárbaro</div></div>
+<div class="cc" onclick="L('André')"><div class="ci" style="color:var(--amber)"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="32" y1="7" x2="32" y2="46"/><line x1="19" y1="19" x2="45" y2="19"/><path d="M27 46 Q32 55 37 46"/><rect x="13" y="28" width="15" height="18" rx="3"/><path d="M13 37 Q20.5 43 28 37"/></svg></div><div class="cn">André</div><div class="ccls">Guerreiro</div></div>
+<div class="cc" onclick="L('Klaus')"><div class="ci" style="color:var(--teal)"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="21"/><circle cx="32" cy="32" r="11"/><line x1="32" y1="21" x2="32" y2="11"/><line x1="32" y1="53" x2="32" y2="43"/><line x1="21" y1="32" x2="11" y2="32"/><line x1="53" y1="32" x2="43" y2="32"/><circle cx="32" cy="32" r="3.5" fill="currentColor" stroke="none" opacity=".75"/></svg></div><div class="cn">Klaus</div><div class="ccls">Monge</div></div>
+<div class="cc" onclick="L('Barunt')"><div class="ci" style="color:var(--rose)"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="11" y="36" width="42" height="15" rx="3"/><rect x="15" y="27" width="34" height="11" rx="2"/><rect x="20" y="18" width="14" height="11" rx="2"/><line x1="32" y1="51" x2="32" y2="58"/><line x1="43" y1="17" x2="53" y2="9"/><rect x="49" y="5" width="11" height="7" rx="1.5" transform="rotate(12 49 5)" fill="currentColor" stroke="none" opacity=".85"/></svg></div><div class="cn">Barunt</div><div class="ccls">Clérigo de Moradin</div></div>
+<div class="cc gm" onclick="oGM()"><div class="ci" style="color:var(--rose)"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 42 L15 20 L26 34 L32 13 L38 34 L49 20 L55 42 Z"/><line x1="9" y1="46" x2="55" y2="46"/><line x1="9" y1="51" x2="55" y2="51"/><circle cx="32" cy="13" r="3" fill="currentColor" stroke="none"/><circle cx="15" cy="20" r="2.5" fill="currentColor" stroke="none"/><circle cx="49" cy="20" r="2.5" fill="currentColor" stroke="none"/></svg></div><div class="cn">GM</div><div class="ccls">Mestre ✦ Senha</div></div>
+</div></div></div>
+
+<div id="gmm"><div class="mbox"><h3>◆ Acesso Restrito ◆</h3><div class="merr" id="gerr"></div><input type="password" id="gpwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')cGM()"><div class="mbtns"><button class="btn btn-gm btn-sm" onclick="cGM()">Entrar</button><button class="btn btn-sm" onclick="xGM()">Cancelar</button></div></div></div>
+
+<div id="ppick"><div class="ppw">
+  <div class="pptitle">Bem-vindo de volta,</div>
+  <div class="ppname" id="ppname">—</div>
+  <div class="ppask">Qual pilar você irá cuidar esta semana?</div>
+  <div class="ppgrid" id="ppgrid"></div>
+</div></div>
+
+<div id="psum"><div class="psbox">
+  <div class="psi" id="psi"></div>
+  <div class="psname" id="psname"></div>
+  <div class="pssub" id="pssub"></div>
+  <div class="pstxt" id="pstxt"></div>
+  <div class="pstxt2" id="pstxt2" style="display:none"></div>
+  <div class="psbtns" id="psbtns"></div>
+</div></div>
+
+<div id="app">
+<header id="hdr">
+<div class="hav" id="hav"></div>
+<div><div class="hnm" id="hnm">—</div><div class="hcls" id="hcls">—</div></div>
+<div class="hsep"></div>
+<div class="hwk" id="hwk">Semana 1</div>
+<div class="hmoralbox"><span class="hmoral-lbl">Moral</span><span class="hmoral-val" id="hmoralv">0</span></div>
+<div class="hr">
+<div id="gmtog" style="display:none"><button class="btn btn-gm btn-sm" onclick="tGMP()">⚙ GM</button></div>
+<button class="bexit" onclick="logout()">Sair ⇤</button>
+</div></header>
+
+<div id="ct">
+<div id="rb">
+<div class="dtw"><div class="dtl">Pontos de Esforço — Semana Atual</div><div class="dtt"><div class="dtf" id="dtf"></div></div><div class="dtn"><b id="dtav">7</b> / <span id="dttot">7</span> PE disponíveis</div></div>
+</div>
+
+<div id="nevbanner">🌫️ NÉVOA DE CINZAS ATIVA — Todos os upgrades custam +1 PE · Todos os testes com desvantagem</div>
+
+<div id="gmp">
+<div class="gmtitle">⚙ Painel do Mestre — Controle Total</div>
+
+<div class="gmsec">
+<div class="gmslbl">Semana &amp; PE Base</div>
+<div class="gmrow">
+<div class="gmgrp"><span class="gmlbl">Semana</span><input class="gminp" id="gwk" type="number" value="1" min="1" max="99"><button class="btn btn-gm btn-sm" onclick="gmWk()">▶ Ir</button></div>
+<div class="gmgrp"><span class="gmlbl">PE base/jogador</span><input class="gminp" id="gdtt" type="number" value="7" min="1" max="99"><button class="btn btn-gm btn-sm" onclick="gmPE()">✓</button></div>
+<button class="btn btn-sm" onclick="gmClearPE()">🔄 Resetar PE</button>
+</div></div>
+
+<div class="gmsec">
+<div class="gmslbl">Moral (-4 a +2)</div>
+<div class="gmrow">
+<button class="btn btn-gm btn-sm" onclick="gmMoral(-1)">▼ −1</button>
+<span id="gmoraldisp" style="font-family:'Cinzel',serif;font-size:13px;color:var(--gold);min-width:130px;text-align:center">+0 — Neutra</span>
+<button class="btn btn-gm btn-sm" onclick="gmMoral(1)">▲ +1</button>
+<div class="gmgrp" style="margin-left:8px"><span class="gmlbl">Definir</span><input class="gminp" id="gmoralinp" type="number" value="0" min="-4" max="2"><button class="btn btn-gm btn-sm" onclick="gmSetMoral()">✓</button></div>
+</div></div>
+
+<div class="gmsec">
+<div class="gmslbl">Névoa de Cinzas</div>
+<div class="gmrow"><button class="btn btn-sm" id="gnevbtn" onclick="gmToggleNevoa()">🌫️ Ativar Névoa</button></div>
+</div>
+
+<div class="gmsec">
+<div class="gmslbl">Controle de Pilares (Status · Níveis · PE Modificador)</div>
+<div class="gmpilar-grid" id="gmpilar-grid"></div>
+</div>
+
+<div class="gmsec">
+<div class="gmslbl">Geral</div>
+<div class="gmrow">
+<button class="btn btn-danger btn-sm" onclick="if(confirm('Resetar tudo?'))gmReset()">↺ Reset Total</button>
+<button class="btn btn-danger btn-sm" onclick="gmClearAssignments()">✕ Limpar Atribuições</button>
+</div></div>
+</div>
+
+<div id="fg"></div>
+<div id="det"></div>
+<div id="logp"><div class="logh">Registro de atividades</div><div id="loge"></div></div>
+</div></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ═══════════════ DADOS ═══════════════
+const FD={
+muralhas:{name:'Muralhas',icon:'🏰',c:'cb',a:'var(--blue)',p:'blue',levels:[
+{pe:2,name:'Pontos Críticos Selados',tag:'Resistência Mínima',hab:'FOR (Atletismo) CD 15',txt:'Torna a muralha resistente, com isso pode ser mais fácil defender a cidade.',rew:'Habilita a magnitude Fácil (CD 15) do evento de Ataque, representando uma cidade mais preparada para investidas menores.'},
+{pe:3,name:'Catapultas e Balistas Recuperadas',tag:'Autonomia Defensiva',hab:'CON CD 20',txt:'Com armas como estas, ondas menores de eivados podem ser repelidas sem dificuldades, e as maiores ficarão mais fáceis.',rew:'Eventos de Ataque Fáceis não gastam PE para defender. Ataques Normais custam apenas 1 PE. Ataques Difíceis podem ser jogados com vantagem.'},
+{pe:3,name:'Torres de Vigia Operacionais',tag:'Posicionamento',hab:'SAB (Percepção) CD 15 · DES (Acrobacia) CD 20',txt:'Sistema de sinais funcionando. Ataques detectados a tempo de montar posição defensiva.',rew:'O herói da Muralha pode convocar outros heróis para a defesa. Custo: 1 PE de cada herói convocado + 1 PE do herói da Muralha. Cada herói adicional contribui com +1d10 no teste de defesa.'},
+{pe:4,name:'Patrulhas Externas',tag:'Investida de Desgaste',hab:'DES (Furtividade) CD 25 · SAB (Sobrevivência) CD 18',txt:'É melhor realizarmos em grupos pequenos, pequenas incursões que saem pelos arredores para interceptar eivados antes que se organizem em ondas maiores.',rew:'Antes do teste de defesa, o herói pode gastar 2 PE para reduzir a magnitude do ataque em 1 nível (uma vez por ataque). Reduz em 10% a chance base do evento de Ataque.'},
+{pe:5,name:'O Baluarte',tag:'⭐ Fortaleza',hab:'FOR (Atletismo) CD 35 · DES (Acrobacia) CD 20',txt:'A cidade finalmente se torna uma fortaleza. Suas muralhas são impenetráveis, capazes de repelir automaticamente ataques de magnitude Fácil ou Normal.',rew:'Repele automaticamente ataques Fáceis e Normais. O herói pode declarar Semana de Fortaleza: eventos de Ataque não causam perda de níveis. Com Torres de Vigia ativas, heróis convocados contribuem com 1d20 inteiro em vez de 1d10.'}]},
+aqueduto:{name:'Infraestrutura',icon:'🏗️',c:'ct',a:'var(--teal)',p:'teal',levels:[
+{pe:3,name:'Aqueduto Restaurado',tag:'Saneamento Básico',hab:'SAB (Sobrevivência) CD 10 · DES (Acrobacia) CD 15',txt:'Água potável para todos beberem e banhar-se.',rew:'Água potável para toda a cidade. Reduz em 10% a chance do evento de Doença.'},
+{pe:3,name:'Forja Operacional',tag:'Esforços Médicos',hab:'DES (Ferramentas de Ferreiro) CD 15 · CON CD 15',txt:'Com a Forja funcionando, ferramentas são produzidas localmente e podemos consertar as quebradas, além de construir carrinhos para movê-las.',rew:'Desbloqueia Esforços Médicos: gaste 2 PE para remover o marcador de Doença de qualquer pilar afetado. Upgrades da Muralha custam 1 PE a menos.'},
+{pe:5,name:'Estruturas Restauradas',tag:'Sólido como Pedra',hab:'SAB (Sobrevivência) CD 25',txt:'Com rachaduras reforçadas e buracos selados, as casas finalmente oferecem abrigo real contra o vento e a chuva. Não dormimos mais no frio.',rew:'Reduz mais 10% a chance de Doença. O evento de Chuva Forte não desfaz mais upgrades — estruturas bem mantidas resistem à natureza.'},
+{pe:3,name:'Rede de Mensageiros',tag:'Comunicação',hab:'DES (Atletismo) CD 30',txt:'Restaurar torres de vigia exige deslocamento até locais distantes. Uma vez ativas, melhoram a comunicação da cidade.',rew:'Contato com Olho Âmbar por 1 PE, reduzindo em 1 o custo de PE da semana seguinte. Heróis podem auxiliar outros pilares por 2 PE. Herói da Moral pode gastar 2 PE para forçar evento de Moral.'},
+{pe:1,name:'Rede Hídrica Avançada',tag:'⭐ Infraestrutura Restituída',hab:'INT (Investigação) CD 60 · SAB (Percepção) CD 40',txt:'Uma cidade que se preze precisa de hidráulica excepcional: canos bem projetados, dutos sem gargalos, conduítes fechados e cuidado arcano. Exige mente afiadíssima.',rew:'Reduz em 30% a chance de Doença. Upgrades de todos os pilares custam 1 PE a menos. Alquimia e poções tornam-se mais poderosas.'}]},
+comando:{name:'Salão de Comando',icon:'🗺️',c:'ca',a:'var(--amber)',p:'amber',levels:[
+{pe:1,name:'Salão Limpo e Operacional',tag:'Análise Operacional',hab:'INT (Investigação) CD 15',txt:'Com um lugar limpo e bem estruturado é possível planejar bem o próximo passo.',rew:'O próximo nível de cada pilar passa a ser visível para todos — jogadores podem ver o upgrade seguinte além do atual disponível.'},
+{pe:2,name:'Mesa de Planejamento',tag:'Mesa de Planejamento',hab:'INT (Investigação) CD 10 · SAB (Atletismo) CD 15',txt:'Há muitos papéis de relatório chegando dos pilares. Sem organização não é fácil distribuir corretamente os esforços.',rew:'O herói do Salão pode redistribuir até 3 PE não gastos de um herói para outro, uma vez por semana. O texto completo e os efeitos mecânicos de todos os upgrades visíveis são revelados a todos.'},
+{pe:4,name:'Arquivo Histórico',tag:'Planta Baixa',hab:'SAB (História) CD 20',txt:'Com certeza nessa papelada há uma planta baixa da cidade, construções, túneis e informações que ajudam a entender melhor em qual pilar focar.',rew:'Reduz em 2 a CD de todos os testes de melhoria. Habilidades exigidas, CDs e recompensa final de cada pilar são revelados antes mesmo de iniciar o próximo upgrade.'},
+{pe:3,name:'Análise Probabilística',tag:'Previsão Estratégica',hab:'SAB (Percepção) CD 30',txt:'As coisas não acontecem aleatoriamente — é possível prevê-las. O cheiro de orvalho antes de uma chuva, o tremor de um exército marchando.',rew:'Por 1 PE, o herói pode prever os eventos da próxima semana. Se qualquer pilar encerrar a semana com 1 PE ou mais sobrando, inicia a próxima com 8 PE.'},
+{pe:7,name:'Comando Unificado',tag:'⭐ Coordenação Exímia',hab:'—',txt:'A coordenação deve estar perfeita. Todos sabem o seu lugar, onde atuar e no momento certo.',rew:'Com a Rede de Mensageiros ativa, heróis não gastam PE para auxiliar outros pilares. Podem auxiliar até duas vezes por semana.'}]},
+moral:{name:'Moral',icon:'🫂',c:'cr',a:'var(--rose)',p:'rose',levels:[
+{pe:2,name:'Segunda Chance',tag:'Não É Bem Assim',hab:'CAR (Enganação) CD 15',txt:'Talvez você possa ter sido mal interpretado.',rew:'Por 1 PE, permite rejogar um teste falho de evento de Moral. Após o uso, fica indisponível por uma semana.'},
+{pe:3,name:'Discurso de Propósito',tag:'Motivação',hab:'CAR (Persuasão) CD 15 · SAB (Percepção) CD 15',txt:'Com a motivação certa, as pessoas podem dar mais de si do que imaginam. É para isso que serve o discurso antes das grandes batalhas.',rew:'Uma vez por semana, escolha um pilar: os PE investidos nele nessa semana custam 1 a menos. Não acumula com outros descontos.'},
+{pe:4,name:'Cultura de Resistência',tag:'Sobrevivência',hab:'CAR (Persuasão) CD 18 · SAB (Intuição) CD 20',txt:'Os soldados do Leste não são voluntários ingênuos — sabem que uma falha não é esforço perdido, é sobrevivência.',rew:'PE gastos em um teste de melhoria são reduzidos à metade (arredondado para baixo). O herói da Moral pode gastar 2 PE para conceder vantagem no próximo teste de melhoria de qualquer pilar.'},
+{pe:4,name:'Noite de Celebração',tag:'Descontração',hab:'CAR (Performance) CD 20',txt:'Bebidas, uma fogueira e histórias de vitória pela cidade inteira. É assim que os soldados se divertem.',rew:'Gaste 4 PE para melhorar o nível de Moral base em 1 ponto, ignorando o teto Neutro. Fica indisponível por duas semanas após o uso.'},
+{pe:4,name:'A Cidade Respira',tag:'⭐ A Cidade Está Viva',hab:'CAR (qualquer) CD 50',txt:'A moral deixou de ser frágil e se tornou força. Este lugar já não é mais uma cidade abandonada — é uma resistência, uma força, um lar. Chegou a hora de nomeá-la.',rew:'Com Moral ≥ 0: todos recebem +1 PE por semana. Com Moral Boa: bônus mantido. Com Moral Excelente: todos os testes com vantagem — testes que já possuem vantagem passam a ter vantagem tripla.'}]}
+};
+
+// Textos completos (versão longa do PDF) para a tela de escolha
+const PFULL={
+muralhas:{
+  resumo:'Defesa da cidade. Sem ela, ataques podem destruir progresso e reduzir níveis de melhorias. Um bom estrategista de guerra pode fazer a diferença… mas não se esqueça: muralhas não se erguem com planos, e sim com pedras... pedras pesadas, trabalho duro e estratégia.',
+  completo:'Uma cidade sem defesas é apenas uma promessa esperando para ser destruída. As muralhas representam proteção, presença militar e a capacidade de resistir ao que espreita do lado de fora.\n\nSe os jogadores ignorarem este pilar, a qualquer momento podem ocorrer ataques surpresa dos eivados. No início, serão investidas pequenas, quase testes. Mas, sem preparo, mesmo um ataque menor pode causar estragos sérios. Estruturas recém-construídas podem ser danificadas, trabalhadores entram em pânico e a moral da cidade despenca.\n\nUm ataque bem-sucedido pode reduzir até 2 níveis de melhorias já conquistadas. Isso não é apenas perda de progresso, é retrocesso real.\n\nInvestir em muralhas não é apenas defesa. É estabilidade. É garantir que o que foi construído continue existindo.'
+},
+aqueduto:{
+  resumo:'Sustentação da cidade. Inclui aquedutos, construções e manutenção geral. Sem ela, a cidade adoece, estruturas falham e a reconstrução se torna ineficiente. Manter tudo funcionando exige mente afiada, olhar atento e mãos firmes.',
+  completo:'A infraestrutura é tudo aquilo que mantém a cidade funcionando de verdade: aquedutos, forjas, armazéns, oficinas. O aqueduto continua sendo uma peça central, responsável por trazer e purificar a água das montanhas distantes, mas ele é apenas parte de um sistema maior. Sem manutenção constante, tudo começa a falhar.\n\nÁgua é vida. Estrutura é sobrevivência.\n\nSe ignorada, as ferramentas que quebrarem não poderão ser reconstruídas sem uma forja, os enfermos não poderão ser tratados sem a água limpa dos aquedutos, e as estruturas rachadas cairão na primeira gota de uma chuva forte. Eventualmente, a cidade entra em colapso funcional.\n\nInfraestrutura não chama atenção como muralhas… mas quando ela falha, tudo falha junto.'
+},
+comando:{
+  resumo:'Centro estratégico. Melhora a eficiência geral da reconstrução a longo prazo. Estar no salão exige pulso firme: todos podem opinar, mas é você quem define a distribuição final dos esforços. Além disso, é aqui que o planejamento acontece... permitindo enxergar um passo à frente dos outros.',
+  completo:'O Salão de Comando é o verdadeiro centro da reconstrução. Instalado no antigo castelo da cidade, é de onde partem todas as decisões estratégicas. É aqui que os esforços são organizados, que prioridades são definidas e que o futuro da cidade é planejado.\n\nDiferente dos outros pilares, ignorá-lo não causa problemas imediatos. A cidade não desmorona, não falta água, não sofre ataques diretos por isso. Mas o preço vem com o tempo: recursos são mal distribuídos, esforços são desperdiçados, o progresso é mais lento do que poderia ser.\n\nInvestir nele cedo não gera impacto imediato visível. Mas quanto antes ele for restaurado, mais eficiente se torna toda a reconstrução. É o tipo de escolha que separa um grupo que sobrevive… de um grupo que prospera.'
+},
+moral:{
+  resumo:'Espírito das pessoas. Afeta diretamente o rendimento e a estabilidade da cidade. Saber quando dar descanso a um soldado e quando exigir mais dele é o que separa o sucesso da derrota. Dar folga é fácil… exigir de um soldado sem quebrar a vontade dele ou fazê-lo odiar exige verdadeiro carisma.',
+  completo:'Vocês acabaram de sair de uma guerra. Muitos morreram. Outros fugiram para o leste, buscando segurança. Quem ficou… escolheu ficar.\n\nAs casas de Porto Norte, Porto Sul, Porto Carga e Garra do Urso são tudo o que resta com vocês. E os que ficaram estão agora diante de uma cidade destruída há séculos, tentando acreditar que aquilo ainda pode ser salvo. A moral de vocês começa baixa. Muito baixa.\n\nSe ignorada, a situação se deteriora rapidamente: trabalhadores rendem menos, pessoas desistem, aliados abandonam a reconstrução. Em casos extremos, revoltas podem surgir contra o próprio conclave.\n\nPor outro lado, investir em moral transforma tudo. Pessoas trabalham com mais vontade, a cidade ganha vida novamente, a reconstrução acelera naturalmente. Moral não é apenas um bônus. É o que mantém tudo de pé quando o resto começa a falhar.'
+}
+};
+
+const ML={2:'Excelente',1:'Boa',0:'Neutra','-1':'Insatisfeita','-2':'Ruim','-3':'Péssima','-4':'Nula'};
+const OR=['muralhas','aqueduto','comando','moral'];
+const CH={Magne:{cls:'Bárbaro',col:'var(--blue)'},André:{cls:'Guerreiro',col:'var(--amber)'},Klaus:{cls:'Monge',col:'var(--teal)'},Barunt:{cls:'Clérigo de Moradin',col:'var(--rose)'},GM:{cls:'Mestre da Campanha',col:'var(--rose)'}};
+const SV={
+Magne:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="32" y1="9" x2="32" y2="55"/><path d="M32 15 Q21 19 17 25 Q21 30 32 27"/><path d="M32 15 Q43 19 47 25 Q43 30 32 27"/><path d="M32 38 Q21 36 17 43 Q21 49 32 47"/><path d="M32 38 Q43 36 47 43 Q43 49 32 47"/><circle cx="32" cy="32" r="3.5" fill="currentColor" stroke="none"/></svg>`,
+André:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="32" y1="7" x2="32" y2="46"/><line x1="19" y1="19" x2="45" y2="19"/><path d="M27 46 Q32 55 37 46"/><rect x="13" y="28" width="15" height="18" rx="3"/><path d="M13 37 Q20.5 43 28 37"/></svg>`,
+Klaus:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="21"/><circle cx="32" cy="32" r="11"/><line x1="32" y1="21" x2="32" y2="11"/><line x1="32" y1="53" x2="32" y2="43"/><line x1="21" y1="32" x2="11" y2="32"/><line x1="53" y1="32" x2="43" y2="32"/><circle cx="32" cy="32" r="3.5" fill="currentColor" stroke="none" opacity=".75"/></svg>`,
+Barunt:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="11" y="36" width="42" height="15" rx="3"/><rect x="15" y="27" width="34" height="11" rx="2"/><rect x="20" y="18" width="14" height="11" rx="2"/><line x1="32" y1="51" x2="32" y2="58"/><line x1="43" y1="17" x2="53" y2="9"/><rect x="49" y="5" width="11" height="7" rx="1.5" transform="rotate(12 49 5)" fill="currentColor" stroke="none" opacity=".85"/></svg>`,
+GM:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 42 L15 20 L26 34 L32 13 L38 34 L49 20 L55 42 Z"/><line x1="9" y1="46" x2="55" y2="46"/><line x1="9" y1="51" x2="55" y2="51"/><circle cx="32" cy="13" r="3" fill="currentColor" stroke="none"/><circle cx="15" cy="20" r="2.5" fill="currentColor" stroke="none"/><circle cx="49" cy="20" r="2.5" fill="currentColor" stroke="none"/></svg>`};
+
+// ═══════════════ ESTADO ═══════════════
+const KEY='acidade_v6';
+function mkFront(){return{level:0,pending:null,peUsed:0,peMod:0,peGifted:0,status:'normal',enfermoWeek:null,discursoBuff:false,resistenciaBuff:false,discourseUsed:false,mesaUsed:false,oAmbarUsed:false,forcarMoralUsed:false,ajudado:false}}
+function fresh(){return{week:1,peTotal:7,moral:0,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,assignments:{},fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
+function load(){try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s),f=fresh();f.week=d.week||1;f.peTotal=d.peTotal||7;f.moral=d.moral||0;f.nevoa=!!d.nevoa;f.oAmbarBuff=!!d.oAmbarBuff;f.oAmbarNextWeek=!!d.oAmbarNextWeek;f.assignments=d.assignments||{};f.log=d.log||[];if(d.fronts)OR.forEach(k=>{if(d.fronts[k])f.fronts[k]={...f.fronts[k],...d.fronts[k]}});return f}}catch(e){}return fresh()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
+let G=load(),P=null,SF=null,TT=null,PPending=null,CrossPopup=null;
+
+// ═══════════════ HELPERS ═══════════════
+function myPillar(){return G.assignments[P]||null}
+function pillarOwner(fid){return Object.keys(G.assignments).find(k=>G.assignments[k]===fid)||null}
+function isOwner(fid){return P==='GM'||G.assignments[P]===fid}
+function salaoLv(){return G.fronts.comando.level}
+function hasAnalise(){return salaoLv()>=1}   // vê próximo upgrade
+function hasMesa()  {return salaoLv()>=2}    // vê texto completo
+function hasArquivo(){return salaoLv()>=3}   // vê hab + CD
+// PE total para um pilar específico (base + modificador)
+function pillarTotalPE(fid){return Math.max(1,G.peTotal+(G.fronts[fid].peMod||0))}
+function myAvailPE(){if(P==='GM')return G.peTotal;const mp=myPillar();if(!mp)return 0;return Math.max(0,pillarTotalPE(mp)-(G.fronts[mp].peUsed||0)+(G.fronts[mp].peGifted||0))}
+function efectivePE(base,fid){let c=base;if(G.nevoa)c+=1;if(G.moral>=1)c=Math.max(1,c-1);if(G.moral<=-1)c+=1;if(G.oAmbarBuff)c=Math.max(1,c-1);if(fid&&G.fronts[fid].discursoBuff)c=Math.max(1,c-1);return Math.max(1,c)}
+function mlabel(){return ML[String(G.moral)]||'?'}
+function alog(who,msg){G.log.unshift({w:G.week,who,msg});if(G.log.length>80)G.log.pop()}
+
+// ═══════════ CROSS-PILAR CHECKS (PDF-completo) ═══════════
+// INFRA: Esforços Médicos — doença OU enfermo, mostra popup mesmo sem nível 2
+function canShowEsforcos(targetFid){return G.assignments[P]==='aqueduto'&&(G.fronts[targetFid].status==='doenca'||G.fronts[targetFid].status==='enfermo')&&targetFid!=='aqueduto'}
+function canUseEsforcosMedicos(targetFid){return canShowEsforcos(targetFid)&&G.fronts.aqueduto.level>=2}
+// INFRA: Olho Âmbar — Rede de Mensageiros (nível 4), clica no Salão
+function canShowOAmbar(targetFid){return G.assignments[P]==='aqueduto'&&G.fronts.aqueduto.level>=4&&!G.fronts.aqueduto.oAmbarUsed&&targetFid==='comando'}
+// INFRA: Auxiliar (Rede) — qualquer pilar pode receber ajuda, 2 PE, 1x/semana por pilar
+function canShowAjuda(targetFid){return G.fronts.aqueduto.level>=4&&!isOwner(targetFid)&&!G.fronts[targetFid].ajudado&&myAvailPE()>=2}
+// MORAL: Discurso de Propósito
+function canShowDiscurso(targetFid){return G.assignments[P]==='moral'&&G.fronts.moral.level>=2&&!G.fronts.moral.discourseUsed&&targetFid!=='moral'}
+// MORAL: Cultura de Resistência
+function canShowResistencia(targetFid){return G.assignments[P]==='moral'&&G.fronts.moral.level>=3&&targetFid!=='moral'}
+// MORAL: Forçar Evento Moral (via Rede de Mensageiros) — aparece no próprio painel da Moral
+function canForcarMoral(){return G.assignments[P]==='moral'&&G.fronts.aqueduto.level>=4&&!G.fronts.moral.forcarMoralUsed}
+// SALÃO: Mesa de Planejamento — redistribui PE, 1x/semana
+function canShowMesa(targetFid){return G.assignments[P]==='comando'&&G.fronts.comando.level>=2&&!G.fronts.comando.mesaUsed&&targetFid!=='comando'}
+// Qualquer ação cross disponível para este card?
+function hasCross(targetFid){return canShowEsforcos(targetFid)||canShowOAmbar(targetFid)||canShowAjuda(targetFid)||canShowDiscurso(targetFid)||canShowResistencia(targetFid)||canShowMesa(targetFid)}
+
+// ═══════════════ LOGIN / PICK ═══════════════
+function L(n){P=n;document.getElementById('login').style.display='none';const ch=CH[n],av=document.getElementById('hav');av.innerHTML=SV[n]||SV.GM;av.style.color=ch.col;document.getElementById('hnm').textContent=n;document.getElementById('hcls').textContent=ch.cls;if(n==='GM'){document.getElementById('gmtog').style.display='block';document.getElementById('app').style.display='block';render()}else showPillarPick(n)}
+function showPillarPick(name){
+  document.getElementById('ppname').textContent=name;
+  const grid=document.getElementById('ppgrid');grid.innerHTML='';
+  const taken=Object.entries(G.assignments).filter(([k])=>k!==name).map(([,v])=>v);
+  OR.forEach(fid=>{
+    const fd=FD[fid],isTaken=taken.includes(fid),isMine=G.assignments[name]===fid;
+    const c=document.createElement('div');
+    c.className='ppc'+(isMine?' psel':'')+(isTaken?' pdis':'');c.dataset.fid=fid;
+    const lbl=isTaken?`<div class="ppc-taken">Em uso: ${pillarOwner(fid)}</div>`:'<div class="ppc-tag">Clique para saber mais</div>';
+    c.innerHTML=`<div class="ppc-icon">${fd.icon}</div><div class="ppc-name">${fd.name}</div>${lbl}`;
+    if(!isTaken)c.onclick=()=>openPSum(fid);
+    grid.appendChild(c);
+  });
+  document.getElementById('ppick').classList.add('open');
+}
+function openPSum(fid){
+  PPending=fid;const fd=FD[fid],pf=PFULL[fid];
+  document.getElementById('psi').textContent=fd.icon;
+  document.getElementById('psname').textContent=fd.name;
+  document.getElementById('pssub').textContent='Visão Geral';
+  document.getElementById('pstxt').textContent=pf.resumo;
+  document.getElementById('pstxt2').textContent=pf.completo;
+  document.getElementById('pstxt').style.display='block';
+  document.getElementById('pstxt2').style.display='none';
+  document.getElementById('psbtns').innerHTML=`
+    <button class="btn" onclick="expandPSum()">📖 Ler descrição completa</button>
+    <button class="btn" onclick="confirmPillar()">✦ Assumir este Pilar</button>
+    <button class="btn" onclick="closePSum()">← Voltar</button>`;
+  document.querySelectorAll('.ppc').forEach(el=>{el.classList.remove('psel');if(el.dataset.fid===fid)el.classList.add('psel')});
+  document.getElementById('psum').classList.add('open');
+}
+function expandPSum(){
+  document.getElementById('pssub').textContent='Descrição Completa';
+  document.getElementById('pstxt').style.display='none';
+  document.getElementById('pstxt2').style.display='block';
+  document.getElementById('psbtns').innerHTML=`
+    <button class="btn" onclick="confirmPillar()">✦ Confirmar e jogar</button>
+    <button class="btn" onclick="backPSum()">← Voltar ao resumo</button>`;
+}
+function backPSum(){
+  document.getElementById('pssub').textContent='Visão Geral';
+  document.getElementById('pstxt').style.display='block';
+  document.getElementById('pstxt2').style.display='none';
+  document.getElementById('psbtns').innerHTML=`
+    <button class="btn" onclick="expandPSum()">📖 Ler descrição completa</button>
+    <button class="btn" onclick="confirmPillar()">✦ Assumir este Pilar</button>
+    <button class="btn" onclick="closePSum()">← Voltar</button>`;
+}
+function closePSum(){document.getElementById('psum').classList.remove('open');document.getElementById('pstxt2').style.display='none';document.getElementById('pstxt').style.display='block'}
+function confirmPillar(){
+  if(!PPending)return;
+  G.assignments[P]=PPending;
+  if(!G.fronts[PPending].peUsed)G.fronts[PPending].peUsed=0;
+  save();
+  document.getElementById('psum').classList.remove('open');
+  document.getElementById('ppick').classList.remove('open');
+  SF=PPending; // auto-abre o pilar do jogador
+  document.getElementById('app').style.display='block';
+  render();
+}
+
+// ═══════════════ GM AUTH ═══════════════
+function oGM(){document.getElementById('gmm').classList.add('open');document.getElementById('gpwd').value='';document.getElementById('gerr').textContent='';setTimeout(()=>document.getElementById('gpwd').focus(),40)}
+function xGM(){document.getElementById('gmm').classList.remove('open')}
+function cGM(){if(document.getElementById('gpwd').value==='Alex@200'){xGM();L('GM')}else{document.getElementById('gerr').textContent='Senha incorreta.';document.getElementById('gpwd').value='';document.getElementById('gpwd').focus()}}
+function logout(){P=null;SF=null;PPending=null;CrossPopup=null;document.getElementById('app').style.display='none';document.getElementById('ppick').classList.remove('open');document.getElementById('psum').classList.remove('open');document.getElementById('login').style.display='flex';document.getElementById('gmp').classList.remove('open');document.getElementById('gmtog').style.display='none'}
+function tGMP(){document.getElementById('gmp').classList.toggle('open')}
+
+// ═══════════════ RENDER ═══════════════
+function render(){
+  if(!P)return;
+  document.getElementById('hwk').textContent='Semana '+G.week;
+  const mv=G.moral,mc=mv>=1?'var(--teal)':mv<=-1?'var(--rose)':'var(--gold)';
+  const hm=document.getElementById('hmoralv');hm.textContent=`${mv>=0?'+':''}${mv} ${mlabel()}`;hm.style.color=mc;
+  const mp=myPillar(),ptotal=mp?pillarTotalPE(mp):G.peTotal;
+  const av=myAvailPE(),pct=ptotal>0?Math.max(0,av/ptotal*100):0;
+  document.getElementById('dtf').style.width=pct+'%';
+  document.getElementById('dtav').textContent=av;
+  document.getElementById('dttot').textContent=ptotal+(G.fronts[mp||'muralhas'].peMod?` (base ${G.peTotal} ${G.fronts[mp||'muralhas'].peMod>0?'+':''}${G.fronts[mp||'muralhas'].peMod})`:'');
+  document.getElementById('nevbanner').className=G.nevoa?'on':'';
+  if(P==='GM'){
+    document.getElementById('gdtt').value=G.peTotal;document.getElementById('gwk').value=G.week;document.getElementById('gmoralinp').value=G.moral;
+    document.getElementById('gmoraldisp').textContent=`${mv>=0?'+':''}${mv} — ${mlabel()}`;document.getElementById('gmoraldisp').style.color=mc;
+    document.getElementById('gnevbtn').textContent=G.nevoa?'🌫️ Desativar Névoa':'🌫️ Ativar Névoa';
+    rGMPillarGrid();
+  }
+  rFronts();if(SF)rDet(SF);rLog();
+}
+
+// ═══════════════ GM PILAR GRID ═══════════════
+function rGMPillarGrid(){
+  const el=document.getElementById('gmpilar-grid');el.innerHTML='';
+  OR.forEach(fid=>{
+    const fd=FD[fid],fs=G.fronts[fid],owner=pillarOwner(fid)||'—';
+    const sico=fs.status==='doenca'?'🦠':fs.status==='enfermo'?'☠️':'✅';
+    const mod=fs.peMod||0;
+    const modStr=mod>0?`+${mod}`:mod<0?`${mod}`:'0';
+    const d=document.createElement('div');d.className='gmpc';
+    const pendBtns=fs.pending?`<button class="btn btn-gm btn-sm" onclick="fc('${fid}')">✓ Completar</button><button class="btn btn-danger btn-sm" onclick="cu('${fid}')">✕ Cancelar</button>`:'';
+    const lvBtns=(fs.level>0?`<button class="btn btn-danger btn-sm" onclick="gmDn('${fid}')">▼ Nível</button>`:'')+(fs.level<5&&!fs.pending?`<button class="btn btn-gm btn-sm" onclick="gmUp('${fid}')">▲ Nível</button>`:'');
+    d.innerHTML=`<div class="gmpc-name">${fd.icon} ${fd.name} <span>${sico}</span></div>
+<div class="gmpc-sub">Nível ${fs.level}/5 · <b>${owner}</b> · PE efetivo: ${pillarTotalPE(fid)}</div>
+<div class="gmpc-btns"><button class="btn btn-sick btn-sm" onclick="gmSt('${fid}','doenca')">🦠 Doença</button><button class="btn btn-danger btn-sm" onclick="gmSt('${fid}','enfermo')">☠️ Enfermo</button><button class="btn btn-sm" onclick="gmSt('${fid}','normal')">✅ Curar</button>${lvBtns}${pendBtns}</div>
+<div class="gmpc-pemod"><span class="gmpc-pemod-lbl">Mod PE:</span><button class="btn btn-sm" style="padding:3px 8px;font-size:10px" onclick="gmPeMod('${fid}',-1)">−</button><span class="gmpc-pemod-val" id="pemod_${fid}">${modStr}</span><button class="btn btn-sm" style="padding:3px 8px;font-size:10px" onclick="gmPeMod('${fid}',1)">+</button><button class="btn btn-sm" style="padding:3px 8px;font-size:10px" onclick="gmPeModSet('${fid}',0)">↺</button><span style="font-size:10px;color:var(--t2);margin-left:4px">PE total: ${pillarTotalPE(fid)}</span></div>`;
+    el.appendChild(d);
+  });
+}
+
+// ═══════════════ FRONTS GRID ═══════════════
+function rFronts(){
+  const g=document.getElementById('fg');g.innerHTML='';
+  OR.forEach(fid=>{
+    const fd=FD[fid],fs=G.fronts[fid],sel=SF===fid,own=isOwner(fid);
+    const sick=fs.status==='doenca',dead=fs.status==='enfermo';
+    // Verifica habilidades cross-pilar disponíveis para este card
+    const crossEsforcos=P!=='GM'&&!own&&canShowEsforcos(fid);
+    const crossDiscurso=P!=='GM'&&!own&&canShowDiscurso(fid);
+    const crossResistencia=P!=='GM'&&!own&&canShowResistencia(fid);
+    const crossMesa=P!=='GM'&&!own&&canShowMesa(fid);
+    const crossOAmbar=P!=='GM'&&!own&&canShowOAmbar(fid);
+    const crossAjuda=P!=='GM'&&!own&&canShowAjuda(fid);
+    const hasCrossAction=crossEsforcos||crossDiscurso||crossResistencia||crossMesa||crossOAmbar||crossAjuda;
+    const popupOpen=CrossPopup===fid;
+
+    const wrap=document.createElement('div');wrap.className='fc-wrap';
+
+    // Card
+    let cls=`fc ${fd.c}`;
+    if(own)cls+=' fc-own';
+    if(hasCrossAction)cls+=' fc-cross';
+    if(sel&&own)cls+=' sel';
+    if(fs.pending&&own)cls+=' glow';
+    if(sick)cls+=' fc-sick';if(dead)cls+=' fc-dead';
+
+    const pips=Array.from({length:5},(_,i)=>{let x='pip';if(i<fs.level)x+=` ${fd.p}`;else if(fs.pending&&i===fs.level)x+=' pend';return`<div class="${x}"></div>`}).join('');
+    const sbadge=sick?`<span class="stk stk-sick">🦠 Doença</span>`:dead?`<span class="stk stk-dead">☠️ Enfermo</span>`:'';
+    const dbuff=fs.discursoBuff?`<span class="stk stk-buff">📣 −1 PE</span>`:'';
+    const rbuff=fs.resistenciaBuff?`<span class="stk stk-buff">🎯 Vantagem</span>`:'';
+    const ownerBadge=P==='GM'?`<div class="fown">${pillarOwner(fid)||'Sem responsável'}</div>`:(!own?`<div class="fown">${pillarOwner(fid)||'Sem responsável'}</div>`:'');
+    let st='';
+    if(fs.level>=5)st='<div class="fst sd">✦ Completo</div>';
+    else if(dead)st='<div class="fst se">☠️ Inoperante — aguardar recuperação</div>';
+    else if(sick&&own)st='<div class="fst" style="border-color:var(--sick);color:var(--sick)">🦠 Custo PE dobrado se investir</div>';
+    else if(sick&&hasCrossAction)st='<div class="fst" style="border-color:var(--teal);color:var(--teal)">⚕ Clique para usar habilidade</div>';
+    else if(fs.pending&&own){const lv=fd.levels[fs.pending.lv-1];st=`<div class="fst sp"><b>⚒ Nível ${fs.pending.lv}</b> — ${lv?lv.name:''}<div style="font-size:10px;color:var(--gold-lo);margin-top:2px">por ${fs.pending.by}</div></div>`}
+    else if(fs.pending&&!own){const lv=fd.levels[fs.pending.lv-1];st=`<div class="fst sp" style="font-size:11px">⚒ ${lv?lv.name:'Em andamento'}</div>`}
+    else if(hasCrossAction&&!sick)st='<div class="fst" style="border-color:var(--teal);color:var(--teal)">⚕ Clique para usar habilidade</div>';
+
+    const c=document.createElement('div');c.className=cls;
+    if(own){c.onclick=()=>tog(fid)}
+    else if(hasCrossAction){c.onclick=()=>togCross(fid)}
+    c.innerHTML=`<div class="acc"></div><div class="ftop"><div class="fico">${fd.icon}</div><div><div class="fnm">${fd.name}${sbadge}${dbuff}${rbuff}</div><div class="flv">Nível ${fs.level} / 5</div></div></div>${ownerBadge}<div class="fpips"><div class="pips">${pips}</div></div>${st}`;
+    wrap.appendChild(c);
+
+    // Cross-pillar popup
+    if(popupOpen&&hasCrossAction){
+      const pop=document.createElement('div');pop.className='cross-popup';
+      let pc='<div class="cross-popup-title">⚕ Habilidades Disponíveis</div>';
+      if(crossEsforcos){
+        const unlocked=G.fronts.aqueduto.level>=2,avMy=myAvailPE(),can=unlocked&&avMy>=2;
+        const btn=unlocked?`<button class="btn btn-teal btn-sm" onclick="useEsforcos('${fid}')" ${can?'':'disabled'}>⚕ Curar · 2 PE</button>`:`<span style="font-size:11px;color:var(--t2)">🔒 Requer Forja Operacional (nível 2)</span>`;
+        pc+=`<div class="cross-popup-desc">🦠 <b>Esforços Médicos</b> — Remove o marcador de ${G.fronts[fid].status==='enfermo'?'Enfermidade':'Doença'} deste pilar. Custo: 2 PE.</div><div class="cross-popup-btns">${btn}</div>`;
+      }
+      if(crossMesa){
+        const avSalao=myAvailPE();
+        pc+=`<div class="cross-popup-desc" style="margin-top:8px">📋 <b>Mesa de Planejamento</b> — Redistribua PE seus para este pilar (máx 3, uma vez por semana).</div><div class="cross-popup-btns">${[1,2,3].map(v=>`<button class="btn btn-sm" onclick="useMesa('${fid}',${v})" ${avSalao>=v?'':'disabled'}>+${v} PE</button>`).join('')}</div>`;
+      }
+      if(crossOAmbar){
+        const avMy=myAvailPE(),can=avMy>=1;
+        pc+=`<div class="cross-popup-desc" style="margin-top:8px">📡 <b>Olho Âmbar</b> — Todos pagam 1 PE a menos na próxima semana. Custo: 1 PE.</div><div class="cross-popup-btns"><button class="btn btn-teal btn-sm" onclick="useOAmbar()" ${can?'':'disabled'}>📡 Contatar · 1 PE</button></div>`;
+      }
+      if(crossAjuda){
+        const avMy=myAvailPE(),can=avMy>=2;
+        pc+=`<div class="cross-popup-desc" style="margin-top:8px">🤝 <b>Auxiliar</b> (Rede) — Transfere 2 PE seus para este pilar. Uma vez por pilar/semana.</div><div class="cross-popup-btns"><button class="btn btn-sm" onclick="useAjuda('${fid}')" ${can?'':'disabled'}>🤝 Auxiliar · 2 PE</button></div>`;
+      }
+      if(crossDiscurso){
+        const used=G.fronts.moral.discourseUsed;
+        pc+=`<div class="cross-popup-desc" style="margin-top:8px">📣 <b>Discurso de Propósito</b> — Upgrades deste pilar custam 1 PE a menos esta semana. Grátis, 1x/semana.</div><div class="cross-popup-btns"><button class="btn btn-sm" onclick="useDiscurso('${fid}')" ${used?'disabled':''}>📣 Aplicar${used?' (usado)':''}</button></div>`;
+      }
+      if(crossResistencia){
+        const avMy=myAvailPE(),can=avMy>=2;
+        pc+=`<div class="cross-popup-desc" style="margin-top:8px">🎯 <b>Cultura de Resistência</b> — Próximo teste deste pilar com vantagem. Custo: 2 PE.</div><div class="cross-popup-btns"><button class="btn btn-sm" onclick="useResistencia('${fid}')" ${can?'':'disabled'}>🎯 Conceder Vantagem · 2 PE</button></div>`;
+      }
+      pc+=`<div style="margin-top:10px"><button class="btn btn-sm" style="opacity:.45;padding:4px 10px;font-size:10px" onclick="CrossPopup=null;rFronts()">Fechar</button></div>`;
+      pop.innerHTML=pc;
+      wrap.appendChild(pop);
+    }
+
+    g.appendChild(wrap);
+  });
+}
+
+// ═══════════════ TOG DETAIL ═══════════════
+function tog(fid){
+  if(!isOwner(fid))return;
+  const mp=myPillar();
+  // Próprio pilar: não pode ser desselecionado pelo jogador (só GM pode fechar)
+  if(P!=='GM'&&fid===mp){SF=fid;rFronts();rDet(fid);return}
+  if(SF===fid&&P==='GM'){SF=null;document.getElementById('det').classList.remove('open');rFronts();return}
+  SF=fid;rFronts();rDet(fid);
+}
+function togCross(fid){CrossPopup=(CrossPopup===fid)?null:fid;rFronts()}
+
+// ═══════════════ DETAIL PANEL ═══════════════
+function rDet(fid){
+  const panel=document.getElementById('det'),fd=FD[fid],fs=G.fronts[fid];
+  panel.classList.add('open');
+  const av=myAvailPE(),sick=fs.status==='doenca',dead=fs.status==='enfermo';
+  // GM vê tudo; jogadores: texto controlado por Salão
+  const showFull=P==='GM'||hasMesa();
+  const showHab =P==='GM'||hasArquivo();
+  const sickWarn=dead?`<div class="status-warn dead">☠️ <b>Pilar Enfermo</b> — Inoperante. Não pode receber PE nesta semana nem na próxima. Recuperação automática no início da semana ${(fs.enfermoWeek||G.week)+2}.</div>`:sick?`<div class="status-warn sick">🦠 <b>Doença</b> — PE investido tem custo dobrado. Investir nesta condição tornará o pilar <b>Enfermo</b> e o bloqueará esta semana e a próxima.</div>`:'';
+
+  const lvs=fd.levels.map((lv,i)=>{
+    const n=i+1,done=fs.level>=n,pend=!!(fs.pending&&fs.pending.lv===n),next=!done&&!pend&&fs.level===i;
+    // GM sempre vê tudo; jogadores controlados por Análise Operacional
+    const vis=P==='GM'||done||pend||next||(hasAnalise()&&i===fs.level+1);
+    if(!vis)return`<div class="lv ll"><div class="lvb bl" style="font-size:15px">?</div><div class="lvbody"><div class="lvnm" style="color:var(--t2)">???</div><div class="lvrew" style="color:var(--t2);font-size:13px">Melhoria ainda desconhecida</div></div></div>`;
+    let ic='lv ',bc='lvb ',bt=n;
+    if(done){ic+='ld';bc+='bd';bt='✓'}else if(pend){ic+='lp';bc+='bp';bt='⚒'}else if(next){ic+='ln';bc+='bn'}else{ic+='ll';bc+='bl'}
+    const cr=efectivePE(lv.pe,fid);
+    const cLabel=cr!==lv.pe?`${cr} PE <s style="color:var(--t2);font-size:10px">${lv.pe}</s>`:cr+' PE';
+    // GM sempre vê texto completo; jogadores dependem de Mesa/Arquivo
+    const desc=P==='GM'||showFull?lv.rew:lv.txt;
+    const habLine=P==='GM'||showHab?`<div class="lvcost">Custo: ${cLabel} &nbsp;|&nbsp; <span style="color:var(--t2)">${lv.hab}</span></div>`:`<div class="lvcost">Custo: ${cLabel}</div>`;
+    let acts='';
+    if(pend&&P==='GM')acts=`<div class="lvacts"><button class="btn btn-gm btn-sm" onclick="fc('${fid}')">✓ Completar</button><button class="btn btn-danger btn-sm" onclick="cu('${fid}')">✕ Cancelar</button></div>`;
+    else if(pend)acts=`<div class="lvacts"><span style="color:var(--gold);font-size:13px">⏳ Em andamento · por ${fs.pending.by}</span></div>`;
+    else if(next){
+      if(dead)acts=`<div class="lvacts"><span style="color:var(--dead);font-size:13px">☠️ Pilar inoperante — aguardar recuperação</span></div>`;
+      else if(sick){const cs=Math.min(pillarTotalPE(fid),cr*2),can=av>=cs;acts=`<div class="lvacts"><button class="btn btn-sick btn-sm" onclick="suSick('${fid}',${n})" ${can?'':'disabled'}>🦠 Trabalhar doente · ${cs} PE → ficará Enfermo</button></div>`}
+      else{const can=av>=cr;acts=`<div class="lvacts"><button class="btn btn-sm" onclick="su('${fid}',${n})" ${can?'':'disabled'} title="${can?'':'PE insuficiente'}">⚒ Iniciar · ${cr} PE</button></div>`}
+    } else if(next&&P==='GM'){const can=av>=cr;acts=`<div class="lvacts"><button class="btn btn-sm" onclick="su('${fid}',${n})" ${can?'':'disabled'}>⚒ Iniciar · ${cr} PE</button></div>`}
+    return`<div class="${ic}"><div class="${bc}">${bt}</div><div class="lvbody"><div class="lvnm">${lv.name}</div><div class="lvrew">${desc}</div><div class="lvtag" style="color:${fd.a};border-color:${fd.a}">${lv.tag}</div>${habLine}${acts}</div></div>`;
+  }).join('');
+
+  // Botão fechar: GM pode sempre fechar; jogador não pode fechar seu próprio pilar
+  const closeBtn=P==='GM'?`<button class="dtcl" onclick="tog('${fid}')">✕</button>`:'';
+  // Aviso de oAmbar ativo
+  const oAmbarActive=G.oAmbarBuff?`<div style="padding:8px 12px;margin-bottom:12px;background:rgba(62,207,160,.08);border:1px solid rgba(62,207,160,.3);border-radius:6px;font-size:12px;color:var(--teal)">📡 <b>Olho Âmbar ativo</b> — todos os upgrades custam 1 PE a menos esta semana</div>`:'';
+  // peGifted (PE recebido por Mesa/Rede)
+  const gifted=fs.peGifted>0?`<div style="padding:8px 12px;margin-bottom:12px;background:rgba(62,207,160,.06);border:1px solid rgba(62,207,160,.2);border-radius:6px;font-size:12px;color:var(--teal)">🤝 <b>${fs.peGifted} PE</b> recebido de outros heróis esta semana</div>`:'';
+  // Botão Forçar Moral (Moral player + Rede ativa)
+  const forcarBtn=(fid==='moral'&&P!=='GM'&&canForcarMoral())?`<div style="margin-bottom:12px"><button class="btn btn-sm" onclick="useForcarMoral()">🔔 Forçar Evento Moral · 2 PE</button></div>`:'';
+  panel.innerHTML=`<div class="dth"><span style="font-size:24px">${fd.icon}</span><div class="dttl">${fd.name}</div>${closeBtn}</div><div class="orn" style="margin-bottom:12px"><span>◆</span></div>${oAmbarActive}${gifted}${forcarBtn}${sickWarn}<div class="lvlist">${lvs}</div>`;
+}
+
+// ═══════════════ LOG ═══════════════
+function rLog(){const el=document.getElementById('loge');if(!G.log.length){el.innerHTML='<div class="logi" style="opacity:.3"><span class="logts">—</span><span class="logmsg">Sem atividade ainda.</span></div>';return}el.innerHTML=G.log.slice(0,25).map((e,i)=>`<div class="logi" style="opacity:${Math.max(0.1,1-i*.04)}"><span class="logts">S${e.w}</span><span class="logmsg"><span class="logwho">${e.who}</span>&nbsp;${e.msg}</span></div>`).join('')}
+
+// ═══════════════ AÇÕES JOGADORES ═══════════════
+function su(fid,n){
+  const fs=G.fronts[fid],lv=FD[fid].levels[n-1];
+  if(fs.pending)return toast('Já há uma melhoria em andamento.',true);
+  if(fs.level!==n-1)return toast('Complete o nível anterior primeiro.',true);
+  if(fs.status==='enfermo')return toast('Pilar enfermo — não pode receber PE.',true);
+  const cr=efectivePE(lv.pe,fid),av=myAvailPE();
+  if(av<cr)return toast(`PE insuficiente. Precisa: ${cr}, disponível: ${av}.`,true);
+  G.fronts[fid].peUsed=(G.fronts[fid].peUsed||0)+cr;
+  fs.pending={lv:n,by:P,peSpent:cr};
+  alog(P,`iniciou <b>${FD[fid].name}</b> nível ${n} (${cr} PE)`);
+  save();render();
+}
+function suSick(fid,n){
+  const fs=G.fronts[fid],lv=FD[fid].levels[n-1];
+  if(fs.pending)return toast('Já há uma melhoria em andamento.',true);
+  const cr=efectivePE(lv.pe,fid),cs=Math.min(pillarTotalPE(fid),cr*2),av=myAvailPE();
+  if(av<cs)return toast(`PE insuficiente para trabalhar doente. Precisa: ${cs}.`,true);
+  G.fronts[fid].peUsed=(G.fronts[fid].peUsed||0)+cs;
+  fs.pending={lv:n,by:P,peSpent:cs};fs.status='enfermo';fs.enfermoWeek=G.week;
+  alog(P,`forçou <b>${FD[fid].name}</b> nível ${n} com doença (${cs} PE) → <b>Enfermo</b>`);
+  save();render();toast('⚠️ Pilar agora Enfermo — bloqueado nesta semana e na próxima.','w');
+}
+function cu(fid){const fs=G.fronts[fid];if(!fs.pending)return;const r=Math.floor((fs.pending.peSpent||0)/2);G.fronts[fid].peUsed=Math.max(0,(G.fronts[fid].peUsed||0)-r);alog(P,`cancelou <b>${FD[fid].name}</b> (${r} PE reembolsados)`);fs.pending=null;save();render()}
+function fc(fid){const fs=G.fronts[fid];if(!fs.pending)return;fs.level=fs.pending.lv;alog(P,`completou <b>${FD[fid].name}</b> — nível ${fs.level}`);fs.pending=null;save();render()}
+
+// ═══════════════ AÇÕES CROSS-PILAR ═══════════════
+function useEsforcos(targetFid){
+  const av=myAvailPE();if(av<2)return toast('PE insuficiente.',true);
+  G.fronts['aqueduto'].peUsed=(G.fronts['aqueduto'].peUsed||0)+2;
+  const era=G.fronts[targetFid].status;
+  G.fronts[targetFid].status='normal';G.fronts[targetFid].enfermoWeek=null;
+  CrossPopup=null;
+  alog(P,`⚕ <b>Esforços Médicos</b> em <b>${FD[targetFid].name}</b> (2 PE) — ${era==='enfermo'?'Enfermidade removida':'Doença curada'}`);
+  save();render();toast(`✅ ${FD[targetFid].name} curado!`);
+}
+function useMesa(targetFid,amount){
+  if(G.fronts.comando.mesaUsed)return toast('Mesa de Planejamento já usada esta semana.',true);
+  const av=myAvailPE();if(av<amount)return toast(`PE insuficiente. Tem: ${av}, precisa: ${amount}.`,true);
+  G.fronts['comando'].peUsed=(G.fronts['comando'].peUsed||0)+amount;
+  G.fronts[targetFid].peGifted=(G.fronts[targetFid].peGifted||0)+amount;
+  G.fronts['comando'].mesaUsed=true;CrossPopup=null;
+  alog(P,`📋 <b>Mesa de Planejamento</b>: ${amount} PE transferido para <b>${FD[targetFid].name}</b>`);
+  save();render();toast(`📋 ${amount} PE transferido para ${FD[targetFid].name}!`);
+}
+function useOAmbar(){
+  const av=myAvailPE();if(av<1)return toast('PE insuficiente.',true);
+  G.fronts['aqueduto'].peUsed=(G.fronts['aqueduto'].peUsed||0)+1;
+  G.fronts['aqueduto'].oAmbarUsed=true;G.oAmbarNextWeek=true;CrossPopup=null;
+  alog(P,'📡 <b>Olho Âmbar</b> contactado (1 PE) — custo de PE reduzido em 1 na próxima semana para todos');
+  save();render();toast('📡 Olho Âmbar contactado — custo −1 PE na próxima semana!');
+}
+function useAjuda(targetFid){
+  const av=myAvailPE();if(av<2)return toast('PE insuficiente para auxiliar.',true);
+  if(G.fronts[targetFid].ajudado)return toast('Este pilar já recebeu ajuda esta semana.',true);
+  const mp=myPillar();
+  G.fronts[mp].peUsed=(G.fronts[mp].peUsed||0)+2;
+  G.fronts[targetFid].peGifted=(G.fronts[targetFid].peGifted||0)+2;
+  G.fronts[targetFid].ajudado=true;CrossPopup=null;
+  alog(P,`🤝 <b>Auxiliar</b>: 2 PE transferido para <b>${FD[targetFid].name}</b> via Rede de Mensageiros`);
+  save();render();toast(`🤝 ${FD[targetFid].name} recebeu 2 PE de ajuda!`);
+}
+function useDiscurso(targetFid){
+  if(G.fronts.moral.discourseUsed)return toast('Discurso já usado esta semana.',true);
+  G.fronts.moral.discourseUsed=true;G.fronts[targetFid].discursoBuff=true;
+  CrossPopup=null;
+  alog(P,`📣 <b>Discurso de Propósito</b> em <b>${FD[targetFid].name}</b> — upgrades com −1 PE esta semana`);
+  save();render();toast('📣 Discurso aplicado!');
+}
+function useResistencia(targetFid){
+  const av=myAvailPE();if(av<2)return toast('PE insuficiente.',true);
+  G.fronts['moral'].peUsed=(G.fronts['moral'].peUsed||0)+2;
+  G.fronts[targetFid].resistenciaBuff=true;CrossPopup=null;
+  alog(P,`🎯 <b>Resistência</b> em <b>${FD[targetFid].name}</b> (2 PE) — próximo teste com vantagem`);
+  save();render();toast('🎯 Vantagem concedida!');
+}
+function useForcarMoral(){
+  if(!canForcarMoral())return;
+  const av=myAvailPE();if(av<2)return toast('PE insuficiente.',true);
+  G.fronts['moral'].peUsed=(G.fronts['moral'].peUsed||0)+2;
+  G.fronts['moral'].forcarMoralUsed=true;
+  alog(P,'🔔 <b>Forçar Evento Moral</b> ativado (2 PE) — GM deve resolver o evento de Moral agora');
+  save();render();toast('🔔 Evento de Moral forçado — aguarde o GM!','w');
+}
+
+// ═══════════════ GM AÇÕES ═══════════════
+function gmWk(){
+  const w=Math.max(1,parseInt(document.getElementById('gwk').value)||1);G.week=w;
+  // Aplicar Olho Âmbar: se foi ativado semana passada, aplica agora; depois limpa
+  G.oAmbarBuff=G.oAmbarNextWeek;G.oAmbarNextWeek=false;
+  OR.forEach(k=>{
+    G.fronts[k].peUsed=0;G.fronts[k].peGifted=0;
+    G.fronts[k].discursoBuff=false;G.fronts[k].resistenciaBuff=false;
+    G.fronts[k].ajudado=false;G.fronts[k].mesaUsed=false;
+    G.fronts[k].oAmbarUsed=false;G.fronts[k].forcarMoralUsed=false;
+  });
+  G.fronts.moral.discourseUsed=false;
+  OR.forEach(k=>{const fs=G.fronts[k];if(fs.status==='enfermo'&&fs.enfermoWeek!==null&&G.week>fs.enfermoWeek+1){fs.status='normal';fs.enfermoWeek=null;alog('Sistema',`<b>${FD[k].name}</b> recuperou de Enfermidade`)}});
+  alog(P,`→ <b>Semana ${G.week}</b> — PE e buffs resetados${G.oAmbarBuff?' · 📡 Olho Âmbar ativo (−1 PE todos os upgrades)':''}`)
+  ;save();render();
+}
+function gmPE(){G.peTotal=Math.max(1,parseInt(document.getElementById('gdtt').value)||7);alog(P,`PE base/jogador → <b>${G.peTotal}</b>`);save();render()}
+function gmMoral(d){G.moral=Math.max(-4,Math.min(2,G.moral+d));document.getElementById('gmoralinp').value=G.moral;alog(P,`Moral → <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b>`);save();render()}
+function gmSetMoral(){const v=Math.max(-4,Math.min(2,parseInt(document.getElementById('gmoralinp').value)||0));G.moral=v;alog(P,`Moral definida → <b>${v>=0?'+':''}${v} ${mlabel()}</b>`);save();render()}
+function gmToggleNevoa(){G.nevoa=!G.nevoa;alog(P,G.nevoa?'🌫️ Névoa ativada':'🌫️ Névoa desativada');save();render()}
+function gmSt(fid,status){const fs=G.fronts[fid];fs.status=status;if(status==='enfermo')fs.enfermoWeek=G.week;else if(status!=='enfermo')fs.enfermoWeek=null;const ico=status==='doenca'?'🦠':status==='enfermo'?'☠️':'✅';alog(P,`${ico} <b>${FD[fid].name}</b> → ${status}`);save();render()}
+function gmDn(fid){if(!confirm(`Reduzir ${FD[fid].name}?`))return;const fs=G.fronts[fid];if(fs.level<=0)return toast('Já no nível mínimo.',true);fs.level--;fs.pending=null;alog(P,`▼ <b>${FD[fid].name}</b> → nível ${fs.level}`);save();render()}
+function gmUp(fid){if(!confirm(`Forçar ${FD[fid].name} para nível ${G.fronts[fid].level+1}?`))return;const fs=G.fronts[fid];if(fs.level>=5)return toast('Já completo.',true);fs.level++;fs.pending=null;alog(P,`▲ <b>${FD[fid].name}</b> → nível ${fs.level}`);save();render()}
+function gmPeMod(fid,d){G.fronts[fid].peMod=(G.fronts[fid].peMod||0)+d;const m=G.fronts[fid].peMod;document.getElementById('pemod_'+fid).textContent=m>0?`+${m}`:m<0?`${m}`:'0';alog(P,`Mod PE <b>${FD[fid].name}</b> → ${m>=0?'+':''}${m} (total ${pillarTotalPE(fid)} PE)`);save();render()}
+function gmPeModSet(fid,v){G.fronts[fid].peMod=v;document.getElementById('pemod_'+fid).textContent='0';alog(P,`Mod PE <b>${FD[fid].name}</b> resetado`);save();render()}
+function gmReset(){G=fresh();save();alog('Sistema','↺ Reset total');render()}
+function gmClearPE(){OR.forEach(k=>G.fronts[k].peUsed=0);alog(P,'🔄 PE resetados');save();render()}
+function gmClearAssignments(){if(!confirm('Limpar atribuições?'))return;G.assignments={};alog(P,'✕ Atribuições limpas');save();render()}
+function toast(msg,type=false){const t=document.getElementById('toast');t.textContent=msg;t.className=(type==='w'?'w on':type?'e on':'on');clearTimeout(TT);TT=setTimeout(()=>t.className='',3400)}
+</script>
+</body>
+</html>
