@@ -149,7 +149,9 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .fc{padding:20px 18px 18px;cursor:default;position:relative;overflow:hidden;transition:border-color .22s,background .22s;border-radius:var(--r);border:1px solid var(--gold-lo);background:var(--bg2)}
 .fc::before{content:'';position:absolute;inset:3px;border:1px solid rgba(201,168,76,.05);border-radius:5px;pointer-events:none}
 .fc::after{content:'';position:absolute;bottom:-5px;right:-5px;width:10px;height:10px;transform:rotate(45deg);background:var(--gold-lo);transition:background .2s}
-.fc-own{cursor:pointer}.fc-own:hover{border-color:var(--gold);background:var(--bg3)}.fc-own:hover::after{background:var(--gold)}
+.fc-attack-wall{border-color:var(--rose)!important;animation:pulseDead 1.8s ease-in-out infinite}
+.fc-attack-bg{background:linear-gradient(135deg,rgba(30,4,4,.18),var(--bg2))!important}
+@keyframes pulseAttackAll{0%,100%{box-shadow:0 0 0 0 rgba(200,50,50,.2)}50%{box-shadow:0 0 0 6px rgba(200,50,50,0)}}
 .fc-salao-view{cursor:pointer;border-color:rgba(224,160,48,.25)!important}.fc-salao-view:hover{border-color:var(--amber)!important;background:rgba(224,160,48,.04)}.fc-salao-view:hover::after{background:var(--amber)}
 .fc-cross{cursor:pointer;border-color:rgba(62,207,160,.4)!important}.fc-cross:hover{border-color:var(--teal)!important;background:rgba(62,207,160,.04)}.fc-cross:hover::after{background:var(--teal)}
 .fc.sel{border-color:var(--gold);background:var(--bg3)}
@@ -216,6 +218,40 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .logwho{font-family:'Cinzel',serif;font-size:10px;color:var(--gold)}
 #toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--bg3);border:1px solid var(--gold-lo);color:var(--t0);font-size:14px;font-family:'Cinzel',serif;padding:10px 26px;border-radius:6px;opacity:0;pointer-events:none;transition:all .28s;z-index:300;white-space:nowrap;box-shadow:0 8px 40px rgba(0,0,0,.7)}
 #toast.e{border-color:#7a1818;color:#e05050}#toast.w{border-color:var(--sick);color:var(--sick)}#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+/* MORAL EVENTS EDITOR */
+#moraleditor{display:none;position:fixed;inset:0;background:rgba(4,5,13,.97);z-index:210;flex-direction:column}
+#moraleditor.open{display:flex}
+.me-hdr{display:flex;align-items:center;gap:16px;padding:16px 24px;background:var(--bg2);border-bottom:1px solid rgba(224,96,144,.2);flex-shrink:0}
+.me-hdr-title{font-family:'Cinzel',serif;font-size:14px;font-weight:600;color:var(--rose);letter-spacing:.15em;text-transform:uppercase}
+.me-hdr-sub{font-size:12px;color:var(--t2);font-style:italic}
+.me-body{display:flex;flex:1;overflow:hidden}
+.me-list{width:280px;flex-shrink:0;overflow-y:auto;border-right:1px solid rgba(224,96,144,.12);background:var(--bg1)}
+.me-item{padding:12px 16px;border-bottom:1px solid rgba(201,168,76,.06);cursor:pointer;transition:background .15s}
+.me-item:hover{background:rgba(224,96,144,.06)}
+.me-item.active{background:rgba(224,96,144,.1);border-left:3px solid var(--rose)}
+.me-item:not(.active){border-left:3px solid transparent}
+.me-item-num{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;color:var(--t2);text-transform:uppercase;margin-bottom:2px}
+.me-item-title{font-family:'Cinzel',serif;font-size:12px;font-weight:600;color:var(--t0)}
+.me-item-img{font-size:10px;color:var(--teal);margin-top:3px}
+.me-item-img.missing{color:var(--t2)}
+.me-panel{flex:1;overflow-y:auto;padding:28px 32px;display:flex;flex-direction:column;gap:20px}
+.me-panel-title{font-family:'Cinzel Decorative',serif;font-size:18px;color:var(--gold-hi);margin-bottom:4px}
+.me-panel-num{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--t2);margin-bottom:16px}
+.me-section{display:flex;flex-direction:column;gap:6px}
+.me-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--rose);opacity:.7}
+.me-textarea{width:100%;min-height:160px;padding:14px 16px;background:var(--bg2);border:1px solid var(--gold-lo);border-radius:6px;color:var(--t0);font-family:'Crimson Pro',Georgia,serif;font-size:16px;line-height:1.75;resize:vertical;outline:none;transition:border-color .2s}
+.me-textarea:focus{border-color:var(--gold)}
+.me-img-row{display:flex;gap:12px;align-items:flex-start}
+.me-img-input{flex:1;padding:10px 14px;background:var(--bg2);border:1px solid var(--gold-lo);border-radius:6px;color:var(--t0);font-family:monospace;font-size:14px;outline:none;transition:border-color .2s}
+.me-img-input:focus{border-color:var(--gold)}
+.me-preview-box{width:140px;height:96px;flex-shrink:0;background:var(--bg3);border:1px solid var(--t3);border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.me-preview-box img{width:100%;height:100%;object-fit:cover}
+.me-preview-box .me-no-img{font-size:11px;color:var(--t2);text-align:center;padding:8px;font-style:italic;line-height:1.4}
+.me-hint{font-size:12px;color:var(--t2);font-style:italic;line-height:1.5}
+.me-save-row{display:flex;gap:10px;align-items:center;padding-top:8px;border-top:1px solid rgba(201,168,76,.08)}
+.me-saved-msg{font-size:13px;color:var(--teal);font-family:'Cinzel',serif;opacity:0;transition:opacity .3s}
+.me-saved-msg.on{opacity:1}
+.me-empty{display:flex;align-items:center;justify-content:center;flex:1;color:var(--t2);font-style:italic;font-size:15px}
 @keyframes gentleGlow{0%,100%{opacity:.55;filter:drop-shadow(0 0 8px currentColor)}50%{opacity:1;filter:drop-shadow(0 0 22px currentColor) drop-shadow(0 0 40px currentColor)}}
 @keyframes twinkle{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 @keyframes fadeOverlay{from{opacity:1}to{opacity:0;pointer-events:none}}
@@ -230,6 +266,139 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .d10wrap svg{position:absolute;inset:0;width:100%;height:100%}
 .d10wrap span{position:relative;z-index:1;font-family:'Cinzel',serif;font-weight:700;font-size:17px}
 .d10wrap.rolling{animation:diceRoll .55s ease forwards}
+
+/* ═══════════════ MOBILE RESPONSIVE ═══════════════ */
+@media(max-width:640px){
+  body{font-size:15px}
+  /* Login */
+  .ltitle{font-size:clamp(20px,7vw,36px)!important}
+  .lsub{font-size:11px;letter-spacing:.16em}
+  .cgrid{gap:10px}
+  .cc{width:calc(50% - 6px);padding:18px 10px 14px}
+  .ci{width:46px;height:46px}
+  .cn{font-size:13px}
+  .ccls{font-size:11px}
+  /* GM modal */
+  .mbox{width:calc(100vw - 32px);padding:24px 18px}
+  /* Pillar pick */
+  #ppick{padding:18px 12px}
+  .ppname{font-size:clamp(18px,6vw,28px)!important}
+  .ppask{font-size:14px;margin-bottom:16px}
+  .ppgrid{gap:10px}
+  .ppc{width:calc(50% - 6px);padding:18px 10px 14px}
+  .ppc-icon{font-size:26px;margin-bottom:8px}
+  .ppc-name{font-size:12px}
+  /* Pillar summary */
+  .psbox{padding:22px 16px}
+  .psname{font-size:17px}
+  .pstxt{font-size:14px;padding:12px 14px}
+  .pstxt2{font-size:14px;padding:14px}
+  .psbtns{flex-direction:column;gap:8px}
+  .psbtns .btn{width:100%;justify-content:center}
+  #psum{padding:12px}
+  /* Header */
+  #hdr{padding:0 10px;gap:7px;height:52px}
+  .hav{width:28px;height:28px;font-size:16px!important}
+  .hnm{font-size:12px}
+  .hcls{font-size:10px}
+  .hwk{font-size:11px;letter-spacing:.05em}
+  .hmoral-lbl{display:none}
+  .hmoral-val{font-size:11px}
+  .hsep{display:none}
+  .bexit{font-size:10px;padding:4px 8px}
+  /* Main content */
+  #ct{padding:14px 10px 88px}
+  /* Resource bar */
+  #rb{padding:10px 12px;gap:10px}
+  .dtw{min-width:0;flex:1 1 calc(50% - 6px)}
+  .dtn{font-size:12px}
+  .dtn b{font-size:14px}
+  /* Fronts grid — single column on mobile */
+  #fg{grid-template-columns:1fr;gap:10px}
+  .fc{padding:14px 12px 12px}
+  .fnm{font-size:13px}
+  /* Detail panel */
+  #det{padding:14px 12px}
+  .dth{gap:8px;margin-bottom:10px}
+  .dttl{font-size:16px}
+  .lv{gap:8px;padding:10px 11px}
+  .lvnm{font-size:12px}
+  .lvrew{font-size:13px}
+  .lvacts{gap:6px}
+  .lvacts .btn{flex:1;justify-content:center;min-width:0;font-size:10px;padding:7px 8px}
+  /* Buttons */
+  .btn{font-size:11px;padding:8px 14px}
+  .btn-sm{padding:6px 10px;font-size:10px}
+  /* Log */
+  #logp{margin-bottom:24px}
+  .logi{font-size:12px;gap:8px;padding:5px 8px}
+  .logts{min-width:24px;font-size:9px}
+  /* Toast */
+  #toast{font-size:12px;padding:8px 16px;max-width:calc(100vw - 24px);white-space:normal;text-align:center;bottom:14px}
+  /* Moral overlay — FIX CENTERING */
+  #moraloverlay{overflow-y:auto}
+  #moraloverlay > div{
+    width:100%;
+    min-height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:14px;
+    padding:20px 14px;
+    box-sizing:border-box;
+    text-align:center;
+  }
+  #moral-event-title{font-size:14px!important}
+  #moral-img{width:min(200px,75vw)!important;height:150px!important}
+  #moral-txt{padding:14px 14px!important;max-width:100%!important}
+  #moral-txt div,#moral-txt p{font-size:14px!important;line-height:1.7!important;text-align:left!important}
+  /* Attack overlay */
+  #attackoverlay{padding:20px 14px;gap:12px;align-items:center;text-align:center}
+  #att-icon{font-size:48px!important}
+  #att-mag{font-size:15px!important}
+  /* Moral picker */
+  #moralpicker{padding:10px;align-items:flex-start;overflow-y:auto}
+  #moralpicker > div{padding:20px 16px;margin:auto}
+  #mp-mode-select{flex-direction:column;gap:10px}
+  #mp-btn-random,#mp-btn-manual{padding:14px}
+  /* Wait overlay */
+  .wait-icon{font-size:54px}
+  .wait-txt{font-size:11px;letter-spacing:.15em}
+  /* GM panel */
+  #gmp{padding:14px 12px}
+  .gmpilar-grid{grid-template-columns:1fr}
+  .gmrow{gap:6px}
+  .gmsec{margin-bottom:12px;padding-bottom:12px}
+  /* Moral editor */
+  .me-body{flex-direction:column}
+  .me-list{width:100%;height:auto;max-height:190px;border-right:none;border-bottom:1px solid rgba(224,96,144,.12);overflow-x:auto;overflow-y:hidden;display:flex;flex-direction:row;flex-wrap:nowrap}
+  .me-item{min-width:130px;flex-shrink:0;border-bottom:none;border-right:1px solid rgba(201,168,76,.06)}
+  .me-panel{padding:16px 14px}
+  .me-img-row{flex-direction:column}
+  .me-preview-box{width:100%;height:110px}
+  .me-hdr{padding:12px 14px}
+  .me-hdr-title{font-size:12px}
+  /* Reward modal */
+  #rewardmodal{padding:14px 12px}
+  /* Nevoa banner */
+  #nevbanner{font-size:10px;padding:7px 12px}
+  /* Pips */
+  .pips{gap:3px}
+  .pip{width:16px;height:6px}
+  /* Cross popup */
+  .cross-popup{padding:10px 12px}
+  .cross-popup-btns .btn{font-size:10px;padding:6px 10px}
+}
+@media(max-width:380px){
+  .cc{width:100%}
+  .ppc{width:100%}
+  .cgrid,.ppgrid{gap:8px}
+  #hdr{height:48px}
+  .hnm{max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .hcls{display:none}
+  #ct{padding:10px 8px 88px}
+}
 </style>
 </head>
 <body>
@@ -272,18 +441,43 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 </div></div>
 
 <!-- MORAL EVENT OVERLAY -->
-<div id="moraloverlay" style="display:none;position:fixed;inset:0;z-index:86;background:rgba(4,5,13,.93);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:20px">
+<div id="moraloverlay" style="display:none;position:fixed;inset:0;z-index:86;background:rgba(4,5,13,.93);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow-y:auto">
+  <div style="width:100%;min-height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:32px 20px;box-sizing:border-box">
   <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(14px,2.2vw,22px);color:var(--rose);letter-spacing:.12em;text-align:center;text-shadow:0 0 30px rgba(224,96,144,.4)">EVENTO DE MORAL</div>
-  <div style="width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--rose),transparent)"></div>
-  <!-- Imagem placeholder — será substituída por conteúdo dinâmico no futuro -->
-  <div style="width:220px;height:220px;background:var(--bg2);border:1px solid rgba(224,96,144,.3);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:12px;font-style:italic;text-align:center;padding:20px" id="moral-img">
+  <div style="width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--rose),transparent);flex-shrink:0"></div>
+  <div id="moral-event-title" style="font-family:'Cinzel',serif;font-size:clamp(13px,2vw,17px);font-weight:600;color:var(--gold-hi);text-align:center;display:none;padding:0 16px"></div>
+  <div id="moral-img" style="width:260px;height:200px;background:var(--bg2);border:1px solid rgba(224,96,144,.3);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:12px;font-style:italic;text-align:center;padding:20px;flex-shrink:0">
     <span>🖼️<br><br>Imagem do<br>evento aqui</span>
   </div>
-  <!-- Texto placeholder -->
-  <div style="max-width:420px;text-align:center;padding:14px 20px;background:var(--bg2);border:1px solid rgba(224,96,144,.2);border-radius:8px" id="moral-txt">
-    <div style="font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);font-style:italic;line-height:1.7">Texto descritivo do evento de moral aparecerá aqui. Uma situação que exige do responsável pela Moral toda sua perspicácia e carisma.</div>
+  <div style="max-width:480px;width:100%;text-align:center;padding:18px 22px;background:var(--bg2);border:1px solid rgba(224,96,144,.2);border-radius:8px" id="moral-txt">
+    <div style="font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);font-style:italic;line-height:1.8">Aguardando o Mestre escolher o evento...</div>
   </div>
-  <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(224,96,144,.4)">Aguardando o Mestre</div>
+  <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(224,96,144,.4);text-align:center">Aguardando o Mestre</div>
+  </div>
+</div>
+
+<!-- ATTACK OVERLAY (aviso ao herói das Muralhas) -->
+<div id="attackoverlay" style="display:none;position:fixed;inset:0;z-index:84;background:rgba(30,4,4,.92);backdrop-filter:blur(12px);align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px">
+  <div style="font-size:60px;animation:gentleGlow 1.8s ease-in-out infinite" id="att-icon">⚔️</div>
+  <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(15px,2.4vw,24px);color:var(--rose);letter-spacing:.1em;text-align:center;text-shadow:0 0 30px rgba(224,96,144,.5)">ATAQUE DETECTADO</div>
+  <div id="att-mag" style="font-family:'Cinzel',serif;font-size:18px;font-weight:600;color:var(--t0);text-align:center"></div>
+  <div id="att-patrulhas" style="display:none;margin-top:4px"></div>
+  <div style="width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--rose),transparent)"></div>
+  <div style="font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);font-style:italic;text-align:center;max-width:400px;line-height:1.7;padding:0 16px">Prepare-se. A defesa será exigida ao final desta semana.</div>
+  <button class="btn" id="att-close-btn" onclick="closeAttackOverlay()" style="margin-top:4px">Entendido — Preparar defesa</button>
+  <div id="att-no-torres" style="display:none;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,96,144,.5);text-align:center;max-width:380px">Sem Torres de Vigia: upgrades pausados até o combate.</div>
+</div>
+
+<!-- REWARD MODAL -->
+<div id="rewardmodal" style="display:none;position:fixed;inset:0;z-index:92;background:rgba(0,0,0,.9);backdrop-filter:blur(14px);align-items:flex-start;justify-content:center;padding:28px 20px;overflow-y:auto">
+<div style="width:100%;max-width:600px;margin:auto;animation:rise .3s ease">
+  <div id="reward-icon" style="font-size:56px;text-align:center;margin-bottom:10px"></div>
+  <div id="reward-title" style="font-family:'Cinzel Decorative',serif;font-size:clamp(16px,2.5vw,24px);color:var(--gold-hi);text-align:center;letter-spacing:.08em;margin-bottom:6px"></div>
+  <div id="reward-sub" style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--t2);text-align:center;margin-bottom:20px"></div>
+  <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 20px"></div>
+  <div id="reward-body" style="font-family:'Crimson Pro',serif;font-size:17px;color:var(--t0);line-height:1.85;white-space:pre-line;padding:20px 24px;background:var(--bg2);border:1px solid var(--gold-lo);border-radius:8px;margin-bottom:20px"></div>
+  <div style="text-align:center"><button class="btn" onclick="document.getElementById('rewardmodal').style.display='none'">← Fechar</button></div>
+</div>
 </div>
 
 <!-- TEST OVERLAY (aparece quando é hora de fazer o teste) -->
@@ -368,6 +562,13 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 </div>
 
 <div class="gmsec">
+<div class="gmslbl">Eventos de Moral</div>
+<div class="gmrow">
+<button class="btn btn-gm btn-sm" onclick="openMoralEditor()">📜 Gerenciar Eventos de Moral</button>
+</div>
+</div>
+
+<div class="gmsec">
 <div class="gmslbl">Geral</div>
 <div class="gmrow">
 <button class="btn btn-danger btn-sm" onclick="if(confirm('Resetar tudo?'))gmReset()">↺ Reset Total</button>
@@ -384,6 +585,60 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 <div id="det"></div>
 <div id="logp"><div class="logh">Registro de atividades</div><div id="loge"></div></div>
 </div></div>
+<!-- MORAL EVENT PICKER (GM only) -->
+<div id="moralpicker" style="display:none;position:fixed;inset:0;background:rgba(4,5,13,.96);z-index:220;align-items:center;justify-content:center;padding:24px">
+  <div style="width:100%;max-width:560px;background:var(--bg2);border:1px solid rgba(224,96,144,.4);border-radius:var(--r);padding:32px;animation:rise .22s ease;position:relative">
+    <div style="font-family:'Cinzel Decorative',serif;font-size:18px;color:var(--rose);text-align:center;margin-bottom:6px">🫂 Evento de Moral</div>
+    <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--t2);text-align:center;margin-bottom:24px">Escolha como a história será selecionada</div>
+
+    <div id="mp-mode-select" style="display:flex;gap:12px;margin-bottom:24px">
+      <div id="mp-btn-random" onclick="mpSetMode('random')" style="flex:1;padding:18px;background:var(--bg3);border:2px solid rgba(224,96,144,.3);border-radius:8px;cursor:pointer;text-align:center;transition:all .18s">
+        <div style="font-size:28px;margin-bottom:8px">🎲</div>
+        <div style="font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--t0);margin-bottom:4px">Aleatório</div>
+        <div style="font-size:12px;color:var(--t2)">Sorteia uma história que ainda não apareceu</div>
+      </div>
+      <div id="mp-btn-manual" onclick="mpSetMode('manual')" style="flex:1;padding:18px;background:var(--bg3);border:2px solid rgba(224,96,144,.3);border-radius:8px;cursor:pointer;text-align:center;transition:all .18s">
+        <div style="font-size:28px;margin-bottom:8px">📜</div>
+        <div style="font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--t0);margin-bottom:4px">Escolher</div>
+        <div style="font-size:12px;color:var(--t2)">Seleciono qual história vai aparecer</div>
+      </div>
+    </div>
+
+    <div id="mp-random-info" style="display:none;padding:14px 16px;background:var(--bg1);border:1px solid rgba(224,96,144,.15);border-radius:6px;margin-bottom:20px">
+      <div id="mp-random-preview" style="font-family:'Cinzel',serif;font-size:13px;color:var(--gold-hi);margin-bottom:4px"></div>
+      <div id="mp-random-sub" style="font-size:12px;color:var(--t2)"></div>
+    </div>
+
+    <div id="mp-manual-select" style="display:none;margin-bottom:20px">
+      <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--rose);opacity:.7;margin-bottom:8px">Escolha o evento</div>
+      <select id="mp-select" style="width:100%;padding:10px 14px;background:var(--bg1);border:1px solid var(--gold-lo);border-radius:6px;color:var(--t0);font-family:'Crimson Pro',serif;font-size:15px;outline:none" onchange="mpPreviewManual()"></select>
+      <div id="mp-manual-preview" style="margin-top:10px;padding:12px 14px;background:var(--bg1);border:1px solid rgba(201,168,76,.1);border-radius:6px;font-size:13px;color:var(--t2);font-style:italic;display:none;line-height:1.6"></div>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-sm" onclick="closeMoralPicker()">Cancelar</button>
+      <button class="btn btn-gm btn-sm" id="mp-confirm-btn" onclick="confirmMoralPicker()" disabled>✦ Confirmar e Disparar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MORAL EVENTS EDITOR MODAL -->
+<div id="moraleditor">
+  <div class="me-hdr">
+    <div>
+      <div class="me-hdr-title">📜 Gerenciador de Eventos de Moral</div>
+      <div class="me-hdr-sub">Clique em um evento para editar o texto e vincular a imagem</div>
+    </div>
+    <button class="btn btn-sm" style="margin-left:auto" onclick="closeMoralEditor()">✕ Fechar</button>
+  </div>
+  <div class="me-body">
+    <div class="me-list" id="me-list"></div>
+    <div class="me-panel" id="me-panel">
+      <div class="me-empty">← Selecione um evento para editar</div>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -392,29 +647,69 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 // ═══════════════ DADOS ═══════════════
 const FD={
 muralhas:{name:'Muralhas',icon:'🏰',c:'cb',a:'var(--blue)',p:'blue',levels:[
-{pe:2,name:'Pontos Críticos Selados',tag:'Resistência Mínima',hab:'FOR (Atletismo) CD 15',txt:'Torna a muralha resistente, com isso pode ser mais fácil defender a cidade.',rew:'Habilita a magnitude Fácil (CD 15) do evento de Ataque, representando uma cidade mais preparada para investidas menores.'},
-{pe:3,name:'Catapultas e Balistas Recuperadas',tag:'Autonomia Defensiva',hab:'CON CD 20',txt:'Com armas como estas, ondas menores de eivados podem ser repelidas sem dificuldades, e as maiores ficarão mais fáceis.',rew:'Eventos de Ataque Fáceis não gastam PE para defender. Ataques Normais custam apenas 1 PE. Ataques Difíceis podem ser jogados com vantagem.'},
-{pe:3,name:'Torres de Vigia Operacionais',tag:'Posicionamento',hab:'SAB (Percepção) CD 15 · DES (Acrobacia) CD 20',txt:'Sistema de sinais funcionando. Ataques detectados a tempo de montar posição defensiva.',rew:'O herói da Muralha pode convocar outros heróis para a defesa. Custo: 1 PE de cada herói convocado + 1 PE do herói da Muralha. Cada herói adicional contribui com +1d10 no teste de defesa.'},
-{pe:4,name:'Patrulhas Externas',tag:'Investida de Desgaste',hab:'DES (Furtividade) CD 25 · SAB (Sobrevivência) CD 18',txt:'É melhor realizarmos em grupos pequenos, pequenas incursões que saem pelos arredores para interceptar eivados antes que se organizem em ondas maiores.',rew:'Antes do teste de defesa, o herói pode gastar 2 PE para reduzir a magnitude do ataque em 1 nível (uma vez por ataque). Reduz em 10% a chance base do evento de Ataque.'},
-{pe:5,name:'O Baluarte',tag:'⭐ Fortaleza',hab:'FOR (Atletismo) CD 35 · DES (Acrobacia) CD 20',txt:'A cidade finalmente se torna uma fortaleza. Suas muralhas são impenetráveis, capazes de repelir automaticamente ataques de magnitude Fácil ou Normal.',rew:'Repele automaticamente ataques Fáceis e Normais. O herói pode declarar Semana de Fortaleza: eventos de Ataque não causam perda de níveis. Com Torres de Vigia ativas, heróis convocados contribuem com 1d20 inteiro em vez de 1d10.'}]},
+{pe:3,name:'Pontos Críticos Selados',tag:'Resistência Mínima',hab:'FOR (Atletismo) CD 15',
+txt:'Torna a muralha resistente, com isso pode ser mais fácil defender a cidade.',
+rew:'Habilita a magnitude Fácil (CD 15) do evento de Ataque, representando uma cidade mais preparada para investidas menores. Não é possível obter a magnitude Fácil sem este upgrade.'},
+{pe:4,name:'Catapultas e Balistas Recuperadas',tag:'Autonomia Defensiva',hab:'CON CD 20',
+txt:'Com armas como estas, ondas menores de eivados podem ser repelidas sem dificuldades, e as maiores ficarão mais fáceis.',
+rew:'Eventos de Ataque Fáceis não gastam PE para defender. Ataques Normais custam apenas 1 PE para defender. Ataques Difíceis podem ser jogados com vantagem no teste de defesa.'},
+{pe:4,name:'Torres de Vigia Operacionais',tag:'Posicionamento',hab:'SAB (Percepção) CD 15 · DES (Acrobacia) CD 20',
+txt:'Sistema de sinais funcionando. Ataques detectados a tempo de montar posição defensiva.',
+rew:'Com as torres operacionais, ataques são detectados com antecedência. O herói da Muralha pode convocar outros heróis para a defesa — custo: 1 PE de cada herói convocado + 1 PE do herói da Muralha; cada herói adicional contribui com +1d10 no teste.\n\nAlém disso, durante um ataque ativo, o herói pode continuar realizando melhorias e auxiliando outros pilares normalmente — os dias de espera de upgrades em andamento continuam contando.'},
+{pe:5,name:'Patrulhas Externas',tag:'Investida de Desgaste',hab:'DES (Furtividade) CD 25 · SAB (Sobrevivência) CD 18',
+txt:'É melhor realizarmos em grupos pequenos, pequenas incursões que saem pelos arredores para interceptar eivados antes que se organizem em ondas maiores.',
+rew:'Quando o evento de Ataque ocorre, antes do teste de defesa o herói da Muralha pode gastar 2 PE para reduzir a magnitude do ataque em 1 nível (Muito Difícil vira Difícil etc.). Esta redução pode ser aplicada uma vez por ataque. Adicionalmente, a chance base do evento de Ataque é reduzida em 10%.'},
+{pe:6,name:'O Baluarte',tag:'⭐ Fortaleza',hab:'FOR (Atletismo) CD 35 · DES (Acrobacia) CD 20',
+txt:'A cidade finalmente se torna uma fortaleza. Suas muralhas são impenetráveis, capazes de repelir automaticamente ataques de magnitude Fácil ou Normal.',
+rew:'Repele automaticamente ataques Fáceis e Normais. O herói pode declarar uma Semana de Fortaleza, consolidando a defesa: eventos de Ataque não causam perda de níveis, independentemente do resultado do teste. Se a cidade for atacada nessa semana, a habilidade não pode ser usada na semana seguinte.\n\nCom as Torres de Vigia operacionais, cada herói convocado para a defesa contribui com um teste completo de 1d20 em vez de 1d10.'}]},
 aqueduto:{name:'Infraestrutura',icon:'🏗️',c:'ct',a:'var(--teal)',p:'teal',levels:[
-{pe:3,name:'Aqueduto Restaurado',tag:'Saneamento Básico',hab:'SAB (Sobrevivência) CD 10 · DES (Acrobacia) CD 15',txt:'Água potável para todos beberem e banhar-se.',rew:'Água potável para toda a cidade. Reduz em 10% a chance do evento de Doença.'},
-{pe:3,name:'Forja Operacional',tag:'Esforços Médicos',hab:'DES (Ferramentas de Ferreiro) CD 15 · CON CD 15',txt:'Com a Forja funcionando, ferramentas são produzidas localmente e podemos consertar as quebradas, além de construir carrinhos para movê-las.',rew:'Desbloqueia Esforços Médicos: gaste 2 PE para remover o marcador de Doença de qualquer pilar afetado. Upgrades da Muralha custam 1 PE a menos.'},
-{pe:5,name:'Estruturas Restauradas',tag:'Sólido como Pedra',hab:'SAB (Sobrevivência) CD 25',txt:'Com rachaduras reforçadas e buracos selados, as casas finalmente oferecem abrigo real contra o vento e a chuva. Não dormimos mais no frio.',rew:'Reduz mais 10% a chance de Doença. O evento de Chuva Forte não desfaz mais upgrades — estruturas bem mantidas resistem à natureza.'},
-{pe:3,name:'Rede de Mensageiros',tag:'Comunicação',hab:'DES (Atletismo) CD 30',txt:'Restaurar torres de vigia exige deslocamento até locais distantes. Uma vez ativas, melhoram a comunicação da cidade.',rew:'Contato com Olho Âmbar por 1 PE, reduzindo em 1 o custo de PE da semana seguinte. Heróis podem auxiliar outros pilares por 2 PE. Herói da Moral pode gastar 2 PE para forçar evento de Moral.'},
-{pe:1,name:'Rede Hídrica Avançada',tag:'⭐ Infraestrutura Restituída',hab:'INT (Investigação) CD 60 · SAB (Percepção) CD 40',txt:'Uma cidade que se preze precisa de hidráulica excepcional: canos bem projetados, dutos sem gargalos, conduítes fechados e cuidado arcano. Exige mente afiadíssima.',rew:'Reduz em 30% a chance de Doença. Upgrades de todos os pilares custam 1 PE a menos. Alquimia e poções tornam-se mais poderosas.'}]},
+{pe:4,name:'Aqueduto Restaurado',tag:'Saneamento Básico',hab:'SAB (Sobrevivência) CD 10 · DES (Acrobacia) CD 15',
+txt:'Água potável para todos beberem e banhar-se.',
+rew:'Água potável chega a toda a cidade. Reduz em 10% a chance do evento de Doença, refletindo melhores condições sanitárias.'},
+{pe:4,name:'Forja Operacional',tag:'Esforços Médicos',hab:'DES (Ferramentas de Ferreiro) CD 15 · CON CD 15',
+txt:'Com a Forja funcionando, ferramentas são produzidas localmente e podemos consertar as ferramentas quebradas, além de construir carrinhos para movê-las.',
+rew:'Desbloqueia a habilidade Esforços Médicos: gaste 2 PE para remover o marcador de Doença de qualquer pilar afetado. Adicionalmente, upgrades da Muralha custam 1 PE a menos.'},
+{pe:6,name:'Estruturas Restauradas',tag:'Sólido como Pedra',hab:'SAB (Sobrevivência) CD 25',
+txt:'Corrigir as falhas da cidade exige esforço, mas com rachaduras reforçadas e buracos selados, as casas finalmente oferecem abrigo real contra o vento e a chuva. Não dormimos mais no frio nem tememos o teto ruir sobre nós.',
+rew:'Reduz mais 10% a chance de Doença. O evento de Chuva Forte não desfaz mais upgrades — estruturas bem mantidas resistem à natureza. O risco de desmoronamento por chuva passa a acontecer apenas com 20% de chance (em vez de ser garantido).'},
+{pe:4,name:'Rede de Mensageiros',tag:'Comunicação',hab:'DES (Atletismo) CD 30',
+txt:'Restaurar torres de vigia exige deslocamento até locais distantes. Uma vez ativas, melhoram a comunicação da cidade.',
+rew:'Permite contatar o Olho Âmbar por 1 PE (ação do Salão de Comando), reduzindo em 1 o custo de PE de todos os pilares na semana seguinte. Também permite que, uma vez na semana, heróis auxiliem outros pilares nos testes de melhoria por 2 PE (gastos pelo herói que vai auxiliar). Além disso, o herói da Moral pode gastar 2 PE para forçar um evento de Moral.'},
+{pe:2,name:'Rede Hídrica Avançada',tag:'⭐ Infraestrutura Restituída',hab:'INT (Investigação) CD 60 · SAB (Percepção) CD 40',
+txt:'Uma cidade que se preze precisa de hidráulica excepcional: canos bem projetados, dutos sem gargalos, conduítes fechados e cuidado arcano para evitar contaminação. Não requer muito esforço, mas exige mente afiadíssima.',
+rew:'Reduz em 30% a chance de Doença. Com água em abundância chegando nas forjas, instrumentos mais precisos são criados: upgrades de todos os pilares custam 1 PE a menos. A alquimia e a criação de poções tornam-se mais poderosas.'}]},
 comando:{name:'Salão de Comando',icon:'🗺️',c:'ca',a:'var(--amber)',p:'amber',levels:[
-{pe:1,name:'Salão Limpo e Operacional',tag:'Análise Operacional',hab:'INT (Investigação) CD 15',txt:'Com um lugar limpo e bem estruturado é possível planejar bem o próximo passo.',rew:'Com o lugar organizado podemos analisar melhor o que temos que fazer — jogadores podem ver o upgrade seguinte além do atual disponível, e o Senhor do Salão poderá analisar todos os pilares.'},
-{pe:2,name:'Mesa de Planejamento',tag:'Mesa de Planejamento',hab:'INT (Investigação) CD 10 · SAB (Atletismo) CD 15',txt:'Há muitos papéis de relatório chegando dos pilares. Sem organização não é fácil distribuir corretamente os esforços.',rew:'O herói do Salão pode redistribuir até 3 PE não gastos de um herói para outro, uma vez por semana. O texto completo e os efeitos mecânicos de todos os upgrades visíveis são revelados a todos.'},
-{pe:4,name:'Arquivo Histórico',tag:'Planta Baixa',hab:'SAB (História) CD 20',txt:'Com certeza nessa papelada há uma planta baixa da cidade, construções, túneis e informações que ajudam a entender melhor em qual pilar focar.',rew:'Reduz em 2 a CD de todos os testes de melhoria. Habilidades exigidas, CDs e recompensa final de cada pilar são revelados antes mesmo de iniciar o próximo upgrade.'},
-{pe:3,name:'Análise Probabilística',tag:'Previsão Estratégica',hab:'SAB (Percepção) CD 30',txt:'As coisas não acontecem aleatoriamente — é possível prevê-las. O cheiro de orvalho antes de uma chuva, o tremor de um exército marchando.',rew:'Por 1 PE, o herói pode prever os eventos da próxima semana. Se qualquer pilar encerrar a semana com 1 PE ou mais sobrando, inicia a próxima com 8 PE.'},
-{pe:7,name:'Comando Unificado',tag:'⭐ Coordenação Exímia',hab:'—',txt:'A coordenação deve estar perfeita. Todos sabem o seu lugar, onde atuar e no momento certo.',rew:'Com a Rede de Mensageiros ativa, heróis não gastam PE para auxiliar outros pilares. Podem auxiliar até duas vezes por semana.'}]},
+{pe:2,name:'Salão Limpo e Operacional',tag:'Análise Operacional',hab:'INT (Investigação) CD 15',
+txt:'Com um lugar limpo e bem estruturado é possível planejar bem o próximo passo.',
+rew:'Com o lugar organizado podemos analisar melhor o que temos que fazer — jogadores podem ver o upgrade seguinte além do atual disponível, e o Senhor do Salão poderá analisar todos os pilares.'},
+{pe:3,name:'Mesa de Planejamento',tag:'Mesa de Planejamento',hab:'INT (Investigação) CD 10 · SAB (Atletismo) CD 15',
+txt:'Há muitos papéis de relatório chegando dos pilares. Sem organização não é fácil distribuir corretamente os esforços, é preciso um local organizado.',
+rew:'Uma vez por semana, o herói do Salão pode redistribuir até 3 PE não gastos de um herói para outro. Além disso, para o herói do Salão ficará mais claro o que os níveis visíveis vão melhorar — o texto completo dos upgrades disponíveis é revelado a todos.'},
+{pe:5,name:'Arquivo Histórico',tag:'Planta Baixa',hab:'SAB (História) CD 20',
+txt:'Com certeza nessa papelada há uma planta baixa da cidade, construções, túneis e informações importantes que podem ajudar a entender melhor em qual pilar é melhor focar.',
+rew:'Reduz em 2 a CD de todos os testes de melhoria de qualquer pilar. As habilidades necessárias para o próximo upgrade são mostradas antes mesmo de iniciá-lo. Mostra também qual será potencialmente a recompensa final de cada pilar se completado.'},
+{pe:4,name:'Análise Probabilística',tag:'Previsão Estratégica',hab:'SAB (Percepção) CD 30',
+txt:'As coisas não acontecem aleatoriamente — é possível prevê-las. O cheiro de orvalho antes de uma chuva, o tremor de um exército marchando, o cheiro de ferro sobre a lua rubra. Tudo pode ser analisado e previsto.',
+rew:'O herói do Salão pode gastar 1 PE para prever os eventos da próxima semana. Quando esta habilidade é usada, caso qualquer pilar encerre a semana com 1 PE ou mais sobrando, ele inicia a próxima semana com 8 PE.'},
+{pe:7,name:'Comando Unificado',tag:'⭐ Coordenação Exímia',hab:'—',
+txt:'A coordenação deve estar perfeita. Todos sabem o seu lugar e onde atuar, no momento que devem atuar. Não é mais um esforço ajudar outros necessitados.',
+rew:'Contanto que a Rede de Mensageiros esteja funcional, os heróis não precisam mais gastar PE para auxiliar outros pilares nos testes de melhoria. Além disso, podem auxiliar até duas vezes na semana.'}]},
 moral:{name:'Moral',icon:'🫂',c:'cr',a:'var(--rose)',p:'rose',levels:[
-{pe:2,name:'Segunda Chance',tag:'Não É Bem Assim',hab:'CAR (Enganação) CD 15',txt:'Talvez você possa ter sido mal interpretado.',rew:'Por 1 PE, permite rejogar um teste falho de evento de Moral. Após o uso, fica indisponível por uma semana.'},
-{pe:3,name:'Discurso de Propósito',tag:'Motivação',hab:'CAR (Persuasão) CD 15 · SAB (Percepção) CD 15',txt:'Com a motivação certa, as pessoas podem dar mais de si do que imaginam. É para isso que serve o discurso antes das grandes batalhas.',rew:'Uma vez por semana, escolha um pilar: os PE investidos nele nessa semana custam 1 a menos. Não acumula com outros descontos.'},
-{pe:4,name:'Cultura de Resistência',tag:'Sobrevivência',hab:'CAR (Persuasão) CD 18 · SAB (Intuição) CD 20',txt:'Os soldados do Leste não são voluntários ingênuos — sabem que uma falha não é esforço perdido, é sobrevivência.',rew:'PE gastos em um teste de melhoria são reduzidos à metade (arredondado para baixo). O herói da Moral pode gastar 2 PE para conceder vantagem no próximo teste de melhoria de qualquer pilar.'},
-{pe:4,name:'Noite de Celebração',tag:'Descontração',hab:'CAR (Performance) CD 20',txt:'Bebidas, uma fogueira e histórias de vitória pela cidade inteira. É assim que os soldados se divertem.',rew:'Gaste 4 PE para melhorar o nível de Moral base em 1 ponto, ignorando o teto Neutro. Fica indisponível por duas semanas após o uso.'},
-{pe:4,name:'A Cidade Respira',tag:'⭐ A Cidade Está Viva',hab:'CAR (qualquer) CD 50',txt:'A moral deixou de ser frágil e se tornou força. Este lugar já não é mais uma cidade abandonada — é uma resistência, uma força, um lar. Chegou a hora de nomeá-la.',rew:'Com Moral ≥ 0: todos recebem +1 PE por semana. Com Moral Boa: bônus mantido. Com Moral Excelente: todos os testes com vantagem — testes que já possuem vantagem passam a ter vantagem tripla.'}]}
+{pe:3,name:'Segunda Chance',tag:'Não É Bem Assim',hab:'CAR (Enganação) CD 15',
+txt:'Talvez você possa ter sido mal interpretado.',
+rew:'Possibilita o herói, ao custo de 1 PE, rejogar um teste falho de evento de Moral. Ao usar esta habilidade, ela fica indisponível por uma semana completa.'},
+{pe:4,name:'Discurso de Propósito',tag:'Motivação',hab:'CAR (Persuasão) CD 15 · SAB (Percepção) CD 15',
+txt:'Com a motivação certa, as pessoas podem dar mais de si do que imaginam. É para isso que serve o discurso antes das grandes batalhas.',
+rew:'Uma vez por semana, escolha um pilar: os PE investidos naquele pilar nesta semana custam 1 a menos. Não acumula com outros descontos de PE.'},
+{pe:5,name:'Cultura de Resistência',tag:'Sobrevivência',hab:'CAR (Persuasão) CD 18 · SAB (Intuição) CD 20',
+txt:'Os soldados do Leste não são voluntários ingênuos — sabem que uma falha não é esforço perdido, é sobrevivência.',
+rew:'Os PE gastos em um teste de melhoria de pilar são reduzidos pela metade (arredondados para baixo). O herói responsável pela Moral pode gastar 2 PE para conceder vantagem no próximo teste de habilidade para concluir aquela melhoria.'},
+{pe:5,name:'Noite de Celebração',tag:'Descontração',hab:'CAR (Performance) CD 20',
+txt:'Bebidas, uma fogueira e histórias de vitória pela cidade inteira. É assim que os soldados se divertem, com certeza isto vai melhorar o humor do pessoal.',
+rew:'O herói responsável pela Moral pode gastar 4 PE para melhorar o nível de Moral base em 1 ponto, ignorando o teto Neutro — podendo deixar a moral Boa ou Excelente. Ao usar esta habilidade, ela fica indisponível por duas semanas.'},
+{pe:5,name:'A Cidade Respira',tag:'⭐ A Cidade Está Viva',hab:'CAR (qualquer) CD 50',
+txt:'A moral deixou de ser frágil e se tornou força. Este lugar já não é mais uma cidade abandonada, mas sim uma resistência… uma força… um lar. Chegou a hora de nomeá-la. Qual será o seu nome?',
+rew:'Enquanto a Moral estiver em nível 0 ou superior, os heróis recebem +1 PE ao início de cada semana. Com Moral Boa (+1), esse benefício se mantém. Com Moral Excelente (+2), além disso, todos os testes de habilidade são feitos com vantagem — testes que já possuírem vantagem passam a ter vantagem tripla.'}]}
 };
 
 // Textos completos (versão longa do PDF) para a tela de escolha
@@ -437,17 +732,65 @@ moral:{
 }
 };
 
+const REWARDS={
+muralhas:{
+  icon:'⚔️',title:'Experiências da Guerra',sub:'Recompensa — Muralhas Completas',
+  text:`O herói que liderou a defesa desta cidade forjou algo que nenhum grimório ensina: experiência real de batalha.
+
+O responsável pelas Muralhas recebe toda a XP necessária para o próximo nível de personagem — o crescimento que só vem de lutar de verdade, dia após dia, contra o que vem do leste.
+
+Além disso, os soldados de defesa da cidadela não o veem mais como um aliado do Conclave. Eles o veem como um irmão de guerra.
+
+Por fim, entre as fileiras dos defensores que resistiram até o fim da reconstrução, há um soldado cujo sangue carrega uma herança marcial antiga. Ele traz ao grupo um conhecimento que poucos que não são guerreiros possuem — ele conversa com vocês e concede a cada um uma manobra de combate do guerreiro.`
+},
+aqueduto:{
+  icon:'🔥',title:'A Forja Rúnica',sub:'Recompensa — Infraestrutura Completa',
+  text:`Enquanto as últimas peças se encaixavam no sistema hídrico da cidade, Barunt sentiu algo diferente no calor das chamas. Não era o fogo comum das forjas do leste — era algo mais antigo, mais profundo.
+
+Aquela forja, aqueles canos, lembraram Barunt de algo que ele havia redescoberto há pouco: a arte de gravar runas de poder em metal e pedra.
+
+A Forja Rúnica foi despertada. Barunt agora, com um pouco de tempo, pode criar runas. Com o tempo, ele pode ensinar outros anões da cidadela, erguendo aqui uma escola de runoforja que gerará itens únicos ao longo de muitos anos — se tudo der certo.
+
+O que vier a ser criado nessa forja, o grupo escolhe. O que for escolhido, mudará o curso do que está por vir.`
+},
+comando:{
+  icon:'🗝️',title:'Câmara dos Ecos',sub:'Recompensa — Salão de Comando Completo',
+  text:`Enquanto os últimos arquivos eram organizados e as paredes do salão reforçadas, um conjunto de papiros antigos chamou a atenção. Diferente dos demais, eles não registravam história… mas caminhos. Mapas esquecidos, detalhando túneis ocultos sob a cidade, passagens secretas mantidas fora de qualquer registro oficial.
+
+Seguindo essas indicações, atrás de uma parede do castelo, revelam-se os Túneis Secretos. Corredores subterrâneos que conectam pontos esquecidos da cidade, câmaras seladas, antigas rotas de fuga… e talvez algo mais.
+
+Na câmara principal, repousam quatro relíquias anteriores à praga.
+
+O que mais esses túneis escondem… Somente o tempo e outras pessoas irão saber.`
+},
+moral:{
+  icon:'👑',title:'Um Verdadeiro Rei',sub:'Recompensa — Moral Completa',
+  text:`Houve um momento — difícil de apontar exatamente quando — em que algo mudou.
+
+Os soldados da cidadela não erguem mais os olhos quando o Conclave entra. Eles erguem os olhos quando vocês entram.
+
+Suas ordens têm peso de lei entre esses muros. Mesmo quando contradizem o Conclave, os soldados seguem vocês. Mesmo quando o custo é alto, eles ficam.
+
+O herói que sustentou o espírito deste povo durante a reconstrução é reconhecido com deferência especial. Quando ele fala, todos ouvem. Quando ele decide, ninguém questiona.
+
+Este é o começo de uma cidade. Um reino.`
+}
+};
 const ML={2:'Excelente',1:'Boa',0:'Neutra','-1':'Insatisfeita','-2':'Ruim','-3':'Péssima','-4':'Nula'};
-const OR=['muralhas','aqueduto','comando','moral'];
-const CH={Magne:{cls:'Bárbaro',col:'var(--blue)'},André:{cls:'Guerreiro',col:'var(--amber)'},Klaus:{cls:'Monge',col:'var(--teal)'},Barunt:{cls:'Clérigo de Moradin',col:'var(--rose)'},GM:{cls:'Mestre da Campanha',col:'var(--rose)'}};
+const OR=['muralhas','aqueduto','comando','moral'];const CH={Magne:{cls:'Bárbaro',col:'var(--blue)'},André:{cls:'Guerreiro',col:'var(--amber)'},Klaus:{cls:'Monge',col:'var(--teal)'},Barunt:{cls:'Clérigo de Moradin',col:'var(--rose)'},GM:{cls:'Mestre da Campanha',col:'var(--rose)'}};
 const PICON={Magne:'🪓',André:'🛡️',Klaus:'☯️',Barunt:'⚒️',GM:'📜'};
 const PILLAR_TITLE={muralhas:'Senhor das Muralhas',aqueduto:'Senhor da Infraestrutura',comando:'Senhor do Salão de Comando',moral:'Guardião da Moral'};
 
 // ═══════════════ ESTADO ═══════════════
 const KEY='acidade_v7';
-function mkFront(){return{level:0,pending:null,peUsed:0,peMod:0,peGifted:0,status:'normal',enfermoWeek:null,discursoBuff:false,resistenciaBuff:false,discourseUsed:false,mesaUsed:false,oAmbarUsed:false,forcarMoralUsed:false,ajudado:false,ajudadoPor:null,seenTests:[]}}
-function fresh(){return{week:1,day:0,peTotal:7,moral:0,moralHalf:false,moralEvent:false,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,gameReleased:false,weekEventShown:false,eventProbs:{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50},assignments:{},fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
-function load(){try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s),f=fresh();f.week=d.week||1;f.day=d.day||0;f.peTotal=d.peTotal||7;f.moral=d.moral||0;f.nevoa=!!d.nevoa;f.oAmbarBuff=!!d.oAmbarBuff;f.oAmbarNextWeek=!!d.oAmbarNextWeek;f.gameReleased=!!d.gameReleased;f.weekEventShown=!!d.weekEventShown;f.moralEvent=!!d.moralEvent;f.moralHalf=!!d.moralHalf;f.eventProbs=d.eventProbs||{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50};f.assignments=d.assignments||{};f.log=d.log||[];if(d.fronts)OR.forEach(k=>{if(d.fronts[k])f.fronts[k]={...f.fronts[k],...d.fronts[k]}});return f}}catch(e){}return fresh()}
+function mkFront(){return{level:0,pending:null,peUsed:0,peMod:0,peGifted:0,status:'normal',enfermoWeek:null,discursoBuff:false,resistenciaBuff:false,discourseUsed:false,mesaUsed:false,oAmbarUsed:false,forcarMoralUsed:false,ajudado:false,ajudadoPor:null,ajudado2:false,ajudadoPor2:null,seenTests:[]}}
+function fresh(){return{week:1,day:0,peTotal:7,moral:0,moralHalf:false,moralEvent:false,moralEventFailed:false,moralEventId:null,moralSeenIds:[],moralPickPending:false,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,gameReleased:false,weekEventShown:false,attackActive:false,attackMagnitude:null,attackWeek:null,attackDefenseReady:false,attackNoticeDismissed:false,patrulhasUsed:false,fortalezaActive:false,fortalezaUsedThisWeek:false,fortalezaBloqueada:false,analisePrevUsed:false,analisePrevAtiva:false,ajudasThisWeek:{},eventProbs:{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50},assignments:{},fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
+function load(){try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s),f=fresh();f.week=d.week||1;f.day=d.day||0;f.peTotal=d.peTotal||7;f.moral=d.moral||0;f.nevoa=!!d.nevoa;f.oAmbarBuff=!!d.oAmbarBuff;f.oAmbarNextWeek=!!d.oAmbarNextWeek;f.gameReleased=!!d.gameReleased;f.weekEventShown=!!d.weekEventShown;f.moralEvent=!!d.moralEvent;f.moralHalf=!!d.moralHalf;f.moralEventFailed=!!d.moralEventFailed;
+f.attackActive=!!d.attackActive;f.attackMagnitude=d.attackMagnitude||null;f.attackWeek=d.attackWeek||null;f.attackDefenseReady=!!d.attackDefenseReady;f.attackNoticeDismissed=!!d.attackNoticeDismissed;
+f.patrulhasUsed=!!d.patrulhasUsed;f.fortalezaActive=!!d.fortalezaActive;f.fortalezaUsedThisWeek=!!d.fortalezaUsedThisWeek;f.fortalezaBloqueada=!!d.fortalezaBloqueada;
+f.analisePrevUsed=!!d.analisePrevUsed;f.analisePrevAtiva=!!d.analisePrevAtiva;f.ajudasThisWeek=d.ajudasThisWeek||{};
+f.moralEventId=d.moralEventId||null;f.moralSeenIds=d.moralSeenIds||[];f.moralPickPending=!!d.moralPickPending;
+f.eventProbs=d.eventProbs||{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50};f.assignments=d.assignments||{};f.log=d.log||[];if(d.fronts)OR.forEach(k=>{if(d.fronts[k])f.fronts[k]={...f.fronts[k],...d.fronts[k]}});return f}}catch(e){}return fresh()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
 let G=load(),P=null,SF=null,TT=null,PPending=null,CrossPopup=null;
 
@@ -485,9 +828,66 @@ function reduceHab(habStr){
     return`CD <b style="color:var(--teal)">${red}</b> <s style="color:var(--t3);font-size:10px">CD ${orig}</s>`;
   });
 }
+function _ac(){try{return new(window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}
+function _osc(ctx,freq,type,start,dur,vol=0.2){const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type=type;o.frequency.setValueAtTime(freq,start);g.gain.setValueAtTime(vol,start);g.gain.exponentialRampToValueAtTime(0.001,start+dur);o.start(start);o.stop(start+dur+.02);}
+function _noise(ctx,dur,lpFreq=800,vol=0.4,start=0){const b=ctx.sampleRate*dur,buf=ctx.createBuffer(1,b,ctx.sampleRate),d=buf.getChannelData(0);for(let i=0;i<b;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/b,0.4);const s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();s.buffer=buf;f.type='lowpass';f.frequency.setValueAtTime(lpFreq,start);f.frequency.exponentialRampToValueAtTime(80,start+dur);s.connect(f);f.connect(g);g.connect(ctx.destination);g.gain.setValueAtTime(vol,start);g.gain.exponentialRampToValueAtTime(0.001,start+dur);s.start(start);s.stop(start+dur+.05);}
+
+function playAlert(type='test'){
+  const ctx=_ac();if(!ctx)return;
+  const t=ctx.currentTime;
+  if(type==='test'){
+    // Três notas ascendentes douradas
+    [[440,.08],[554,.08],[659,.15]].forEach(([f,d],i)=>_osc(ctx,f,'sine',t+i*.09,d,0.15));
+  } else if(type==='moral'){
+    // Suave descendente rosa
+    [[440,.12],[370,.12],[330,.22]].forEach(([f,d],i)=>_osc(ctx,f,'sine',t+i*.13,d,0.12));
+  } else if(type==='attack'){
+    // Grave tenso de alerta
+    [[110,.2],[82,.2],[73,.3],[82,.1]].forEach(([f,d],i)=>_osc(ctx,f,'sawtooth',t+i*.22,d,0.1));
+    _noise(ctx,.3,400,.2,t);
+  }
+}
+function playSoundEffect(type){
+  const ctx=_ac();if(!ctx)return;
+  const t=ctx.currentTime;
+  if(type==='pass'){
+    // Melodia feliz — arpejo maior rápido
+    [[523,.1],[659,.1],[784,.1],[1047,.25]].forEach(([f,d],i)=>_osc(ctx,f,'sine',t+i*.12,d,0.14));
+  } else if(type==='fail'){
+    // Melodia triste — descida menor lenta
+    [[392,.18],[349,.18],[311,.18],[262,.35]].forEach(([f,d],i)=>_osc(ctx,f,'sine',t+i*.2,d,0.13));
+    // Harmonia grave
+    [[196,.18],[174,.18],[155,.18],[130,.35]].forEach(([f,d],i)=>_osc(ctx,f,'sine',t+i*.2,d,0.06));
+  } else if(type==='stone'){
+    // Pedras quebrando — ruído com impacto
+    _noise(ctx,.15,1200,.5,t);
+    _noise(ctx,.3,400,.3,t+.1);
+    _noise(ctx,.4,200,.25,t+.25);
+    _osc(ctx,80,'sine',t,.15,.25);
+    _osc(ctx,55,'sine',t+.1,.2,.2);
+  } else if(type==='cough'){
+    // Tosse — ruído modulado curto
+    for(let i=0;i<3;i++){_noise(ctx,.08,2000,.35,t+i*.12);_noise(ctx,.04,800,.15,t+i*.12+.05);}
+  } else if(type==='rain'){
+    // Chuva destruindo — vento + estrondo + pedras
+    _noise(ctx,.6,8000,.15,t);// vento
+    _noise(ctx,.3,600,.5,t+.2);// impacto
+    _osc(ctx,70,'sine',t+.2,.3,.2);// estrondo grave
+    _noise(ctx,.5,300,.3,t+.4);// escombros
+  }
+}
 function pillarTotalPE(fid){return Math.max(1,G.peTotal+(G.fronts[fid].peMod||0))}
 function myAvailPE(){if(P==='GM')return G.peTotal;const mp=myPillar();if(!mp)return 0;return Math.max(0,pillarTotalPE(mp)-(G.fronts[mp].peUsed||0)+(G.fronts[mp].peGifted||0))}
-function efectivePE(base,fid){let c=base;if(G.nevoa)c+=1;if(G.moral>=1)c=Math.max(1,c-1);if(G.moral<=-1)c+=1;if(G.oAmbarBuff)c=Math.max(1,c-1);if(fid&&G.fronts[fid].discursoBuff)c=Math.max(1,c-1);return Math.max(1,c)}
+function efectivePE(base,fid){let c=base;if(G.nevoa)c+=1;if(G.moral>=1)c=Math.max(1,c-1);if(G.moral<=-1)c+=1;if(G.oAmbarBuff)c=Math.max(1,c-1);if(fid&&G.fronts[fid].discursoBuff)c=Math.max(1,c-1);if(fid==='muralhas'&&G.fronts.aqueduto.level>=2)c=Math.max(1,c-1);if(G.fronts.aqueduto.level>=5)c=Math.max(1,c-1);return Math.max(1,c)}
+function openReward(fid){
+  const r=REWARDS[fid];if(!r)return;
+  document.getElementById('reward-icon').textContent=r.icon;
+  document.getElementById('reward-title').textContent=r.title;
+  document.getElementById('reward-sub').textContent=r.sub;
+  document.getElementById('reward-body').textContent=r.text;
+  document.getElementById('rewardmodal').style.display='flex';
+  playSoundEffect('pass');
+}
 function mlabel(){return ML[String(G.moral)]||'?'}
 function alog(who,msg){G.log.unshift({w:G.week,who,msg});if(G.log.length>80)G.log.pop()}
 
@@ -498,7 +898,21 @@ function canUseEsforcosMedicos(targetFid){return canShowEsforcos(targetFid)&&G.f
 // SALÃO: Olho Âmbar — apenas o jogador do Salão pode usar, aparece no próprio card do Salão
 function canShowOAmbar(targetFid){return G.assignments[P]==='comando'&&G.fronts.aqueduto.level>=4&&!G.fronts.aqueduto.oAmbarUsed&&targetFid==='aqueduto'}
 // INFRA: Auxiliar (Rede) — qualquer player pode gastar 2 PE para poder participar do próximo teste de upgrade de outro pilar
-function canShowAjuda(targetFid){return G.fronts.aqueduto.level>=4&&P!=='GM'&&!isOwner(targetFid)&&!G.fronts[targetFid].ajudado&&myAvailPE()>=2}
+// Comando Unificado (Salão nível 5): auxílio grátis e 2x por semana
+function canShowAjuda(targetFid){
+  if(P==='GM'||isOwner(targetFid))return false;
+  if(!G.fronts.aqueduto.level>=4)return false; // requer Rede de Mensageiros
+  const hasUnificado=G.fronts.comando.level>=5;
+  // Conta quantos auxílios o jogador já deu esta semana
+  const myAjudasThisWeek=G.ajudasThisWeek&&G.ajudasThisWeek[P]||0;
+  const maxAjudas=hasUnificado?2:1;
+  if(myAjudasThisWeek>=maxAjudas)return false;
+  if(G.fronts[targetFid].ajudado&&!hasUnificado)return false; // sem Unificado: 1 por pilar
+  if(G.fronts[targetFid].ajudado2&&hasUnificado)return false; // com Unificado: máx 2 por pilar total
+  const custo=hasUnificado?0:2;
+  if(!hasUnificado&&myAvailPE()<custo)return false;
+  return G.fronts.aqueduto.level>=4;
+}
 // MORAL: Discurso de Propósito
 function canShowDiscurso(targetFid){return G.assignments[P]==='moral'&&G.fronts.moral.level>=2&&!G.fronts.moral.discourseUsed&&targetFid!=='moral'}
 // MORAL: Cultura de Resistência
@@ -623,34 +1037,81 @@ function closePSum(){document.getElementById('psum').classList.remove('open');do
 // ═══════════════ GM AUTH ═══════════════
 function oGM(){document.getElementById('gmm').classList.add('open');document.getElementById('gpwd').value='';document.getElementById('gerr').textContent='';setTimeout(()=>document.getElementById('gpwd').focus(),40)}
 function xGM(){document.getElementById('gmm').classList.remove('open')}
-function cGM(){if(document.getElementById('gpwd').value==='Alex@200'){xGM();L('GM')}else{document.getElementById('gerr').textContent='Senha incorreta.';document.getElementById('gpwd').value='';document.getElementById('gpwd').focus()}}
+function cGM(){
+  // Senha verificada via hash simples (não armazenar em plaintext)
+  const input=document.getElementById('gpwd').value;
+  const h=Array.from(input).reduce((a,c)=>((a<<5)-a+c.charCodeAt(0))|0,0);
+  if(h===1683994800){xGM();L('GM')}else{document.getElementById('gerr').textContent='Senha incorreta.';document.getElementById('gpwd').value='';document.getElementById('gpwd').focus()}
+}
 function logout(){P=null;SF=null;PPending=null;CrossPopup=null;document.getElementById('app').style.display='none';document.getElementById('ppick').classList.remove('open');document.getElementById('psum').classList.remove('open');document.getElementById('login').style.display='flex';document.getElementById('gmp').classList.remove('open');document.getElementById('gmtog').style.display='none'}
 function tGMP(){document.getElementById('gmp').classList.toggle('open')}
 
 // ═══════════════ RENDER ═══════════════
 function render(){
   if(!P)return;
-  // Overlay de evento moral para o jogador da moral
+  // Overlay de evento moral
   if(P&&P!=='GM'&&G.gameReleased){
     const isMoralPlayer=G.assignments[P]==='moral';
     const mov=document.getElementById('moraloverlay');
-    if(isMoralPlayer&&G.moralEvent){mov.style.display='flex'}
-    else if(mov.style.display==='flex'){mov.style.display='none'}
+    const wasMoralHidden=mov.style.display!=='flex';
+    if(isMoralPlayer&&G.moralEvent){
+      mov.style.display='flex';
+      if(wasMoralHidden)playAlert('moral');
+      populateMoralOverlay();
+    } else if(mov.style.display==='flex'){mov.style.display='none'}
   }
+  // Overlay de ataque para Muralhas player
+  if(P&&P!=='GM'&&G.gameReleased){
+    const isWallPlayer=G.assignments[P]==='muralhas';
+    const aov=document.getElementById('attackoverlay');
+    if(isWallPlayer&&G.attackActive&&!G.attackDefenseReady&&!G.attackNoticeDismissed){
+      if(aov.style.display!=='flex'){
+        const mags={facil:'Fácil (CD 15)',normal:'Normal (CD 20)',dificil:'Difícil (CD 25)',muitoDificil:'Muito Difícil (CD 30)',impossivel:'Impossível (CD 35)'};
+        document.getElementById('att-mag').textContent=`Magnitude: ${mags[G.attackMagnitude]||G.attackMagnitude}`;
+        // Patrulhas Externas (nível 4): botão para reduzir magnitude
+        const patrulhasDiv=document.getElementById('att-patrulhas');
+        if(G.fronts.muralhas.level>=4&&!G.patrulhasUsed){
+          const avWall=myAvailPE();
+          patrulhasDiv.style.display='block';
+          patrulhasDiv.innerHTML=`<button class="btn btn-sm" style="border-color:rgba(90,170,240,.5);color:var(--blue)" onclick="usePatrulhas()" ${avWall>=2?'':'disabled'}>🗡️ Patrulhas Externas · 2 PE — Reduzir magnitude</button>`;
+        } else {patrulhasDiv.style.display='none';}
+        const hasTorres=G.fronts.muralhas.level>=3;
+        document.getElementById('att-no-torres').style.display=hasTorres?'none':'block';
+        aov.style.display='flex';
+        playAlert('attack');
+      }
+    } else if(aov.style.display==='flex'&&(!G.attackActive||G.attackDefenseReady)){aov.style.display='none'}
+    // Overlay de teste de defesa no dia 7 da semana
+    const ov=document.getElementById('testoverlay');
+    if(isWallPlayer&&G.attackDefenseReady){
+      if(ov.style.display!=='flex'){
+        ov.style.display='flex';
+        const mag=G.attackMagnitude;const cds={facil:15,normal:20,dificil:25,muitoDificil:30,impossivel:35};
+        document.getElementById('test-icon').textContent='⚔️';
+        document.getElementById('test-icon').style.color='var(--rose)';
+        document.getElementById('test-upgrade-name').textContent='Defesa da Cidade';
+        document.getElementById('test-skill-val').textContent=`FOR ou DES vs CD ${cds[mag]||20}`;
+        playAlert('attack');
+      }
+    }
+  }
+  // Overlay de upgrade pronto para teste (não muralhas em ataque)
   if(P&&P!=='GM'&&G.gameReleased){
     const mp=myPillar();
     if(mp){
       const fs=G.fronts[mp];
       const ov=document.getElementById('testoverlay');
-      if(fs.pending&&fs.pending.testReady&&!fs.pending.testResult){
-        // Mostra overlay de teste
+      if(!G.attackDefenseReady&&fs.pending&&fs.pending.testReady&&!fs.pending.testResult){
         const lv=FD[mp].levels[fs.pending.lv-1];
+        const wasHidden=ov.style.display!=='flex';
         ov.style.display='flex';
         document.getElementById('test-icon').textContent=PICON[P]||'⚔️';
         document.getElementById('test-icon').style.color=CH[P]?CH[P].col:'var(--gold)';
         document.getElementById('test-upgrade-name').textContent=lv?lv.tag:'';
         document.getElementById('test-skill-val').textContent=lv?lv.hab:'—';
-      } else {
+        if(wasHidden)playAlert('test');
+      } else if(!G.attackDefenseReady||(!G.attackActive&&!G.attackDefenseReady)){
+        // Esconde para qualquer pilar (inclusive muralhas) quando não há mais defesa ativa
         if(ov.style.display==='flex')ov.style.display='none';
       }
     }
@@ -677,6 +1138,12 @@ function render(){
   document.getElementById('dtav').textContent=av;
   document.getElementById('dttot').textContent=ptotal+(G.fronts[mp||'muralhas'].peMod?` (base ${G.peTotal} ${G.fronts[mp||'muralhas'].peMod>0?'+':''}${G.fronts[mp||'muralhas'].peMod})`:'');
   document.getElementById('nevbanner').className=G.nevoa?'on':'';
+  // Banner de moral crítica
+  let moralBanner=document.getElementById('moralbanner');
+  if(!moralBanner){moralBanner=document.createElement('div');moralBanner.id='moralbanner';moralBanner.style.cssText='display:none;padding:9px 20px;margin-bottom:18px;border-radius:var(--r);font-family:\'Cinzel\',serif;font-size:11px;letter-spacing:.1em;text-align:center';document.getElementById('nevbanner').parentNode.insertBefore(moralBanner,document.getElementById('nevbanner').nextSibling)}
+  if(G.moral<=-4){moralBanner.style.display='block';moralBanner.style.background='rgba(200,50,50,.15)';moralBanner.style.border='1px solid rgba(200,50,50,.5)';moralBanner.style.color='var(--dead)';moralBanner.textContent='☠️ MORAL NULA — Soldados exigem que o Conclave abandone a cidade!'}
+  else if(G.moral<=-3){moralBanner.style.display='block';moralBanner.style.background='rgba(224,80,80,.1)';moralBanner.style.border='1px solid rgba(224,80,80,.4)';moralBanner.style.color='var(--rose)';moralBanner.textContent='⚠️ MORAL PÉSSIMA — Mesmo aprovando o teste, há 50% de chance dos soldados desistirem!'}
+  else{moralBanner.style.display='none'}
   if(P==='GM'){
     document.getElementById('gdtt').value=G.peTotal;document.getElementById('gmoralinp').value=G.moral;
     document.getElementById('gmoraldisp').textContent=`${mv>=0?'+':''}${mv} — ${mlabel()}`;document.getElementById('gmoraldisp').style.color=mc;
@@ -712,10 +1179,15 @@ function rGMPillarGrid(){
     const mod=fs.peMod||0;
     const modStr=mod>0?`+${mod}`:mod<0?`${mod}`:'0';
     const d=document.createElement('div');d.className='gmpc';
-    const testReady=fs.pending&&fs.pending.testReady;
+    const defBtns=(fid==='muralhas'&&G.attackDefenseReady)
+      ?`<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:10px;color:var(--rose);width:100%;margin-bottom:2px">⚔️ Defesa aguardando resultado:</span><button class="btn btn-sm" style="border-color:#1a7a50;color:var(--teal)" onclick="gmDefensePass()">✓ Defesa Bem-sucedida</button><button class="btn btn-danger btn-sm" onclick="gmDefenseFail()">✗ Defesa Falhou</button></div>`
+      :'';
     const moralEventBtn=(fid==='moral'&&G.moralEvent)
       ?`<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:10px;color:var(--rose);width:100%;margin-bottom:2px">🫂 Evento Moral aguardando:</span><button class="btn btn-sm" style="border-color:#1a7a50;color:var(--teal)" onclick="gmMoralPass()">✓ Passou no Teste</button><button class="btn btn-danger btn-sm" onclick="gmMoralFail()">✗ Não Passou</button></div>`
+      :(fid==='moral'&&G.moralPickPending)
+      ?`<div style="margin-top:6px;padding:8px 10px;background:rgba(224,96,144,.08);border:1px solid rgba(224,96,144,.4);border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:11px;color:var(--rose)">🫂 Evento de Moral pendente — escolha a história:</span><button class="btn btn-gm btn-sm" onclick="openMoralPicker()">📜 Escolher História</button></div>`
       :'';
+    const testReady=fs.pending&&fs.pending.testReady;
     const daysLeft=fs.pending&&!testReady?Math.max(0,(fs.pending.startDay+fs.pending.peSpent)-G.day):0;
     const pendBtns=testReady
       ?`<button class="btn btn-sm" style="border-color:#1a7a50;color:var(--teal);background:rgba(62,207,160,.08)" onclick="gmApprove('${fid}')">✓ Aprovar Teste</button><button class="btn btn-danger btn-sm" onclick="gmReject('${fid}')">✗ Reprovar Teste</button>`
@@ -724,7 +1196,7 @@ function rGMPillarGrid(){
     const lvBtns=(fs.level>0?`<button class="btn btn-danger btn-sm" onclick="gmDn('${fid}')">▼ Nível</button>`:'')+(fs.level<5&&!fs.pending?`<button class="btn btn-gm btn-sm" onclick="gmUp('${fid}')">▲ Nível</button>`:'');
     d.innerHTML=`<div class="gmpc-name">${fd.icon} ${fd.name} <span>${sico}</span></div>
 <div class="gmpc-sub">Nível ${fs.level}/5 · <b>${owner}</b> · PE efetivo: ${pillarTotalPE(fid)}</div>
-<div class="gmpc-btns"><button class="btn btn-sick btn-sm" onclick="gmSt('${fid}','doenca')">🦠 Doença</button><button class="btn btn-danger btn-sm" onclick="gmSt('${fid}','enfermo')">☠️ Enfermo</button><button class="btn btn-sm" onclick="gmSt('${fid}','normal')">✅ Curar</button>${lvBtns}${pendBtns}</div>${moralEventBtn}
+<div class="gmpc-btns"><button class="btn btn-sick btn-sm" onclick="gmSt('${fid}','doenca')">🦠 Doença</button><button class="btn btn-danger btn-sm" onclick="gmSt('${fid}','enfermo')">☠️ Enfermo</button><button class="btn btn-sm" onclick="gmSt('${fid}','normal')">✅ Curar</button>${lvBtns}${pendBtns}</div>${moralEventBtn}${defBtns}
 <div class="gmpc-pemod"><span class="gmpc-pemod-lbl">Mod PE:</span><button class="btn btn-sm" style="padding:3px 8px;font-size:10px" onclick="gmPeMod('${fid}',-1)">−</button><span class="gmpc-pemod-val" id="pemod_${fid}">${modStr}</span><button class="btn btn-sm" style="padding:3px 8px;font-size:10px" onclick="gmPeMod('${fid}',1)">+</button><button class="btn btn-sm" style="padding:3px 8px;font-size:10px" onclick="gmPeModSet('${fid}',0)">↺</button><span style="font-size:10px;color:var(--t2);margin-left:4px">PE total: ${pillarTotalPE(fid)}</span></div>`;
     el.appendChild(d);
   });
@@ -757,9 +1229,15 @@ function rFronts(){
     if(sel&&(own||isSalaoViewer||P==='GM'))cls+=' sel';
     if(fs.pending&&own)cls+=' glow';
     if(sick)cls+=' fc-sick';if(dead)cls+=' fc-dead';
+    // Visual de ataque ativo
+    if(G.attackActive){
+      if(fid==='muralhas')cls+=' fc-attack-wall';
+      else cls+=' fc-attack-bg';
+    }
 
     const pips=Array.from({length:5},(_,i)=>{let x='pip';if(i<fs.level)x+=` ${fd.p}`;else if(fs.pending&&i===fs.level)x+=' pend';return`<div class="${x}"></div>`}).join('');
-    const sbadge=sick?`<span class="stk stk-sick">🦠 Doença</span>`:dead?`<span class="stk stk-dead">☠️ Enfermo</span>`:'';
+    const sbadge=sick?`<span class="stk stk-sick">🦠 Doença</span>`:dead?`<span class="stk stk-dead">☠️ Enfermo</span>`:''
+    const abadge=(G.attackActive&&fid==='muralhas')?`<span class="stk stk-dead">⚔️ Sob Ataque</span>`:'';
     const dbuff=fs.discursoBuff?`<span class="stk stk-buff">📣 −1 PE</span>`:'';
     const rbuff=fs.resistenciaBuff?`<span class="stk stk-buff">🎯 Vantagem</span>`:'';
     const abuff=fs.ajudado&&fs.ajudadoPor?`<span class="stk stk-buff">🤝 ${fs.ajudadoPor}</span>`:'';
@@ -783,7 +1261,7 @@ function rFronts(){
     if(own){c.onclick=()=>tog(fid)}
     else if(hasCrossAction){c.onclick=()=>togCross(fid)}
     else if(isSalaoViewer){c.onclick=()=>tog(fid)}
-    c.innerHTML=`<div class="acc"></div><div class="ftop"><div class="fico">${fd.icon}</div><div><div class="fnm">${fd.name}${sbadge}${dbuff}${rbuff}${abuff}</div><div class="flv">Nível ${fs.level} / 5</div></div></div>${ownerBadge}<div class="fpips"><div class="pips">${pips}</div></div>${st}`;
+    c.innerHTML=`<div class="acc"></div><div class="ftop"><div class="fico">${fd.icon}</div><div><div class="fnm">${fd.name}${sbadge}${abadge}${dbuff}${rbuff}${abuff}</div><div class="flv">Nível ${fs.level} / 5</div></div></div>${ownerBadge}<div class="fpips"><div class="pips">${pips}</div></div>${st}`;
     wrap.appendChild(c);
 
     // Cross-pillar popup
@@ -888,23 +1366,86 @@ function rDet(fid){
   const gifted=fs.peGifted>0?`<div style="padding:8px 12px;margin-bottom:12px;background:rgba(62,207,160,.06);border:1px solid rgba(62,207,160,.2);border-radius:6px;font-size:12px;color:var(--teal)">🤝 <b>${fs.peGifted} PE</b> recebido de outros heróis esta semana</div>`:'';
   // Botão Forçar Moral (Moral player + Rede ativa)
   const forcarBtn=(fid==='moral'&&P!=='GM'&&canForcarMoral())?`<div style="margin-bottom:12px"><button class="btn btn-sm" onclick="useForcarMoral()">🔔 Forçar Evento Moral · 2 PE</button></div>`:'';
-  panel.innerHTML=`<div class="dth"><span style="font-size:24px">${fd.icon}</span><div class="dttl">${fd.name}</div>${closeBtn}</div><div class="orn" style="margin-bottom:12px"><span>◆</span></div>${oAmbarActive}${gifted}${forcarBtn}${sickWarn}<div class="lvlist">${lvs}</div>`;
+  // Botão Noite de Celebração (Moral nível ≥ 4)
+  let noiteBtn='';
+  if(fid==='moral'&&P!=='GM'&&G.fronts.moral.level>=4){
+    const cdWeeks=G.fronts.moral.noiteCdWeek||0;const cdLeft=Math.max(0,cdWeeks-G.week+1);
+    const avMy=myAvailPE();const can=cdLeft<=0&&avMy>=4;
+    noiteBtn=`<div style="margin-bottom:12px"><button class="btn btn-sm" onclick="useNoiteCelebracao()" ${can?'':'disabled'}>🎉 Noite de Celebração · 4 PE${cdLeft>0?' (disponível em '+cdLeft+' semana'+(cdLeft>1?'s':'')+')':(avMy<4?' (PE insuficiente)':'')}</button></div>`;
+  }
+  // Botão Segunda Chance (Moral nível ≥ 1) — rejogar teste de moral falhado
+  let segundaBtn='';
+  if(fid==='moral'&&P!=='GM'&&G.fronts.moral.level>=1&&G.moralEvent===false&&G.moralEventFailed){
+    const cdWeek=G.fronts.moral.segundaCdWeek||0;const cdLeft=Math.max(0,cdWeek-G.week+1);
+    const avMy=myAvailPE();const can=cdLeft<=0&&avMy>=1;
+    segundaBtn=`<div style="margin-bottom:12px"><button class="btn btn-sm" onclick="useSegundaChance()" ${can?'':'disabled'}>🔄 Segunda Chance · 1 PE${cdLeft>0?' (disponível em '+cdLeft+' semana'+(cdLeft>1?'s':'')+')':(avMy<1?' (PE insuficiente)':'')}</button></div>`;
+  }
+  // Botão Semana de Fortaleza (Muralhas nível 5)
+  let fortalezaBtn='';
+  if(fid==='muralhas'&&P!=='GM'&&G.fronts.muralhas.level>=5){
+    if(G.fortalezaBloqueada){
+      fortalezaBtn=`<div style="margin-bottom:12px;padding:8px 12px;background:rgba(200,50,50,.07);border:1px solid rgba(200,50,50,.3);border-radius:6px;font-size:12px;color:var(--dead)">🏰 Semana de Fortaleza — em cooldown (foi usada semana passada com ataque ativo)</div>`;
+    } else if(G.fortalezaActive){
+      fortalezaBtn=`<div style="margin-bottom:12px;padding:8px 12px;background:rgba(90,170,240,.08);border:1px solid rgba(90,170,240,.4);border-radius:6px;font-size:12px;color:var(--blue)">🏰 <b>Semana de Fortaleza ATIVA</b> — pilares protegidos · ataques Fáceis e Normais repelidos automaticamente<br><button class="btn btn-sm" style="margin-top:6px;border-color:rgba(200,50,50,.4);color:var(--dead)" onclick="useFortaleza(false)">Desativar Fortaleza</button></div>`;
+    } else {
+      fortalezaBtn=`<div style="margin-bottom:12px"><button class="btn btn-sm" style="border-color:rgba(90,170,240,.5);color:var(--blue)" onclick="useFortaleza(true)">🏰 Declarar Semana de Fortaleza</button></div>`;
+    }
+  }
+  // Análise Probabilística (Salão nível 4): 1 PE para prever eventos + 8 PE se sobrar
+  let analiseBtn='';
+  if(fid==='comando'&&P!=='GM'&&G.fronts.comando.level>=4){
+    if(G.analisePrevUsed){
+      analiseBtn=`<div style="margin-bottom:12px;padding:8px 12px;background:rgba(224,160,48,.07);border:1px solid rgba(224,160,48,.3);border-radius:6px;font-size:12px;color:var(--amber)">🔭 Análise Probabilística já usada esta semana${G.analisePrevAtiva?' — previsão ativa: se sobrar PE, próxima semana começa com 8 PE':''}</div>`;
+    } else {
+      const avMy=myAvailPE();
+      analiseBtn=`<div style="margin-bottom:12px"><button class="btn btn-sm" style="border-color:rgba(224,160,48,.5);color:var(--amber)" onclick="useAnalisePrev()" ${avMy>=1?'':'disabled'}>🔭 Análise Probabilística · 1 PE — prever próxima semana</button></div>`;
+    }
+  }
+  // Info de Catapultas (Muralhas nível 2) — custos reduzidos visíveis
+  let catapultasInfo='';
+  if(fid==='muralhas'&&G.fronts.muralhas.level>=2&&G.attackActive){
+    catapultasInfo=`<div style="margin-bottom:12px;padding:8px 12px;background:rgba(90,170,240,.07);border:1px solid rgba(90,170,240,.3);border-radius:6px;font-size:12px;color:var(--blue)">🏹 <b>Catapultas</b> — Ataque Fácil: grátis (0 PE) · Normal: 1 PE · Difícil: com vantagem no teste</div>`;
+  }
+  const canSeeReward=REWARDS[fid]&&(P==='GM'||fs.level>=5||hasArquivo());
+  const rewardLocked=canSeeReward&&fs.level<5;
+  const rewardCard=canSeeReward?`
+<div style="margin-top:16px;padding:18px 20px;background:linear-gradient(135deg,rgba(201,168,76,${rewardLocked?'.04':'.09'}),transparent);border:1px solid ${rewardLocked?'var(--gold-lo)':'var(--gold)'};border-radius:8px;cursor:pointer;transition:border-color .2s,background .2s;${rewardLocked?'opacity:.75':''}" onclick="openReward('${fid}')" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='${rewardLocked?'var(--gold-lo)':'var(--gold)'}'">
+  <div style="display:flex;align-items:center;gap:12px">
+    <span style="font-size:30px;${rewardLocked?'filter:grayscale(.5)':''}">${REWARDS[fid].icon}</span>
+    <div>
+      <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:${rewardLocked?'var(--t2)':'var(--gold)'};margin-bottom:3px">⭐ ${rewardLocked?'Recompensa Final (Pilar Incompleto)':'Recompensa Desbloqueada'}</div>
+      <div style="font-family:'Cinzel',serif;font-size:15px;font-weight:600;color:${rewardLocked?'var(--t1)':'var(--gold-hi)'}">${REWARDS[fid].title}</div>
+    </div>
+    <div style="margin-left:auto;font-size:16px;color:${rewardLocked?'var(--t3)':'var(--gold-lo)'}">▶</div>
+  </div>
+</div>`:'';
+  panel.innerHTML=`<div class="dth"><span style="font-size:24px">${fd.icon}</span><div class="dttl">${fd.name}</div>${closeBtn}</div><div class="orn" style="margin-bottom:12px"><span>◆</span></div>${oAmbarActive}${gifted}${forcarBtn}${noiteBtn}${segundaBtn}${fortalezaBtn}${analiseBtn}${catapultasInfo}${sickWarn}<div class="lvlist">${lvs}</div>${rewardCard}`;
 }
 
 // ═══════════════ LOG ═══════════════
 function rLog(){const el=document.getElementById('loge');if(!G.log.length){el.innerHTML='<div class="logi" style="opacity:.3"><span class="logts">—</span><span class="logmsg">Sem atividade ainda.</span></div>';return}el.innerHTML=G.log.slice(0,25).map((e,i)=>`<div class="logi" style="opacity:${Math.max(0.1,1-i*.04)}"><span class="logts">S${e.w}</span><span class="logmsg"><span class="logwho">${e.who}</span>&nbsp;${e.msg}</span></div>`).join('')}
 
 // ═══════════════ AÇÕES JOGADORES ═══════════════
+function _attackBlocksPlayer(){
+  // Sem Torres de Vigia: player das muralhas está bloqueado durante o ataque
+  return G.attackActive&&G.assignments[P]==='muralhas'&&G.fronts.muralhas.level<3;
+}
 function su(fid,n){
+  if(_attackBlocksPlayer())return toast('⚔️ Ataque ativo — sem Torres de Vigia você não pode iniciar melhorias.',true);
   const fs=G.fronts[fid],lv=FD[fid].levels[n-1];
   if(fs.pending)return toast('Já há uma melhoria em andamento.',true);
   if(fs.level!==n-1)return toast('Complete o nível anterior primeiro.',true);
   if(fs.status==='enfermo')return toast('Pilar enfermo — não pode receber PE.',true);
-  const cr=efectivePE(lv.pe,fid),av=myAvailPE();
+  let cr=efectivePE(lv.pe,fid);
+  // Cultura de Resistência (Moral nível 3): PE gastos no teste reduzidos à metade (arredondado para baixo)
+  const culturaAtiva=G.fronts.moral.level>=3;
+  if(culturaAtiva)cr=Math.max(1,Math.floor(cr/2));
+  const av=myAvailPE();
   if(P!=='GM'&&av<cr)return toast(`PE insuficiente. Precisa: ${cr}, disponível: ${av}.`,true);
   if(P!=='GM') G.fronts[fid].peUsed=(G.fronts[fid].peUsed||0)+cr;
   fs.pending={lv:n,by:P,peSpent:cr,startDay:G.day,testReady:false,testResult:null};
-  alog(P,`iniciou <b>${FD[fid].name}</b> nível ${n} (${cr} PE)`);
+  const culturaNote=culturaAtiva?` (Cultura de Resistência: custo reduzido para ${cr} PE)`:'';
+  alog(P,`iniciou <b>${FD[fid].name}</b> nível ${n} (${cr} PE)${culturaNote}`);
   save();render();
 }
 function suSick(fid,n){
@@ -922,6 +1463,7 @@ function fc(fid){const fs=G.fronts[fid];if(!fs.pending)return;fs.level=fs.pendin
 
 // ═══════════════ AÇÕES CROSS-PILAR ═══════════════
 function useEsforcos(targetFid){
+  if(_attackBlocksPlayer())return toast('⚔️ Ataque ativo — não pode usar habilidades durante o ataque.',true);
   const av=myAvailPE();if(av<2)return toast('PE insuficiente.',true);
   G.fronts['aqueduto'].peUsed=(G.fronts['aqueduto'].peUsed||0)+2;
   const era=G.fronts[targetFid].status;
@@ -947,14 +1489,22 @@ function useOAmbar(){
   save();render();toast('📡 Olho Âmbar contactado — custo −1 PE na próxima semana!');
 }
 function useAjuda(targetFid){
-  const av=myAvailPE();if(av<2)return toast('PE insuficiente para se deslocar.',true);
-  if(G.fronts[targetFid].ajudado)return toast('Este pilar já tem um herói auxiliar esta semana.',true);
+  const hasUnificado=G.fronts.comando.level>=5;
+  const custo=hasUnificado?0:2;
+  const av=myAvailPE();
+  if(!hasUnificado&&av<2)return toast('PE insuficiente para se deslocar.',true);
+  if(G.fronts[targetFid].ajudado&&G.fronts[targetFid].ajudado2)return toast('Este pilar já tem dois heróis auxiliares esta semana.',true);
+  if(G.fronts[targetFid].ajudado&&!hasUnificado)return toast('Este pilar já tem um herói auxiliar esta semana.',true);
   const mp=myPillar();
-  G.fronts[mp].peUsed=(G.fronts[mp].peUsed||0)+2;
-  G.fronts[targetFid].ajudado=true;
-  G.fronts[targetFid].ajudadoPor=P;
+  if(!hasUnificado)G.fronts[mp].peUsed=(G.fronts[mp].peUsed||0)+2;
+  // Rastreia auxílios do jogador esta semana
+  if(!G.ajudasThisWeek)G.ajudasThisWeek={};
+  G.ajudasThisWeek[P]=(G.ajudasThisWeek[P]||0)+1;
+  if(!G.fronts[targetFid].ajudado){G.fronts[targetFid].ajudado=true;G.fronts[targetFid].ajudadoPor=P;}
+  else{G.fronts[targetFid].ajudado2=true;G.fronts[targetFid].ajudadoPor2=P;}
   CrossPopup=null;
-  alog(P,`🤝 <b>${P}</b> se deslocou para auxiliar no próximo teste de <b>${FD[targetFid].name}</b> (2 PE)`);
+  const custoNote=hasUnificado?'grátis (Comando Unificado)':'2 PE';
+  alog(P,`🤝 <b>${P}</b> se deslocou para auxiliar no próximo teste de <b>${FD[targetFid].name}</b> (${custoNote})`);
   save();render();toast(`🤝 ${P} estará presente no próximo teste de ${FD[targetFid].name}!`);
 }
 function useDiscurso(targetFid){
@@ -971,6 +1521,37 @@ function useResistencia(targetFid){
   alog(P,`🎯 <b>Resistência</b> em <b>${FD[targetFid].name}</b> (2 PE) — próximo teste com vantagem`);
   save();render();toast('🎯 Vantagem concedida!');
 }
+function useAnalisePrev(){
+  if(G.fronts.comando.level<4)return toast('Requer Análise Probabilística (Salão nível 4).',true);
+  if(G.analisePrevUsed)return toast('Análise Probabilística já usada esta semana.',true);
+  const av=myAvailPE();if(av<1)return toast('PE insuficiente. Custo: 1 PE.',true);
+  G.fronts['comando'].peUsed=(G.fronts['comando'].peUsed||0)+1;
+  G.analisePrevUsed=true;G.analisePrevAtiva=true;
+  alog(P,'🔭 <b>Análise Probabilística</b> (1 PE) — se qualquer pilar sobrar PE esta semana, a próxima começa com 8 PE');
+  save();render();toast('🔭 Análise ativa — se sobrar PE, próxima semana = 8 PE!');
+}
+function useFortaleza(ativar){
+  if(G.fronts.muralhas.level<5)return toast('Requer O Baluarte (nível 5).',true);
+  if(G.fortalezaBloqueada)return toast('Semana de Fortaleza em cooldown — foi usada com ataque ativo na semana passada.',true);
+  G.fortalezaActive=!!ativar;
+  if(ativar){alog(P,'🏰 <b>Semana de Fortaleza</b> declarada — pilares protegidos, ataques Fáceis/Normais repelidos automaticamente');}
+  else{alog(P,'🏰 Semana de Fortaleza desativada');}
+  save();render();toast(ativar?'🏰 Semana de Fortaleza ativa!':'🏰 Fortaleza desativada.');
+}
+function usePatrulhas(){
+  if(G.fronts.muralhas.level<4)return toast('Requer Patrulhas Externas (nível 4).',true);
+  if(G.patrulhasUsed)return toast('Patrulhas Externas já usadas neste ataque.',true);
+  const av=myAvailPE();if(av<2)return toast('PE insuficiente. Custo: 2 PE.',true);
+  const magOrder=['facil','normal','dificil','muitoDificil','impossivel'];
+  const cur=magOrder.indexOf(G.attackMagnitude);
+  if(cur<=0){toast('Magnitude já está no mínimo possível.',true);return;}
+  G.fronts.muralhas.peUsed=(G.fronts.muralhas.peUsed||0)+2;
+  G.attackMagnitude=magOrder[cur-1];
+  G.patrulhasUsed=true;
+  const labels={facil:'Fácil (CD 15)',normal:'Normal (CD 20)',dificil:'Difícil (CD 25)',muitoDificil:'Muito Difícil (CD 30)',impossivel:'Impossível (CD 35)'};
+  alog(P,`🗡️ <b>Patrulhas Externas</b> (2 PE) — magnitude reduzida para <b>${labels[G.attackMagnitude]}</b>`);
+  save();render();toast(`🗡️ Magnitude reduzida para ${labels[G.attackMagnitude]}!`);
+}
 function useForcarMoral(){
   if(!canForcarMoral())return;
   const av=myAvailPE();if(av<2)return toast('PE insuficiente.',true);
@@ -978,6 +1559,28 @@ function useForcarMoral(){
   G.fronts['moral'].forcarMoralUsed=true;
   alog(P,'🔔 <b>Forçar Evento Moral</b> ativado (2 PE) — GM deve resolver o evento de Moral agora');
   save();render();toast('🔔 Evento de Moral forçado — aguarde o GM!','w');
+}
+function useNoiteCelebracao(){
+  const cdWeeks=G.fronts.moral.noiteCdWeek||0;
+  if(G.week<=cdWeeks)return toast(`Noite de Celebração em cooldown — disponível na semana ${cdWeeks+1}.`,true);
+  const av=myAvailPE();if(av<4)return toast('PE insuficiente. Custo: 4 PE.',true);
+  G.fronts['moral'].peUsed=(G.fronts['moral'].peUsed||0)+4;
+  G.moral=Math.min(2,G.moral+1);
+  G.fronts.moral.noiteCdWeek=G.week+1;
+  alog(P,`🎉 <b>Noite de Celebração</b> (4 PE) — Moral subiu para <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b> · Cooldown: 2 semanas`);
+  save();render();toast(`🎉 Noite de Celebração! Moral agora ${mlabel()}.`);
+}
+function useSegundaChance(){
+  const cdWeek=G.fronts.moral.segundaCdWeek||0;
+  if(G.week<=cdWeek)return toast(`Segunda Chance em cooldown — disponível na semana ${cdWeek+1}.`,true);
+  if(!G.moralEventFailed)return toast('Nenhum teste de moral falho recente para rolar novamente.',true);
+  const av=myAvailPE();if(av<1)return toast('PE insuficiente. Custo: 1 PE.',true);
+  G.fronts['moral'].peUsed=(G.fronts['moral'].peUsed||0)+1;
+  G.fronts.moral.segundaCdWeek=G.week;
+  G.moralEventFailed=false;
+  activateMoralEvent();
+  alog(P,'🔄 <b>Segunda Chance</b> (1 PE) — teste de Moral pode ser refeito · Cooldown: 1 semana');
+  save();render();toast('🔄 Segunda Chance ativada — aguarde o GM!','w');
 }
 
 // ── MODAL DE EVENTOS SEMANAIS ─────────────────────
@@ -993,7 +1596,8 @@ function getEffectiveProb(key){
   let base=G.eventProbs[key];
   const aquaLv=G.fronts.aqueduto.level;
   if(key==='doenca'){if(aquaLv>=1)base-=10;if(aquaLv>=3)base-=10;if(aquaLv>=5)base-=30;}
-  if(key==='chuva'&&aquaLv>=3)base=0;
+  // Patrulhas Externas (Muralhas nível 4): −10% de chance de ataque
+  if(key==='ataque'&&G.fronts.muralhas.level>=4)base-=10;
   return Math.max(0,Math.min(100,base));
 }
 // Probs locais do modal (podem ser ajustadas antes de rolar)
@@ -1010,9 +1614,7 @@ function rGMProbs(){
     d.innerHTML=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span>${ev.icon}</span><span style="font-family:'Cinzel',serif;font-size:11px;color:${ev.color}">${ev.label.replace(/[^\w\s\u00C0-\u024F]/g,'').trim()}</span></div>
 <div style="display:flex;align-items:center;gap:6px">
 <button class="btn btn-sm" style="padding:3px 8px;font-size:11px" onclick="gmProbAdj('${key}',-10)">−10</button>
-<button class="btn btn-sm" style="padding:3px 8px;font-size:11px" onclick="gmProbAdj('${key}',-5)">−5</button>
 <span style="font-family:'Cinzel',serif;font-size:13px;color:var(--gold);min-width:36px;text-align:center">${base}%</span>
-<button class="btn btn-sm" style="padding:3px 8px;font-size:11px" onclick="gmProbAdj('${key}',5)">+5</button>
 <button class="btn btn-sm" style="padding:3px 8px;font-size:11px" onclick="gmProbAdj('${key}',10)">+10</button>
 </div>${eff!==base?`<div style="font-size:10px;color:var(--t2);margin-top:4px">Efetivo c/ upgrades: ${eff}%</div>`:''}`;
     el.appendChild(d);
@@ -1025,6 +1627,7 @@ function gmProbAdj(key,delta){
 function gmResetProbs(){G.eventProbs={doenca:10,chuva:40,ataque:0,nevoa:30,moral:50};save();rGMProbs();toast('Probabilidades restauradas para o padrão do PDF.')}
 
 function openWeekModal(){
+  wmQueue=[];
   // Copia probs efetivas para o modal (ajustáveis localmente)
   wmLocalProbs={};
   Object.keys(EV_META).forEach(k=>wmLocalProbs[k]=getEffectiveProb(k));
@@ -1117,9 +1720,11 @@ function wmShowAction(key,show){
   } else if(key==='moral'){
     act.innerHTML=`<button class="btn btn-sm" onclick="wmApply('moral')">🫂 Registrar Evento Moral</button>`;
   } else if(key==='ataque'){
-    const mags=['Fácil (CD15)','Normal (CD20)','Difícil (CD25)','Muito Difícil (CD30)'];
-    const idx=G.fronts.muralhas.level>=1?Math.floor(Math.random()*4):Math.floor(Math.random()*3)+1;
-    act.innerHTML=`<div style="font-size:12px;color:var(--rose);margin-bottom:6px">Magnitude: <b>${mags[Math.min(idx,3)]}</b></div><button class="btn btn-danger btn-sm" onclick="wmApply('ataque')">⚔️ Registrar Ataque</button>`;
+    const hasFacil=G.fronts.muralhas.level>=1;
+    const magKeys=hasFacil?['facil','normal','dificil','muitoDificil']:['normal','dificil','muitoDificil','impossivel'];
+    const magLabels={facil:'Fácil (CD 15)',normal:'Normal (CD 20)',dificil:'Difícil (CD 25)',muitoDificil:'Muito Difícil (CD 30)',impossivel:'Impossível (CD 35)'};
+    const rolledMag=magKeys[Math.floor(Math.random()*4)];
+    act.innerHTML=`<div style="font-size:12px;color:var(--rose);margin-bottom:6px">Magnitude: <b>${magLabels[rolledMag]}</b></div><button class="btn btn-danger btn-sm" onclick="wmApply('ataque','${rolledMag}')">⚔️ Registrar Ataque</button>`;
   } else {
     const pilarNames=['Muralhas','Infraestrutura','Salão de Comando','Moral'];
     const pilarKeys=['muralhas','aqueduto','comando','moral'];
@@ -1141,30 +1746,97 @@ function wmReSortPilar(key){
 <button class="btn btn-sm" style="margin-left:6px" onclick="wmReSortPilar('${key}')">🎲 Ressortear pilar</button>`;
 }
 
-function wmApply(key){
-  if(key==='nevoa'){G.nevoa=true;alog(P,`🌫️ <b>Névoa de Cinzas</b> ativada — Semana ${G.week}`)}
-  else if(key==='moral'){G.moralEvent=true;alog(P,`🫂 <b>Evento Moral</b> — herói da Moral deve agir`)}
-  else if(key==='ataque'){alog(P,`⚔️ <b>Ataque</b> registrado — Semana ${G.week}`)}
-  document.getElementById(`wm-action-${key}`).innerHTML+='<span style="color:var(--teal);font-size:12px;margin-left:8px">✓ Aplicado</span>';
-  save();render();
+let wmQueue=[];
+function wmApply(key,preMag){
+  if(key==='ataque'){
+    const hasFacil=G.fronts.muralhas.level>=1;
+    const mags=hasFacil?['facil','normal','dificil','muitoDificil']:['normal','dificil','muitoDificil','impossivel'];
+    const mag=preMag||mags[Math.floor(Math.random()*4)];
+    const labels={facil:'Fácil (CD 15)',normal:'Normal (CD 20)',dificil:'Difícil (CD 25)',muitoDificil:'Muito Difícil (CD 30)',impossivel:'Impossível (CD 35)'};
+    wmQueue.push({type:'ataque',mag});
+    document.getElementById(`wm-action-${key}`).innerHTML+=`<span style="color:var(--teal);font-size:12px;margin-left:8px">✓ Registrado — <b>${labels[mag]}</b></span>`;
+  } else {
+    wmQueue.push({type:key});
+    document.getElementById(`wm-action-${key}`).innerHTML+='<span style="color:var(--teal);font-size:12px;margin-left:8px">✓ Registrado</span>';
+  }
 }
 function wmApplyPilar(key,fid){
-  if(key==='doenca'){G.fronts[fid].status='doenca';alog(P,`🦠 <b>Doença</b> → <b>${FD[fid].name}</b>`)}
-  else if(key==='chuva'){
-    if(G.fronts[fid].level>0&&G.fronts.aqueduto.level<3){G.fronts[fid].level--;G.fronts[fid].pending=null;alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[fid].name}</b> nível ${G.fronts[fid].level}`)}
-    else{alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[fid].name}</b> — resistiu`)}
-  }
-  document.getElementById(`wm-action-${key}`).innerHTML+='<span style="color:var(--teal);font-size:12px;margin-left:8px">✓ Aplicado</span>';
+  wmQueue.push({type:key,fid});
+  const pn={muralhas:'Muralhas',aqueduto:'Infraestrutura',comando:'Salão',moral:'Moral'};
+  document.getElementById(`wm-action-${key}`).innerHTML+=`<span style="color:var(--teal);font-size:12px;margin-left:8px">✓ Registrado → ${pn[fid]}</span>`;
+}
+function closeWeekModal(){
+  wmQueue.forEach(ev=>{
+    if(ev.type==='nevoa'){G.nevoa=true;alog(P,`🌫️ <b>Névoa de Cinzas</b> ativada — Semana ${G.week}`)}
+    else if(ev.type==='moral'){activateMoralEvent();alog(P,`🫂 <b>Evento Moral</b> — herói da Moral deve agir`)}
+    else if(ev.type==='ataque'){
+      // Baluarte (nível 5): repele automaticamente Fácil e Normal
+      if(G.fronts.muralhas.level>=5&&(ev.mag==='facil'||ev.mag==='normal')){
+        const labels={facil:'Fácil (CD 15)',normal:'Normal (CD 20)'};
+        alog(P,`⚔️ <b>Ataque ${labels[ev.mag]}</b> — <b>O Baluarte</b> repeliu automaticamente! Nenhum dano.`);
+        playSoundEffect('pass');
+        // Verifica Semana de Fortaleza (se ativa, não bloqueia semana seguinte)
+        if(G.fortalezaActive){G.fortalezaUsedThisWeek=true;}
+      } else {
+        // Baluarte com Semana de Fortaleza: ataque não causa perda de níveis independentemente do resultado
+        G.attackActive=true;G.attackMagnitude=ev.mag;G.attackWeek=G.week;G.attackDefenseReady=false;G.attackNoticeDismissed=false;
+        // Cobra 3 PE do jogador das Muralhas (ou 0 com Catapultas para Fácil, 1 para Normal)
+        const catapultas=G.fronts.muralhas.level>=2;
+        let custoDef=3;
+        if(catapultas){if(ev.mag==='facil')custoDef=0;else if(ev.mag==='normal')custoDef=1;}
+        G.fronts.muralhas.peUsed=(G.fronts.muralhas.peUsed||0)+custoDef;
+        if(G.fortalezaActive){G.fortalezaUsedThisWeek=true;alog(P,`⚔️ <b>Ataque</b> — Magnitude: <b>${{facil:'Fácil (CD 15)',normal:'Normal (CD 20)',dificil:'Difícil (CD 25)',muitoDificil:'Muito Difícil (CD 30)',impossivel:'Impossível (CD 35)'}[ev.mag]}</b> · Muralhas −${custoDef} PE · 🏰 Semana de Fortaleza: pilares protegidos mesmo se falhar`)}
+        else{const labels={facil:'Fácil (CD 15)',normal:'Normal (CD 20)',dificil:'Difícil (CD 25)',muitoDificil:'Muito Difícil (CD 30)',impossivel:'Impossível (CD 35)'};alog(P,`⚔️ <b>Ataque</b> — Magnitude: <b>${labels[ev.mag]}</b> · Muralhas deduzidas <b>−${custoDef} PE</b> — Semana ${G.week}`);}
+      }
+    }
+    else if(ev.type==='doenca'){G.fronts[ev.fid].status='doenca';alog(P,`🦠 <b>Doença</b> → <b>${FD[ev.fid].name}</b>`);playSoundEffect('cough')}
+    else if(ev.type==='chuva'){
+      const aquaLv=G.fronts.aqueduto.level;
+      let desfaz=false;
+      if(aquaLv>=3){// Estruturas Restauradas: 20% de chance de desmoronar (rola 1d10, ocorre em ≤2)
+        const roll=Math.floor(Math.random()*10)+1;
+        desfaz=roll<=2;
+        if(desfaz){alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[ev.fid].name}</b> — estruturas resistentes, mas d10=${roll} (≤2 = desmorona!)`)}
+        else{alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[ev.fid].name}</b> — estruturas resistiram (d10=${roll}, precisa ≤2)`)}
+      } else {
+        desfaz=G.fronts[ev.fid].level>0;
+      }
+      if(desfaz&&G.fronts[ev.fid].level>0){G.fronts[ev.fid].level--;G.fronts[ev.fid].pending=null;alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[ev.fid].name}</b> recuou para nível ${G.fronts[ev.fid].level}`);playSoundEffect('rain')}
+      else if(!desfaz&&aquaLv<3){alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[ev.fid].name}</b> — sem upgrades para destruir`)}
+    }
+  });
+  wmQueue=[];
+  G.weekEventShown=true;
+  document.getElementById('weekmodal').style.display='none';
   save();render();
 }
-function closeWeekModal(){G.weekEventShown=true;document.getElementById('weekmodal').style.display='none';save();render()}
-function _hasPendingTest(){return OR.some(k=>G.fronts[k].pending&&G.fronts[k].pending.testReady)}
+function _hasPendingTest(){return OR.some(k=>G.fronts[k].pending&&G.fronts[k].pending.testReady)||G.attackDefenseReady}
+
 function _checkTestReady(){OR.forEach(k=>{const fs=G.fronts[k];if(fs.pending&&!fs.pending.testReady&&fs.pending.testResult===null&&G.day>=(fs.pending.startDay+fs.pending.peSpent)){fs.pending.testReady=true;if(!fs.seenTests)fs.seenTests=[];if(!fs.seenTests.includes(fs.pending.lv))fs.seenTests.push(fs.pending.lv);alog('Sistema',`⚔️ <b>${FD[k].name}</b> pronto para o teste! (Dia ${G.day})`);}})}
 function _updateWeekFromDay(){G.week=Math.max(1,Math.ceil(Math.max(G.day,1)/7))}
 function _resetWeek(){
-  OR.forEach(k=>{G.fronts[k].peUsed=0;G.fronts[k].peGifted=0;G.fronts[k].discursoBuff=false;G.fronts[k].resistenciaBuff=false;G.fronts[k].ajudado=false;G.fronts[k].ajudadoPor=null;G.fronts[k].mesaUsed=false;G.fronts[k].oAmbarUsed=false;G.fronts[k].forcarMoralUsed=false});
+  OR.forEach(k=>{G.fronts[k].peUsed=0;G.fronts[k].peGifted=0;G.fronts[k].discursoBuff=false;G.fronts[k].resistenciaBuff=false;G.fronts[k].ajudado=false;G.fronts[k].ajudadoPor=null;G.fronts[k].ajudado2=false;G.fronts[k].ajudadoPor2=null;G.fronts[k].mesaUsed=false;G.fronts[k].oAmbarUsed=false;G.fronts[k].forcarMoralUsed=false});
   G.fronts.moral.discourseUsed=false;G.oAmbarBuff=G.oAmbarNextWeek;G.oAmbarNextWeek=false;
-  G.weekEventShown=false; // reseta modal de eventos para a nova semana
+  G.weekEventShown=false;G.ajudasThisWeek={};
+  G.moralEventFailed=false;
+  // Fortaleza: se estava bloqueada esta semana, desbloqueia agora
+  if(G.fortalezaBloqueada){G.fortalezaBloqueada=false;alog('Sistema','🏰 Semana de Fortaleza disponível novamente');}
+  G.fortalezaUsedThisWeek=false;
+  // Análise Probabilística: se estava ativa e qualquer pilar sobrou PE → próxima semana todos ganham bônus para chegar a 8 PE
+  if(G.analisePrevAtiva){
+    const alguemSobrou=OR.some(k=>{const total=pillarTotalPE(k),used=G.fronts[k].peUsed||0;return(total-used)>=1;});
+    if(alguemSobrou){
+      OR.forEach(k=>{const base=G.peTotal+(G.fronts[k].peMod||0);const bonus=Math.max(0,8-base);if(bonus>0)G.fronts[k].peGifted=(G.fronts[k].peGifted||0)+bonus;});
+      alog('Sistema','🔭 <b>Análise Probabilística</b> — PE excedente detectado: todos iniciam com 8 PE esta semana!');
+    }
+    G.analisePrevAtiva=false;
+  }
+  G.analisePrevUsed=false;
+  // A Cidade Respira (Moral nível 5): +1 PE para todos quando moral ≥ 0
+  if(G.fronts.moral.level>=5&&G.moral>=0){
+    OR.forEach(k=>{G.fronts[k].peGifted=(G.fronts[k].peGifted||0)+1});
+    alog('Sistema','✨ <b>A Cidade Respira</b> — +1 PE para todos os pilares esta semana');
+  }
   OR.forEach(k=>{const fs=G.fronts[k];if(fs.status==='enfermo'&&fs.enfermoWeek!==null&&G.week>fs.enfermoWeek+1){fs.status='normal';fs.enfermoWeek=null;alog('Sistema',`<b>${FD[k].name}</b> recuperou`)}});
 }
 function gmAdvDay(){
@@ -1172,6 +1844,19 @@ function gmAdvDay(){
   const prevWeek=G.week;G.day+=1;_updateWeekFromDay();
   if(G.week>prevWeek){_resetWeek();alog(P,`→ <b>Semana ${G.week}</b> — PE resetados (Dia ${G.day})`)}
   else{alog(P,`+1 dia → <b>Dia ${G.day}</b> (Semana ${G.week})`)}
+  // Verifica ataque: no último dia da semana (dia divisível por 7 = dia 7,14,21...) acionar defesa
+  if(G.attackActive&&!G.attackDefenseReady){
+    const dayOfWeek=((G.day-1)%7)+1; // 1-7
+    if(dayOfWeek===7){G.attackDefenseReady=true;alog('Sistema','⚔️ <b>Hora da defesa!</b> — Teste de habilidade das Muralhas agora')}
+    // Atualiza startDay dos upgrades paused (sem Torres)
+    OR.forEach(k=>{
+      const hasTorres=G.fronts.muralhas.level>=3;
+      const fs=G.fronts[k];
+      if(fs.pending&&fs.pending._pausedDay!==undefined&&!hasTorres){
+        fs.pending.startDay++; // estende deadline 1 dia
+      }
+    });
+  }
   _checkTestReady();save();render();
 }
 function gmNextWeek(){
@@ -1186,9 +1871,22 @@ function gmNextWeek(){
 function gmPE(){G.peTotal=Math.max(1,parseInt(document.getElementById('gdtt').value)||7);alog(P,`PE base/jogador → <b>${G.peTotal}</b>`);save();render()}
 function gmApprove(fid){
   const fs=G.fronts[fid];if(!fs.pending||!fs.pending.testReady)return;
+  // Moral −3: 50% de chance de soldados desistirem mesmo com teste aprovado
+  if(G.moral<=-3){
+    const roll=Math.floor(Math.random()*2);
+    if(roll===0){
+      const owner=pillarOwner(fid)||'?';
+      fs.pending=null;
+      alog(P,`✓ <b>${FD[fid].name}</b> — teste APROVADO, mas moral Péssima (−3): soldados desistiram! (50%) — ${owner}`);
+      playSoundEffect('fail');
+      save();render();toast('⚠️ Moral Péssima! Soldados desistiram apesar do teste aprovado.',true);
+      return;
+    }
+  }
   const lv=fs.pending.lv,owner=pillarOwner(fid)||'?';
   fs.level=lv;fs.pending=null;
   alog(P,`✓ <b>${FD[fid].name}</b> — teste <b>APROVADO</b> · nível ${fs.level} concluído por ${owner}`);
+  playSoundEffect('pass');
   save();render();toast(`✓ ${FD[fid].name} avançou para nível ${fs.level}!`);
 }
 function gmReject(fid){
@@ -1196,17 +1894,56 @@ function gmReject(fid){
   const owner=pillarOwner(fid)||'?';
   fs.pending=null;
   alog(P,`✗ <b>${FD[fid].name}</b> — teste <b>REPROVADO</b> por ${owner}`);
+  playSoundEffect('fail');
   save();render();toast(`✗ Teste reprovado. ${FD[fid].name} não avançou.`,true);
 }
+function gmDefensePass(){
+  G.attackActive=false;G.attackDefenseReady=false;G.attackMagnitude=null;G.attackWeek=null;G.attackNoticeDismissed=false;G.patrulhasUsed=false;
+  // Se Fortaleza foi usada com ataque: bloqueia próxima semana
+  if(G.fortalezaUsedThisWeek){G.fortalezaBloqueada=true;G.fortalezaActive=false;G.fortalezaUsedThisWeek=false;}
+  OR.forEach(k=>{if(G.fronts[k].pending){delete G.fronts[k].pending._pausedDay;delete G.fronts[k].pending._pauseLogged}});
+  document.getElementById('testoverlay').style.display='none';
+  alog(P,'⚔️ <b>Defesa BEM-SUCEDIDA</b> — ataque repelido sem danos');
+  save();render();toast('✓ Defesa bem-sucedida!');
+}
+function gmDefenseFail(){
+  const wasFortaleza=G.fortalezaActive;
+  G.attackActive=false;G.attackDefenseReady=false;G.attackMagnitude=null;G.attackWeek=null;G.attackNoticeDismissed=false;G.patrulhasUsed=false;
+  // Baluarte com Fortaleza: pilares protegidos mesmo na falha
+  if(!wasFortaleza){
+    OR.forEach(k=>{if(G.fronts[k].pending){delete G.fronts[k].pending._pausedDay;delete G.fronts[k].pending._pauseLogged}if(G.fronts[k].level>0){G.fronts[k].level--;G.fronts[k].pending=null}});
+  } else {
+    OR.forEach(k=>{if(G.fronts[k].pending){delete G.fronts[k].pending._pausedDay;delete G.fronts[k].pending._pauseLogged}});
+  }
+  // Semana de Fortaleza usada com ataque: bloqueia próxima semana
+  if(G.fortalezaUsedThisWeek){G.fortalezaBloqueada=true;G.fortalezaActive=false;G.fortalezaUsedThisWeek=false;}
+  document.getElementById('testoverlay').style.display='none';
+  if(wasFortaleza){alog(P,'⚔️ <b>Defesa FALHOU</b> — mas 🏰 Semana de Fortaleza protegeu os pilares!');toast('⚠️ Defesa falhou, mas Fortaleza protegeu os pilares!','w');}
+  else{alog(P,'⚔️ <b>Defesa FALHOU</b> — todos os pilares perderam 1 nível');playSoundEffect('stone');toast('✗ Defesa falhou — todos os pilares recuaram 1 nível.',true);}
+  save();render();
+}
+function closeAttackOverlay(){
+  G.attackNoticeDismissed=true;
+  document.getElementById('attackoverlay').style.display='none';
+  // Sem Torres de Vigia: pausa contagem de dias dos upgrades (apenas loga na primeira vez)
+  const hasTorres=G.fronts.muralhas.level>=3;
+  if(!hasTorres&&G.fronts.muralhas.pending&&!G.fronts.muralhas.pending.testReady&&!G.fronts.muralhas.pending._pauseLogged){
+    G.fronts.muralhas.pending._pauseLogged=true;
+    alog(P,'⏸️ Upgrade das Muralhas pausado durante o ataque (sem Torres de Vigia)');
+  }
+  save();render();
+}
 function gmMoralPass(){
-  G.moralEvent=false;
+  G.moralEvent=false;G.moralEventId=null;G.moralPickPending=false;
+  G.moralEventFailed=false;
   // Sucesso: +0.5 nível de moral. Dois sucessos = +1 nível
   if(G.moralHalf){G.moral=Math.min(2,G.moral+1);G.moralHalf=false;alog(P,`🫂 Evento Moral <b>PASSOU</b> — Moral subiu para <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b>`)}
   else{G.moralHalf=true;alog(P,`🫂 Evento Moral <b>PASSOU</b> — meio nível acumulado (passe mais 1 vez para subir)`)}
   save();render();toast('✓ Teste de moral passou!');
 }
 function gmMoralFail(){
-  G.moralEvent=false;G.moralHalf=false;
+  G.moralEvent=false;G.moralEventId=null;G.moralPickPending=false;G.moralHalf=false;
+  G.moralEventFailed=true; // permite usar Segunda Chance
   G.moral=Math.max(-4,G.moral-1);
   alog(P,`🫂 Evento Moral <b>NÃO PASSOU</b> — Moral caiu para <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b>`);
   save();render();toast('✗ Teste de moral falhou.',true);
@@ -1230,6 +1967,262 @@ function gmReset(){G=fresh();save();alog('Sistema','↺ Reset total');render()}
 function gmClearPE(){OR.forEach(k=>G.fronts[k].peUsed=0);alog(P,'🔄 PE resetados');save();render()}
 function gmClearAssignments(){if(!confirm('Limpar atribuições?'))return;G.assignments={};alog(P,'✕ Atribuições limpas');save();render()}
 function toast(msg,type=false){const t=document.getElementById('toast');t.textContent=msg;t.className=(type==='w'?'w on':type?'e on':'on');clearTimeout(TT);TT=setTimeout(()=>t.className='',3400)}
+
+// ═══════════════ MORAL EVENT PICKER ═══════════════
+let _mpMode=null,_mpChosenId=null;
+
+function activateMoralEvent(){
+  // Se o GM está ativo agora, abre o picker imediatamente
+  if(P==='GM'){
+    G.moralPickPending=false;
+    save();
+    openMoralPicker();
+  } else {
+    // Disparado por jogador (Segunda Chance) — GM verá o aviso no painel
+    G.moralPickPending=true;
+    save();render();
+  }
+}
+
+function openMoralPicker(){
+  if(!ME_DATA)ME_DATA=loadMoralEvents();
+  _mpMode=null;_mpChosenId=null;
+  // Reset visual modes
+  document.getElementById('mp-btn-random').style.borderColor='rgba(224,96,144,.3)';
+  document.getElementById('mp-btn-manual').style.borderColor='rgba(224,96,144,.3)';
+  document.getElementById('mp-random-info').style.display='none';
+  document.getElementById('mp-manual-select').style.display='none';
+  document.getElementById('mp-confirm-btn').disabled=true;
+  // Populate manual select
+  const sel=document.getElementById('mp-select');
+  sel.innerHTML='<option value="">— selecione —</option>';
+  ME_DATA.forEach(ev=>{
+    const seen=G.moralSeenIds.includes(ev.id);
+    const opt=document.createElement('option');
+    opt.value=ev.id;
+    opt.textContent=`${String(ev.id).padStart(2,'0')}. ${ev.title}${seen?' (já exibida)':''}`;
+    sel.appendChild(opt);
+  });
+  document.getElementById('mp-manual-preview').style.display='none';
+  document.getElementById('moralpicker').style.display='flex';
+}
+
+function closeMoralPicker(){
+  document.getElementById('moralpicker').style.display='none';
+}
+
+function mpSetMode(mode){
+  _mpMode=mode;_mpChosenId=null;
+  const rBtn=document.getElementById('mp-btn-random');
+  const mBtn=document.getElementById('mp-btn-manual');
+  const rInfo=document.getElementById('mp-random-info');
+  const mSel=document.getElementById('mp-manual-select');
+  const confirmBtn=document.getElementById('mp-confirm-btn');
+
+  rBtn.style.borderColor=mode==='random'?'var(--rose)':'rgba(224,96,144,.3)';
+  mBtn.style.borderColor=mode==='manual'?'var(--rose)':'rgba(224,96,144,.3)';
+
+  if(mode==='random'){
+    mSel.style.display='none';
+    // Pick random from unseen
+    const unseen=ME_DATA.filter(e=>!G.moralSeenIds.includes(e.id));
+    if(unseen.length===0){
+      // All seen — reset and pick from all
+      rInfo.style.display='block';
+      const all=ME_DATA;
+      const picked=all[Math.floor(Math.random()*all.length)];
+      _mpChosenId=picked.id;
+      document.getElementById('mp-random-preview').textContent=`📜 ${picked.title}`;
+      document.getElementById('mp-random-sub').textContent='Todas as histórias já foram exibidas — sorteando da lista completa.';
+    } else {
+      rInfo.style.display='block';
+      const picked=unseen[Math.floor(Math.random()*unseen.length)];
+      _mpChosenId=picked.id;
+      document.getElementById('mp-random-preview').textContent=`📜 ${picked.title}`;
+      document.getElementById('mp-random-sub').textContent=`${unseen.length} história${unseen.length!==1?'s':''} disponível${unseen.length!==1?'is':''} · ${G.moralSeenIds.length} já exibida${G.moralSeenIds.length!==1?'s':''}`;
+    }
+    confirmBtn.disabled=false;
+  } else {
+    rInfo.style.display='none';
+    mSel.style.display='block';
+    document.getElementById('mp-select').value='';
+    document.getElementById('mp-manual-preview').style.display='none';
+    confirmBtn.disabled=true;
+  }
+}
+
+function mpPreviewManual(){
+  const val=parseInt(document.getElementById('mp-select').value);
+  const confirmBtn=document.getElementById('mp-confirm-btn');
+  const preview=document.getElementById('mp-manual-preview');
+  if(!val){_mpChosenId=null;confirmBtn.disabled=true;preview.style.display='none';return;}
+  _mpChosenId=val;
+  confirmBtn.disabled=false;
+  const ev=ME_DATA.find(e=>e.id===val);
+  if(ev){
+    preview.style.display='block';
+    preview.textContent=ev.text.substring(0,120)+(ev.text.length>120?'…':'');
+  }
+}
+
+function confirmMoralPicker(){
+  if(!_mpChosenId)return;
+  G.moralEvent=true;
+  G.moralEventId=_mpChosenId;
+  G.moralPickPending=false;
+  if(!G.moralSeenIds.includes(_mpChosenId))G.moralSeenIds.push(_mpChosenId);
+  closeMoralPicker();
+  populateMoralOverlay();
+  alog(P,`🫂 <b>Evento Moral</b> — história escolhida: "${ME_DATA.find(e=>e.id===_mpChosenId)?.title||'?'}"`);
+  save();render();
+}
+
+function populateMoralOverlay(){
+  if(!ME_DATA)ME_DATA=loadMoralEvents();
+  const ev=G.moralEventId?ME_DATA.find(e=>e.id===G.moralEventId):null;
+  const titleEl=document.getElementById('moral-event-title');
+  const imgEl=document.getElementById('moral-img');
+  const txtEl=document.getElementById('moral-txt');
+  if(!ev){
+    titleEl.style.display='none';
+    imgEl.innerHTML='<span>🖼️<br><br>Imagem do<br>evento aqui</span>';
+    txtEl.innerHTML='<div style="font-family:\'Crimson Pro\',serif;font-size:16px;color:var(--t1);font-style:italic;line-height:1.8">Aguardando o Mestre escolher o evento...</div>';
+    return;
+  }
+  // Title
+  titleEl.textContent=ev.title;
+  titleEl.style.display='block';
+  // Image
+  if(ev.img&&ev.img.trim()){
+    imgEl.innerHTML=`<img src="${ev.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<span style=text-align:center;padding:12px>🖼️<br><br>Imagem não<br>encontrada</span>'">`;
+    imgEl.style.padding='0';
+  } else {
+    imgEl.innerHTML='<span>🖼️<br><br>Sem imagem<br>vinculada</span>';
+    imgEl.style.padding='20px';
+  }
+  // Text — preserve line breaks
+  const lines=ev.text.split('\n').map(l=>l.trim()?`<p style="margin-bottom:10px">${l}</p>`:'').join('');
+  txtEl.innerHTML=`<div style="font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);font-style:italic;line-height:1.8;text-align:left">${lines}</div>`;
+}
+
+
+const ME_KEY='pilares_moral_v1';
+const ME_DEFAULT=[
+  {id:1,title:'O Barril Quebrado',text:'Uma briga explodiu no pátio central. Dois soldados estão se empurrando no meio de uma roda de dez ou doze homens e mulheres que gritam, alguns rindo, outros claramente assustados. Um barril de cerveja foi chutado e o chão está molhado.\n\nDoran, um anão veterano, disse que elfas "não deveriam estar reconstruindo muralhas". Sael, uma elfa jovem, respondeu quebrando a xícara dele na cabeça.\n\nA maioria dos presentes está do lado dela.',img:'moral_01.jpg'},
+  {id:2,title:'O Que Não Fala Mais',text:'Mira, uma soldada halfling, parou de trabalhar. Não pediu folga, não deu explicação — simplesmente sentou numa pedra e ficou olhando para a parede destruída à frente.\n\nO nome dela estava numa lista de mortos que circulou semana passada — um erro administrativo. A lista chegou até a família dela antes de ser corrigida. Eles já fizeram o luto.\n\nO silêncio está se espalhando.',img:'moral_02.jpg'},
+  {id:3,title:'Porto Contra Porto',text:'A tensão entre soldados de Porto Sul e Porto Carga chegou num ponto de ebulição. Um grupo de Porto Carga está usando uma área de descanso que "sempre foi" dos soldados de Porto Sul.\n\nNinguém levantou a mão ainda, mas os talheres estão sendo segurados com mais força do que deveriam.\n\nSão dois grupos de seis pessoas cada, com fome, cansados e ressentidos.',img:'moral_03.jpg'},
+  {id:4,title:'O Sonho Que Ele Conta',text:'Thorvek, um humano de meia-idade, está acordando todo mundo à noite com pesadelos — mas quando acorda, ri do próprio susto e diz "não é nada".\n\nEle está claramente sem dormir há dias. Ontem ele errou um cálculo simples numa construção que quase derrubou uma viga em cima de dois colegas.\n\nOs outros da barraca estão com medo de dormir perto dele.',img:'moral_04.jpg'},
+  {id:5,title:'Quem Manda Aqui?',text:'Gael, um elfo de Garra do Urso com décadas de experiência, começou a dar ordens para soldados de outros setores — sem autorização. Ele tem razão: as ordens dele são tecnicamente melhores.\n\nO problema é que o responsável oficial pelo setor é Brenn, um humano jovem, que agora está de braços cruzados num canto enquanto seus próprios soldados obedecem Gael.\n\nTrês soldados observam você observar a situação.',img:'moral_05.jpg'},
+  {id:6,title:'A Carta',text:'Yenna, uma soldada humana, recebeu uma carta com lacre cinza: alguém da família morreu. Ela está em serviço, de guarda, parada no posto com os olhos vermelhos e a carta amassada na mão.\n\nEla recusou ser substituída. Disse que precisa "ficar ocupada".\n\nA produtividade do turno inteiro desacelerou porque ninguém consegue ignorar aquilo.',img:'moral_06.jpg'},
+  {id:7,title:'O Racionamento',text:'Alguém descobriu que os soldados de Garra do Urso estão recebendo porções maiores de carne. O cozinheiro, Bofri, serve os seus primeiro e o que sobra vai pro resto.\n\nHoje um grupo de seis soldados chegou na cozinha e colocou as tigelas na bancada sem pegar nada, em protesto silencioso.\n\nBofri está confuso e levemente ofendido.',img:'moral_07.jpg'},
+  {id:8,title:'O Boato',text:'Alguém começou a falar que o Conclave está mentindo sobre o estado da cidade — que a situação é pior do que parece e que os líderes já têm um plano de abandono.\n\nNão tem como rastrear quem começou. O boato está em todo lugar: no refeitório, nas obras, nas barracas.\n\nTrês soldados já perguntaram pra líderes menores se "é verdade".',img:'moral_08.jpg'},
+  {id:9,title:'O Veterano Que Quer Ir Embora',text:'Kas, veterano de Porto Norte, está com a mochila nas costas. Ele não está desertando — está pedindo licença formal para ir embora. Diz que cumpriu sua parte.\n\nTecnicamente ele tem razão. Mas outros quatro soldados estão observando. E você sabe que se ele sair, mais dois já estavam pensando na mesma coisa.\n\nKas não é covarde. É um dos melhores que vocês têm.',img:'moral_09.jpg'},
+  {id:10,title:'A Noite Que Quase Virou Desastre',text:'Um incêndio pequeno foi controlado antes de se alastrar. Dois soldados estavam bebendo dentro do depósito, perto de material inflamável, e um derrubou uma tocha.\n\nNinguém se machucou. Quase nada foi perdido. Mas todo o acampamento acordou com o alarme.\n\nCinquenta pessoas estão de pé no frio da noite olhando para os dois culpados. Todos olham pra você pra ver o que vai fazer.',img:'moral_10.jpg'},
+  {id:11,title:'A Mesa de Apostas',text:'No fundo do acampamento, atrás de uma pilha de madeira, há uma mesa de apostas funcionando há pelo menos uma semana. As apostas não são em moedas — são em dias de folga, turnos de guarda e "favores".\n\nDois dos jogadores têm dívidas com os outros que equivalem a semanas de trabalho. Helda, uma anã, está visivelmente tensa, claramente perdendo mais do que deveria.\n\nAcabar com a mesa vai gerar ressentimento. Deixar continuar vai criar hierarquias paralelas.',img:'moral_11.jpg'},
+  {id:12,title:'O Trabalho de Quem?',text:'Uma seção inteira de muro foi concluída durante a noite. Orren, um humano, trabalhou sozinho por horas além do turno — no setor errado. O cronograma está atrasado.\n\nOrren não vê erro. Está esperando reconhecimento.\n\nSeis soldados ao redor dele esperam ver como você vai lidar, porque três deles fizeram hora extra no lugar certo ontem e não receberam elogio.',img:'moral_12.jpg'},
+  {id:13,title:'Três Dias de Chuva',text:'Três dias de chuva forte paralisaram as obras. Os soldados estão confinados sob lonas encharcadas. O moral está corroendo devagar — não por um motivo único, mas pela soma de tudo.\n\nO frio, a lama, a sensação de que a cidade nunca vai ficar pronta, e alguém começou a contar em voz alta quantos dias faltam para o inverno chegar.\n\nVocê não tem recursos extras. Tem apenas você.',img:'moral_13.jpg'},
+  {id:14,title:'O Que Ele Fez Na Guerra',text:'Alguém reconheceu Fadren como parte de uma milícia que queimou uma aldeia durante a guerra. Ele nunca escondeu. Disse que foi obrigado, que depois desertou, que escolheu ficar aqui para compensar.\n\nDois soldados que perderam família naquela aldeia agora sabem quem ele é. Não fizeram nada ainda.\n\nA maioria do acampamento está dividida.',img:'moral_14.jpg'},
+  {id:15,title:'A Rivalidade Antiga',text:'Brea, elfa veterana, e Wulf, humano veterano, se reconheceram no segundo em que se viram durante um exercício. Lutaram em lados opostos numa guerra anterior.\n\nNão se agrediram. Estão parados a três metros um do outro com expressões de pedra.\n\nOs soldados mais novos ao redor não entendem o que está acontecendo mas sentem que algo está muito errado.',img:'moral_15.jpg'},
+  {id:16,title:'O Soldado Que Não Quer Se Curar',text:'Davan, um halfling, levou um corte feio numa obra três dias atrás. Profundo, infeccionado, claramente doloroso. O curandeiro pediu quatro dias de repouso.\n\nDavan se recusa — está voltando às obras todo dia, reabrindo o ferimento. Diz que "não tem tempo pra ficar deitado".\n\nOutros dois soldados já começaram a fazer o mesmo, achando que descansar é sinal de fraqueza.',img:'moral_16.jpg'},
+  {id:17,title:'A Música Errada',text:'Anis, uma soldada de Porto Norte, canta toda noite depois do jantar. Por duas semanas foi o único momento de leveza.\n\nHoje ela cantou um hino militar de uma cidade rival — inocentemente, sem saber a história. Dois soldados de Porto Carga se levantaram e saíram em silêncio.\n\nAnis parou no meio da música sem entender o que aconteceu, com o rosto vermelho.',img:'moral_17.jpg'},
+  {id:18,title:'O Animal',text:'Rem, um soldado jovem, apareceu com um filhote de lobo ferido que encontrou nas ruínas. Está escondido numa caixa de ferramentas. Outros quatro soldados estão cobrindo para ele.\n\nO animal está ficando mais alto, comendo das rações, e ontem uivou e acordou metade do acampamento.\n\nMetade do acampamento sabe e está esperando pra ver o que você faz.',img:'moral_18.jpg'},
+  {id:19,title:'O Memorial',text:'Alguém começou a gravar nomes no muro leste — soldados que morreram. Sem autorização. Com uma faca ou cinzel improvisado, em letra pequena mas cuidadosa. Já são quarenta e dois nomes.\n\nO muro precisa ser reforçado essa semana, o que vai exigir cobrir aquela seção com argamassa nova. Apagar os nomes.\n\nA maioria dos soldados já foi ver o muro. Alguns tocaram os nomes com a mão.',img:'moral_19.jpg'},
+  {id:20,title:'A Primeira Boa Notícia',text:'Um setor importante da reconstrução foi concluído antes do prazo. É real e concreto. Mas a notícia chegou errada: o mensageiro anunciou o nome do líder responsável, esquecendo completamente de mencionar os dezessete soldados que fizeram o trabalho pesado.\n\nEsses dezessete estão ali, ouvindo. Torrin, um anão, virou as costas e foi embora sem dizer nada.\n\nA primeira boa notícia está prestes a virar motivo de ressentimento.',img:'moral_20.jpg'},
+];
+
+let ME_DATA=null;
+let ME_ACTIVE=null;
+
+function loadMoralEvents(){
+  try{const s=localStorage.getItem(ME_KEY);if(s)return JSON.parse(s)}catch(e){}
+  return ME_DEFAULT.map(e=>({...e}));
+}
+function saveMoralEvents(){
+  try{localStorage.setItem(ME_KEY,JSON.stringify(ME_DATA))}catch(e){}
+}
+function openMoralEditor(){
+  ME_DATA=loadMoralEvents();
+  ME_ACTIVE=null;
+  renderMEList();
+  renderMEPanel(null);
+  document.getElementById('moraleditor').classList.add('open');
+}
+function closeMoralEditor(){
+  document.getElementById('moraleditor').classList.remove('open');
+}
+function renderMEList(){
+  const el=document.getElementById('me-list');
+  el.innerHTML='';
+  ME_DATA.forEach(ev=>{
+    const hasImg=ev.img&&ev.img.trim()!=='';
+    const d=document.createElement('div');
+    d.className='me-item'+(ME_ACTIVE===ev.id?' active':'');
+    d.innerHTML=`<div class="me-item-num">Evento ${String(ev.id).padStart(2,'0')}</div><div class="me-item-title">${ev.title}</div><div class="me-item-img ${hasImg?'':'missing'}">${hasImg?'🖼 '+ev.img:'sem imagem'}</div>`;
+    d.onclick=()=>{ME_ACTIVE=ev.id;renderMEList();renderMEPanel(ev)};
+    el.appendChild(d);
+  });
+}
+function renderMEPanel(ev){
+  const panel=document.getElementById('me-panel');
+  if(!ev){panel.innerHTML='<div class="me-empty">← Selecione um evento para editar</div>';return;}
+  const imgSrc=ev.img&&ev.img.trim()!==''?ev.img:'';
+  panel.innerHTML=`
+    <div>
+      <div class="me-panel-num">Evento ${String(ev.id).padStart(2,'0')} de 20</div>
+      <div class="me-panel-title">${ev.title}</div>
+    </div>
+    <div class="me-section">
+      <div class="me-label">Texto do Evento</div>
+      <textarea class="me-textarea" id="me-txt" rows="10">${ev.text}</textarea>
+    </div>
+    <div class="me-section">
+      <div class="me-label">Imagem Vinculada</div>
+      <div class="me-img-row">
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+          <input class="me-img-input" id="me-img" type="text" placeholder="nome_do_arquivo.jpg" value="${ev.img||''}" oninput="updateMEPreview()">
+          <div class="me-hint">Digite o nome do arquivo de imagem (ex: <b>moral_01.jpg</b>).<br>A imagem deve estar na mesma pasta que o <b>index.html</b>.</div>
+        </div>
+        <div class="me-preview-box" id="me-preview-box">
+          ${imgSrc?`<img id="me-preview-img" src="${imgSrc}" onerror="this.parentNode.innerHTML='<div class=me-no-img>Imagem não<br>encontrada</div>'">`:'<div class="me-no-img">Sem<br>imagem</div>'}
+        </div>
+      </div>
+    </div>
+    <div class="me-save-row">
+      <button class="btn btn-gm btn-sm" onclick="saveMEEvent(${ev.id})">💾 Salvar Evento</button>
+      <button class="btn btn-sm" onclick="resetMEEvent(${ev.id})">↺ Restaurar Padrão</button>
+      <span class="me-saved-msg" id="me-saved-msg"></span>
+    </div>`;
+}
+function updateMEPreview(){
+  const val=document.getElementById('me-img').value.trim();
+  const box=document.getElementById('me-preview-box');
+  if(!val){box.innerHTML='<div class="me-no-img">Sem<br>imagem</div>';return;}
+  box.innerHTML=`<img src="${val}" onerror="this.parentNode.innerHTML='<div class=me-no-img>Imagem não<br>encontrada</div>'">`;
+}
+function saveMEEvent(id){
+  const ev=ME_DATA.find(e=>e.id===id);if(!ev)return;
+  ev.text=document.getElementById('me-txt').value;
+  ev.img=(document.getElementById('me-img').value||'').trim();
+  saveMoralEvents();
+  renderMEList();
+  const msg=document.getElementById('me-saved-msg');
+  if(msg){msg.textContent='✓ Salvo!';msg.classList.add('on');setTimeout(()=>msg.classList.remove('on'),2000);}
+}
+function resetMEEvent(id){
+  if(!confirm('Restaurar o texto padrão deste evento?'))return;
+  const def=ME_DEFAULT.find(e=>e.id===id);
+  const ev=ME_DATA.find(e=>e.id===id);
+  if(!def||!ev)return;
+  ev.text=def.text;ev.img=def.img;
+  saveMoralEvents();
+  renderMEList();renderMEPanel(ev);
+}
+// Função pública para obter evento de moral pelo ID (usada pelo overlay de moral)
+function getMoralEvent(id){
+  if(!ME_DATA)ME_DATA=loadMoralEvents();
+  return ME_DATA.find(e=>e.id===id)||null;
+}
+
 </script>
 </body>
 </html>
