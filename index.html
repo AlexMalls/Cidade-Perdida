@@ -884,13 +884,13 @@ const PILLAR_TITLE={muralhas:'Senhor das Muralhas',aqueduto:'Senhor da Infraestr
 // ═══════════════ ESTADO ═══════════════
 const KEY='acidade_v7';
 function mkFront(){return{level:0,pending:null,peUsed:0,peMod:0,peGifted:0,status:'normal',enfermoWeek:null,discursoBuff:false,resistenciaBuff:false,discourseUsed:false,mesaUsed:false,oAmbarUsed:false,forcarMoralUsed:false,ajudado:false,ajudadoPor:null,ajudado2:false,ajudadoPor2:null,ajudado3:false,ajudadoPor3:null,ajudado4:false,ajudadoPor4:null,seenTests:[]}}
-function fresh(){return{week:1,day:0,peTotal:7,moral:0,moralHalf:false,moralEvent:false,moralEventFailed:false,moralFailedOverlay:false,moralPendingDiscount:false,moralEventId:null,moralSeenIds:[],moralPickPending:false,moralForcarPending:false,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,gameReleased:false,weekEventShown:false,attackActive:false,attackMagnitude:null,attackWeek:null,attackDefenseReady:false,attackNoticeDismissed:false,patrulhasUsed:false,fortalezaActive:false,fortalezaUsedThisWeek:false,fortalezaBloqueada:false,fortalezaPromptDone:false,analisePrevUsed:false,analisePrevAtiva:false,ajudasThisWeek:{},autoEventAdj:true,attackStreakWeeks:0,attackHappenedThisWeek:false,convocacaoPending:null,eventProbs:{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50},assignments:{},fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
+function fresh(){return{week:1,day:0,peTotal:7,moral:0,moralHalf:false,moralEvent:false,moralEventFailed:false,moralFailedOverlay:false,moralPendingDiscount:false,moralEventId:null,moralSeenIds:[],moralPickPending:false,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,gameReleased:false,weekEventShown:false,attackActive:false,attackMagnitude:null,attackWeek:null,attackDefenseReady:false,attackNoticeDismissed:false,patrulhasUsed:false,fortalezaActive:false,fortalezaUsedThisWeek:false,fortalezaBloqueada:false,fortalezaPromptDone:false,analisePrevUsed:false,analisePrevAtiva:false,ajudasThisWeek:{},autoEventAdj:true,attackStreakWeeks:0,attackHappenedThisWeek:false,convocacaoPending:null,eventProbs:{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50},assignments:{},fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
 function load(){try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s),f=fresh();f.week=d.week||1;f.day=d.day||0;f.peTotal=d.peTotal||7;f.moral=d.moral||0;f.nevoa=!!d.nevoa;f.oAmbarBuff=!!d.oAmbarBuff;f.oAmbarNextWeek=!!d.oAmbarNextWeek;f.gameReleased=!!d.gameReleased;f.weekEventShown=!!d.weekEventShown;f.moralEvent=!!d.moralEvent;f.moralHalf=!!d.moralHalf;f.moralEventFailed=!!d.moralEventFailed;f.moralFailedOverlay=!!d.moralFailedOverlay;f.moralPendingDiscount=!!d.moralPendingDiscount;
 f.attackActive=!!d.attackActive;f.attackMagnitude=d.attackMagnitude||null;f.attackWeek=d.attackWeek||null;f.attackDefenseReady=!!d.attackDefenseReady;f.attackNoticeDismissed=!!d.attackNoticeDismissed;
 f.patrulhasUsed=!!d.patrulhasUsed;f.fortalezaActive=!!d.fortalezaActive;f.fortalezaUsedThisWeek=!!d.fortalezaUsedThisWeek;f.fortalezaBloqueada=!!d.fortalezaBloqueada;f.fortalezaPromptDone=!!d.fortalezaPromptDone;
 f.analisePrevUsed=!!d.analisePrevUsed;f.analisePrevAtiva=!!d.analisePrevAtiva;f.ajudasThisWeek=d.ajudasThisWeek||{};
 f.autoEventAdj=(d.autoEventAdj===undefined)?true:!!d.autoEventAdj;f.attackStreakWeeks=d.attackStreakWeeks||0;f.attackHappenedThisWeek=!!d.attackHappenedThisWeek;f.convocacaoPending=d.convocacaoPending||null;
-f.moralEventId=d.moralEventId||null;f.moralSeenIds=d.moralSeenIds||[];f.moralPickPending=!!d.moralPickPending;f.moralForcarPending=!!d.moralForcarPending;
+f.moralEventId=d.moralEventId||null;f.moralSeenIds=d.moralSeenIds||[];f.moralPickPending=!!d.moralPickPending;
 f.eventProbs=d.eventProbs||{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50};f.assignments=d.assignments||{};f.log=d.log||[];if(d.fronts)OR.forEach(k=>{if(d.fronts[k])f.fronts[k]={...f.fronts[k],...d.fronts[k]}});return f}}catch(e){}return fresh()}
 function save(){
   const data=JSON.stringify(G);
@@ -1343,7 +1343,7 @@ function rGMPillarGrid(){
     const moralEventBtn=(fid==='moral'&&G.moralEvent)
       ?`<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:10px;color:var(--rose);width:100%;margin-bottom:2px">🫂 Evento Moral aguardando:</span><button class="btn btn-sm" style="border-color:#1a7a50;color:var(--teal)" onclick="gmMoralPass()">✓ Passou no Teste</button><button class="btn btn-danger btn-sm" onclick="gmMoralFail()">✗ Não Passou</button></div>`
       :(fid==='moral'&&G.moralPickPending)
-      ?`<div style="margin-top:6px;padding:8px 10px;background:rgba(224,96,144,.1);border:1px solid rgba(224,96,144,.5);border-radius:6px;display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;color:var(--rose);font-weight:600">${G.moralForcarPending?'🔔 Jogador forçou um Evento de Moral!':'🫂 Evento de Moral pendente'} — escolha a história:</span><button class="btn btn-gm btn-sm" onclick="openMoralPicker()">📜 Escolher e Disparar História</button></div>`
+      ?`<div style="margin-top:6px;padding:8px 10px;background:rgba(224,96,144,.08);border:1px solid rgba(224,96,144,.4);border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:11px;color:var(--rose)">🫂 Evento de Moral pendente — escolha a história:</span><button class="btn btn-gm btn-sm" onclick="openMoralPicker()">📜 Escolher História</button></div>`
       :'';
     const testReady=fs.pending&&fs.pending.testReady;
     const daysLeft=fs.pending&&!testReady?Math.max(0,(fs.pending.startDay+fs.pending.peSpent)-G.day):0;
@@ -1744,11 +1744,12 @@ function useForcarMoral(){
   const av=myAvailPE();if(av<2)return toast('PE insuficiente.',true);
   G.fronts['moral'].peUsed=(G.fronts['moral'].peUsed||0)+2;
   G.fronts['moral'].forcarMoralUsed=true;
-  // NÃO ativa moralEvent ainda — aguarda o GM escolher e disparar
-  G.moralPickPending=true; // sinaliza para o GM
-  G.moralForcarPending=true; // distingue de evento automático
+  G.moralEvent=true;
   alog(P,'🔔 <b>Forçar Evento Moral</b> ativado (2 PE) — GM deve escolher e disparar o evento agora');
-  save();render();toast('🔔 Evento de Moral forçado — aguarde o GM!','w');
+  save();
+  // Abre o picker imediatamente se for o GM, senão flag para o GM ver
+  activateMoralEvent();
+  render();toast('🔔 Evento de Moral forçado — aguarde o GM!','w');
 }
 function useNoiteCelebracao(){
   const cdWeeks=G.fronts.moral.noiteCdWeek||0;
@@ -2281,45 +2282,7 @@ function gmToggleAutoEvent(val){G.autoEventAdj=!!val;alog(P,`Regulagem automáti
 function gmClearAssignments(){if(!confirm('Limpar atribuições?'))return;G.assignments={};alog(P,'✕ Atribuições limpas');save();render()}
 function toast(msg,type=false){const t=document.getElementById('toast');t.textContent=msg;t.className=(type==='w'?'w on':type?'e on':'on');clearTimeout(TT);TT=setTimeout(()=>t.className='',3400)}
 
-// ─── BOTÃO VOLTAR DO CELULAR ──────────────────────────────────────────
-// Empurra um estado na história ao iniciar, para o botão voltar interceptar
-history.pushState({pilares:true},'');
-window.addEventListener('popstate',function(e){
-  // 1. Fechar qualquer modal/overlay aberto
-  const modals=['weekmodal','moralpicker','moraleditor','rewardmodal','convocarmodal','convocadooverlay'];
-  for(const id of modals){
-    const el=document.getElementById(id);
-    if(el&&(el.style.display==='flex'||el.style.display==='block')){
-      el.style.display='none';
-      history.pushState({pilares:true},'');
-      return;
-    }
-  }
-  // 2. Fechar painel de detalhes se aberto num pilar que não é do jogador
-  const det=document.getElementById('det');
-  if(SF&&SF!==myPillar()&&det&&det.classList.contains('open')){
-    SF=null;det.classList.remove('open');
-    CrossPopup=null;
-    rFronts();
-    window.scrollTo({top:0,behavior:'smooth'});
-    history.pushState({pilares:true},'');
-    return;
-  }
-  // 3. Fechar popup cross-pillar se aberto
-  if(CrossPopup){
-    CrossPopup=null;rFronts();
-    history.pushState({pilares:true},'');
-    return;
-  }
-  // 4. Fechar painel de detalhes se aberto no próprio pilar
-  if(SF&&det&&det.classList.contains('open')){
-    SF=null;det.classList.remove('open');
-    history.pushState({pilares:true},'');
-    return;
-  }
-  // Nada mais para fechar → empurra estado de volta para não sair do app
-  history.pushState({pilares:true},'');
-});
+// ═══════════════ MORAL EVENT PICKER ═══════════════
 let _mpMode=null,_mpChosenId=null;
 
 function activateMoralEvent(){
@@ -2421,7 +2384,6 @@ function confirmMoralPicker(){
   G.moralEvent=true;
   G.moralEventId=_mpChosenId;
   G.moralPickPending=false;
-  G.moralForcarPending=false;
   if(!G.moralSeenIds.includes(_mpChosenId))G.moralSeenIds.push(_mpChosenId);
   closeMoralPicker();
   populateMoralOverlay();
@@ -2430,27 +2392,27 @@ function confirmMoralPicker(){
 }
 
 function populateMoralOverlay(){
-  // Garante que a camada de falha está oculta ao mostrar o conteúdo normal
+  // Garante que a camada de falha está oculta
   const failLayer=document.getElementById('moral-fail-layer');
   if(failLayer)failLayer.style.display='none';
   document.getElementById('moraloverlay').style.background='rgba(4,5,13,.93)';
+  // Sempre usa ME_DATA em memória (pode ter sido atualizado pelo Firebase)
+  // Se ainda não carregou, tenta localStorage; o listener ME vai atualizar quando chegar
   if(!ME_DATA)ME_DATA=loadMoralEvents();
   const ev=G.moralEventId?ME_DATA.find(e=>e.id===G.moralEventId):null;
   const titleEl=document.getElementById('moral-event-title');
   const imgEl=document.getElementById('moral-img');
   const txtEl=document.getElementById('moral-txt');
-  if(!titleEl||!imgEl||!txtEl)return; // segurança
+  if(!titleEl||!imgEl||!txtEl)return;
   if(!ev){
     titleEl.style.display='none';
-    imgEl.innerHTML='<span>🖼️<br><br>Imagem do<br>evento aqui</span>';
+    imgEl.innerHTML='<span>🖼️<br><br>Aguardando<br>o Mestre</span>';
     imgEl.style.padding='20px';
     txtEl.innerHTML='<div style="font-family:\'Crimson Pro\',serif;font-size:16px;color:var(--t1);font-style:italic;line-height:1.8">Aguardando o Mestre escolher o evento...</div>';
     return;
   }
-  // Title
   titleEl.textContent=ev.title;
   titleEl.style.display='block';
-  // Image — usa id no onerror em vez de parentNode para evitar referência nula
   if(ev.img&&ev.img.trim()){
     imgEl.innerHTML=`<img src="${ev.img}" style="width:100%;height:100%;object-fit:cover" onerror="const p=document.getElementById('moral-img');if(p){p.innerHTML='<span style=\\'text-align:center;padding:12px\\'>🖼️<br><br>Imagem não<br>encontrada</span>';p.style.padding='20px';}">`;
     imgEl.style.padding='0';
@@ -2458,7 +2420,6 @@ function populateMoralOverlay(){
     imgEl.innerHTML='<span>🖼️<br><br>Sem imagem<br>vinculada</span>';
     imgEl.style.padding='20px';
   }
-  // Text — preserve line breaks
   const lines=ev.text.split('\n').map(l=>l.trim()?`<p style="margin-bottom:10px">${l}</p>`:'').join('');
   txtEl.innerHTML=`<div style="font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);font-style:italic;line-height:1.8;text-align:left">${lines}</div>`;
 }
@@ -2520,22 +2481,32 @@ function loadMoralEvents(){
 }
 function saveMoralEvents(){
   try{localStorage.setItem(ME_KEY,JSON.stringify(ME_DATA))}catch(e){}
-  // Sincroniza no Firebase para que todos os dispositivos usem os textos editados
+  // Propaga edições para todos os dispositivos via Firebase
   if(window._fb&&window._fb.setME){
     window._fb.setME(ME_DATA).catch(e=>console.warn('[Firebase] ME save erro:',e));
   }
 }
-// Listener Firebase para ME_DATA: quando o GM edita, os outros dispositivos recebem
+// Listener Firebase para ME_DATA — atualiza todos os dispositivos quando o GM edita
 let _meListening=false;
+function _initMEListener(){
+  if(_meListening||!window._fb||!window._fb.listenME)return;
+  _meListening=true;
+  window._fb.listenME(data=>{
+    if(!data||!Array.isArray(data))return;
+    try{localStorage.setItem(ME_KEY,JSON.stringify(data))}catch(e){}
+    ME_DATA=data;
+    // Se o overlay de moral está aberto, re-popula com o texto atualizado
+    const ov=document.getElementById('moraloverlay');
+    if(ov&&ov.style.display!=='none'&&G.moralEventId){
+      populateMoralOverlay();
+    }
+  });
+}
+// Tenta iniciar o listener ME quando Firebase estiver pronto
+let _meFbWait=0;
 (function waitMEFb(){
-  if(window._fb&&window._fb.listenME&&!_meListening){
-    _meListening=true;
-    window._fb.listenME(data=>{
-      if(!data||!Array.isArray(data))return;
-      try{localStorage.setItem(ME_KEY,JSON.stringify(data))}catch(e){}
-      ME_DATA=data; // atualiza em memória imediatamente
-    });
-  } else if(!_meListening){setTimeout(waitMEFb,400);}
+  if(window._fb&&window._fb.listenME){_initMEListener();return;}
+  if(_meFbWait++<30)setTimeout(waitMEFb,300);
 })();
 function openMoralEditor(){
   ME_DATA=loadMoralEvents();
