@@ -834,8 +834,23 @@ let G=load(),P=null,SF=null,TT=null,PPending=null,CrossPopup=null;
 
 // ── SYNC CROSS-DEVICE VIA FIREBASE ─────────────────────────────────────
 let _lastSyncStr=JSON.stringify(G);
+let _fbReady=false;          // true depois que o primeiro snapshot chegar
+let _fbReadyCbs=[];          // callbacks aguardando o primeiro snapshot
+function _onFbReady(cb){if(_fbReady)cb();else _fbReadyCbs.push(cb);}
+
 function _applyRemote(data){
   const str=JSON.stringify(data);
+  // Sempre aplica o primeiro snapshot (inicialização), mesmo que igual ao localStorage
+  if(!_fbReady){
+    _fbReady=true;
+    _lastSyncStr=str;
+    try{localStorage.setItem(KEY,str)}catch(e){}
+    G=load();
+    _fbReadyCbs.forEach(cb=>{try{cb()}catch(e){}});
+    _fbReadyCbs=[];
+    if(P)render();
+    return;
+  }
   if(str===_lastSyncStr)return;
   _lastSyncStr=str;
   try{localStorage.setItem(KEY,str)}catch(e){}
@@ -847,6 +862,7 @@ let _fbWait=0;
 (function waitFb(){
   if(window._fb){window._fb.listen(_applyRemote);return}
   if(_fbWait++<20)setTimeout(waitFb,300); // tenta por 6s
+  else{_fbReady=true;_fbReadyCbs.forEach(cb=>{try{cb()}catch(e){}});_fbReadyCbs=[];} // timeout: segue sem Firebase
 })();
 // Fallback: sync entre abas do mesmo navegador
 window.addEventListener('storage',e=>{if(e.key===KEY){G=load();if(P)render()}});
@@ -968,39 +984,52 @@ function hasCross(targetFid){return canShowEsforcos(targetFid)||canShowOAmbar(ta
 
 // ═══════════════ LOGIN / PICK ═══════════════
 function L(n){
-  P=n;document.getElementById('login').style.display='none';
+  P=n;
   const ch=CH[n];
-  // Avatar: emoji
-  const av=document.getElementById('hav');
-  av.textContent=PICON[n]||'?';
-  av.style.color=ch.col;av.style.fontSize='22px';
-  // Nome e título de pilar (ou classe para GM)
-  document.getElementById('hnm').textContent=n;
-  if(n==='GM'){
-    document.getElementById('hcls').textContent='Mestre da Campanha';
-  } else {
-    const mp=G.assignments[n];
-    document.getElementById('hcls').textContent=mp?PILLAR_TITLE[mp]||ch.cls:ch.cls;
-  }
-  if(n==='GM'){
-    document.getElementById('gmtog').style.display='block';
-    document.getElementById('app').style.display='block';
-    document.getElementById('waitoverlay').className='';
-    render();
-  } else {
-    if(G.assignments[n]){
-      SF=G.assignments[n];
+
+  // Oculta login e mostra indicador de carregamento enquanto aguarda Firebase
+  document.getElementById('login').style.display='none';
+  const loadDiv=document.createElement('div');
+  loadDiv.id='fb-loading';
+  loadDiv.style.cssText='position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:150;background:var(--bg0)';
+  loadDiv.innerHTML='<div style="font-size:48px;animation:gentleGlow 1.8s ease-in-out infinite">'+(PICON[n]||'\u2694\uFE0F')+'</div><div style="font-family:\'Cinzel\',serif;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--t1)">Sincronizando...</div>';
+  document.body.appendChild(loadDiv);
+
+  _onFbReady(function(){
+    // Remove indicador de carregamento
+    const el=document.getElementById('fb-loading');if(el)el.remove();
+    // Avatar: emoji
+    const av=document.getElementById('hav');
+    av.textContent=PICON[n]||'?';
+    av.style.color=ch.col;av.style.fontSize='22px';
+    // Nome e título de pilar (ou classe para GM)
+    document.getElementById('hnm').textContent=n;
+    if(n==='GM'){
+      document.getElementById('hcls').textContent='Mestre da Campanha';
+    } else {
+      const mp=G.assignments[n];
+      document.getElementById('hcls').textContent=mp?PILLAR_TITLE[mp]||ch.cls:ch.cls;
+    }
+    if(n==='GM'){
+      document.getElementById('gmtog').style.display='block';
       document.getElementById('app').style.display='block';
-      if(!G.gameReleased){
-        document.getElementById('wait-icon').textContent=PICON[n]||'⚔️';
-        document.getElementById('wait-icon').style.color=ch.col;
-        document.getElementById('waitoverlay').className='on';
-      }
+      document.getElementById('waitoverlay').className='';
       render();
     } else {
-      showPillarPick(n);
+      if(G.assignments[n]){
+        SF=G.assignments[n];
+        document.getElementById('app').style.display='block';
+        if(!G.gameReleased){
+          document.getElementById('wait-icon').textContent=PICON[n]||'\u2694\uFE0F';
+          document.getElementById('wait-icon').style.color=ch.col;
+          document.getElementById('waitoverlay').className='on';
+        }
+        render();
+      } else {
+        showPillarPick(n);
+      }
     }
-  }
+  });
 }
 function showPillarPick(name){
   document.getElementById('ppname').textContent=name;
