@@ -562,6 +562,16 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 <div id="gmp">
 <div class="gmtitle">⚙ Painel do Mestre — Controle Total</div>
 
+<!-- Banner de alerta: evento moral pendente de escolha -->
+<div id="gm-moral-pending-banner" style="display:none;padding:14px 16px;margin-bottom:16px;background:rgba(224,96,144,.12);border:2px solid rgba(224,96,144,.6);border-radius:8px;display:none;align-items:center;gap:14px;animation:pulse 1.8s ease-in-out infinite">
+  <span style="font-size:28px;flex-shrink:0">🫂</span>
+  <div style="flex:1">
+    <div style="font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--rose);margin-bottom:4px">EVENTO DE MORAL PENDENTE</div>
+    <div style="font-size:13px;color:var(--t1)">O jogador da Moral forçou um evento. Escolha a história que será exibida.</div>
+  </div>
+  <button class="btn btn-gm btn-sm" onclick="openMoralPicker()" style="flex-shrink:0">📜 Escolher Agora</button>
+</div>
+
 <div class="gmsec">
 <div class="gmslbl">Semana · Dia · PE Base</div>
 <div class="gmrow">
@@ -704,6 +714,15 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
       <button class="btn btn-sm" style="border-color:rgba(90,170,240,.8);color:var(--blue);background:rgba(90,170,240,.12);font-size:13px;padding:10px 24px;font-weight:600" onclick="responderConvocacao(true)">✦ Ajudar na Defesa</button>
     </div>
   </div>
+</div>
+
+<!-- ESPERA DE CONVOCAÇÃO (para o herói das Muralhas, aguardando respostas) -->
+<div id="convwait" style="display:none;position:fixed;inset:0;z-index:202;background:rgba(4,5,13,.97);backdrop-filter:blur(16px);align-items:center;justify-content:center;flex-direction:column;gap:20px;padding:20px">
+  <div style="font-size:56px;animation:gentleGlow 1.8s ease-in-out infinite">🔔</div>
+  <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(15px,2.2vw,22px);color:var(--blue);letter-spacing:.1em;text-align:center;text-shadow:0 0 30px rgba(90,170,240,.5)">AGUARDANDO RESPOSTA</div>
+  <div style="width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
+  <div style="font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);font-style:italic;text-align:center;max-width:380px;line-height:1.7;padding:0 16px">Convocação enviada. Aguardando os heróis responderem...</div>
+  <div id="convwait-list" style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:360px"></div>
 </div>
 
 <!-- FORTALEZA DIA 6 — pergunta ao jogador de Muralhas -->
@@ -1181,8 +1200,16 @@ function render(){
       populateMoralOverlay();
     } else if(mov.style.display==='flex'){mov.style.display='none'}
   }
-  // Convocação: mostrar overlay para convocados
-  if(P&&P!=='GM'&&G.gameReleased)_renderConvocacaoResponse();
+  // Convocação: mostrar overlay para convocados (e espera para Muralhas)
+  if(P&&P!=='GM'&&G.gameReleased){
+    if(G.convocacaoPending){
+      _renderConvocacaoResponse();
+    } else {
+      // Sem convocação ativa: fecha ambos
+      document.getElementById('convresp').style.display='none';
+      document.getElementById('convwait').style.display='none';
+    }
+  }
   // Overlay de ataque para Muralhas player
   if(P&&P!=='GM'&&G.gameReleased){
     const isWallPlayer=G.assignments[P]==='muralhas';
@@ -1279,6 +1306,18 @@ function render(){
     // Sincronizar checkbox de regulagem automática
     const autoCb=document.getElementById('auto-event-cb');
     if(autoCb)autoCb.checked=!!G.autoEventAdj;
+    // Banner de moral pendente de escolha (forçar moral pelo jogador da Moral)
+    const moralPendingBanner=document.getElementById('gm-moral-pending-banner');
+    if(moralPendingBanner){
+      if(G.moralPickPending){
+        moralPendingBanner.style.display='flex';
+        // Auto-abre o painel GM se ainda estava fechado
+        const gmp=document.getElementById('gmp');
+        if(!gmp.classList.contains('open')){gmp.classList.add('open');}
+      } else {
+        moralPendingBanner.style.display='none';
+      }
+    }
     // Abre modal de eventos no início de semana se não foi mostrado ainda
     if(G.gameReleased&&!G.weekEventShown){openWeekModal()}
     rGMPillarGrid();rGMProbs();
@@ -2605,13 +2644,37 @@ function responderConvocacao(aceitar){
 function _renderConvocacaoResponse(){
   if(!P||P==='GM'||!G.convocacaoPending)return;
   const mp=myPillar();
-  if(!mp||mp==='muralhas')return;
+  if(!mp)return;
   const resp=document.getElementById('convresp');
+  const wait=document.getElementById('convwait');
+  if(mp==='muralhas'){
+    // Herói das Muralhas: mostra tela de espera enquanto houver 'aguardando'
+    const pendentes=Object.entries(G.convocacaoPending).filter(([,v])=>v==='aguardando');
+    const todos=Object.entries(G.convocacaoPending);
+    if(pendentes.length>0){
+      // Monta lista de status
+      const listEl=document.getElementById('convwait-list');
+      listEl.innerHTML=todos.map(([fid,status])=>{
+        const ico=status==='aguardando'?'⏳':status==='aceitou'?'✅':'❌';
+        const col=status==='aguardando'?'var(--t2)':status==='aceitou'?'var(--teal)':'var(--rose)';
+        const label=status==='aguardando'?'Aguardando...':status==='aceitou'?'Aceitou':'Recusou';
+        return`<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg3);border:1px solid var(--t3);border-radius:6px"><span style="font-size:22px">${FD[fid].icon}</span><span style="font-family:'Cinzel',serif;font-size:13px;color:var(--t0);flex:1">${FD[fid].name}</span><span style="font-size:18px">${ico}</span><span style="font-family:'Cinzel',serif;font-size:11px;color:${col}">${label}</span></div>`;
+      }).join('');
+      if(wait.style.display!=='flex')wait.style.display='flex';
+    } else {
+      // Todos responderam — fecha a espera
+      wait.style.display='none';
+    }
+    resp.style.display='none';
+    return;
+  }
+  // Outros heróis: overlay de resposta
   if(G.convocacaoPending[mp]==='aguardando'){
     if(resp.style.display!=='flex')resp.style.display='flex';
   } else {
     resp.style.display='none';
   }
+  wait.style.display='none';
 }
 
 </script>
