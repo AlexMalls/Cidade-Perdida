@@ -183,7 +183,8 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .fc{padding:20px 18px 18px;cursor:default;position:relative;overflow:hidden;transition:border-color .22s,background .22s;border-radius:var(--r);border:1px solid var(--gold-lo);background:var(--bg2)}
 .fc::before{content:'';position:absolute;inset:3px;border:1px solid rgba(201,168,76,.05);border-radius:5px;pointer-events:none}
 .fc::after{content:'';position:absolute;bottom:-5px;right:-5px;width:10px;height:10px;transform:rotate(45deg);background:var(--gold-lo);transition:background .2s}
-.fc-attack-wall{border-color:var(--rose)!important;animation:pulseDead 1.8s ease-in-out infinite}
+@keyframes pulseFortaleza{0%,100%{box-shadow:0 0 0 0 rgba(90,170,240,.5),0 0 20px rgba(90,170,240,.15)}50%{box-shadow:0 0 0 10px rgba(90,170,240,0),0 0 40px rgba(90,170,240,.25)}}
+.fc-fortaleza{border-color:var(--blue)!important;animation:pulseFortaleza 2.5s ease-in-out infinite!important}
 .fc-attack-bg{background:linear-gradient(135deg,rgba(30,4,4,.18),var(--bg2))!important}
 @keyframes pulseAttackAll{0%,100%{box-shadow:0 0 0 0 rgba(200,50,50,.2)}50%{box-shadow:0 0 0 6px rgba(200,50,50,0)}}
 .fc-salao-view{cursor:pointer;border-color:rgba(224,160,48,.25)!important}.fc-salao-view:hover{border-color:var(--amber)!important;background:rgba(224,160,48,.04)}.fc-salao-view:hover::after{background:var(--amber)}
@@ -568,6 +569,10 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 <button class="btn btn-gm btn-sm" onclick="gmAdvDay()">+1 Dia</button>
 <div class="gmgrp"><span class="gmlbl">PE base/jogador</span><input class="gminp" id="gdtt" type="number" value="7" min="1" max="99"><button class="btn btn-gm btn-sm" onclick="gmPE()">✓</button></div>
 <button class="btn btn-sm" onclick="gmClearPE()">🔄 Resetar PE</button>
+<label style="display:inline-flex;align-items:center;gap:6px;font-family:'Cinzel',serif;font-size:11px;color:var(--t1);cursor:pointer;padding:6px 10px;border:1px solid var(--t3);border-radius:4px">
+  <input type="checkbox" id="auto-event-cb" onchange="gmToggleAutoEvent(this.checked)" style="accent-color:var(--gold);width:14px;height:14px">
+  Regulagem Auto de Eventos
+</label>
 </div></div>
 
 <div class="gmsec">
@@ -674,6 +679,45 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 </div>
 
 <div id="toast"></div>
+
+<!-- CONVOCAÇÃO MODAL (Torres de Vigia) -->
+<div id="convmodal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(4,5,13,.95);backdrop-filter:blur(14px);align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px">
+  <div style="width:100%;max-width:480px;background:var(--bg2);border:1px solid rgba(90,170,240,.5);border-radius:var(--r);padding:32px;animation:rise .22s ease">
+    <div style="font-family:'Cinzel Decorative',serif;font-size:18px;color:var(--blue);text-align:center;margin-bottom:6px">🔔 Convocar para a Defesa</div>
+    <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;color:var(--t2);text-align:center;margin-bottom:20px;text-transform:uppercase">Torres de Vigia · Selecione os pilares</div>
+    <div id="conv-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-sm" onclick="closeConvocacaoModal()">Fechar</button>
+      <button class="btn btn-sm" style="border-color:rgba(90,170,240,.6);color:var(--blue);font-weight:600" id="conv-btn" onclick="confirmarConvocacao()">🔔 Convocar</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESPOSTA DE CONVOCAÇÃO (para os convocados) -->
+<div id="convresp" style="display:none;position:fixed;inset:0;z-index:201;background:rgba(4,5,13,.95);backdrop-filter:blur(14px);align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px">
+  <div style="width:100%;max-width:420px;background:var(--bg2);border:1px solid rgba(90,170,240,.5);border-radius:var(--r);padding:32px;text-align:center;animation:rise .22s ease">
+    <div style="font-size:48px;margin-bottom:10px">⚔️</div>
+    <div style="font-family:'Cinzel Decorative',serif;font-size:18px;color:var(--blue);margin-bottom:8px">Convocado para a Defesa!</div>
+    <div style="font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);font-style:italic;margin-bottom:24px;line-height:1.7">O Senhor das Muralhas solicita sua ajuda na defesa da cidade. Você aceita? Custo: 1 PE.</div>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button class="btn btn-sm" onclick="responderConvocacao(false)" style="opacity:.6">Recusar</button>
+      <button class="btn btn-sm" style="border-color:rgba(90,170,240,.8);color:var(--blue);background:rgba(90,170,240,.12);font-size:13px;padding:10px 24px;font-weight:600" onclick="responderConvocacao(true)">✦ Ajudar na Defesa</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORTALEZA DIA 6 — pergunta ao jogador de Muralhas -->
+<div id="fortalezaprompt" style="display:none;position:fixed;inset:0;z-index:199;background:rgba(4,5,13,.92);backdrop-filter:blur(12px);align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px">
+  <div style="width:100%;max-width:440px;background:var(--bg2);border:1px solid rgba(90,170,240,.4);border-radius:var(--r);padding:32px;text-align:center;animation:rise .22s ease">
+    <div style="font-size:48px;margin-bottom:10px">🏰</div>
+    <div style="font-family:'Cinzel Decorative',serif;font-size:17px;color:var(--blue);margin-bottom:8px">Semana de Fortaleza?</div>
+    <div style="font-family:'Crimson Pro',serif;font-size:15px;color:var(--t1);font-style:italic;margin-bottom:24px;line-height:1.7">Ao entrar na próxima semana, você deseja ativar a Semana de Fortaleza? Pilares protegidos de dano e ataques Fáceis/Normais serão repelidos automaticamente.</div>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button class="btn btn-sm" onclick="responderFortaleza(false)" style="opacity:.6">Não ativar</button>
+      <button class="btn btn-sm" style="border-color:rgba(90,170,240,.8);color:var(--blue);background:rgba(90,170,240,.12);font-size:13px;padding:10px 24px;font-weight:600" onclick="responderFortaleza(true)">🏰 Ativar Fortaleza</button>
+    </div>
+  </div>
+</div>
 
 <script>
 'use strict';
@@ -817,12 +861,13 @@ const PILLAR_TITLE={muralhas:'Senhor das Muralhas',aqueduto:'Senhor da Infraestr
 
 // ═══════════════ ESTADO ═══════════════
 const KEY='acidade_v7';
-function mkFront(){return{level:0,pending:null,peUsed:0,peMod:0,peGifted:0,status:'normal',enfermoWeek:null,discursoBuff:false,resistenciaBuff:false,discourseUsed:false,mesaUsed:false,oAmbarUsed:false,forcarMoralUsed:false,ajudado:false,ajudadoPor:null,ajudado2:false,ajudadoPor2:null,seenTests:[]}}
-function fresh(){return{week:1,day:0,peTotal:7,moral:0,moralHalf:false,moralEvent:false,moralEventFailed:false,moralPendingDiscount:false,moralEventId:null,moralSeenIds:[],moralPickPending:false,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,gameReleased:false,weekEventShown:false,attackActive:false,attackMagnitude:null,attackWeek:null,attackDefenseReady:false,attackNoticeDismissed:false,patrulhasUsed:false,fortalezaActive:false,fortalezaUsedThisWeek:false,fortalezaBloqueada:false,analisePrevUsed:false,analisePrevAtiva:false,ajudasThisWeek:{},eventProbs:{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50},assignments:{},fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
+function mkFront(){return{level:0,pending:null,peUsed:0,peMod:0,peGifted:0,status:'normal',enfermoWeek:null,discursoBuff:false,resistenciaBuff:false,discourseUsed:false,mesaUsed:false,oAmbarUsed:false,forcarMoralUsed:false,ajudado:false,ajudadoPor:null,ajudado2:false,ajudadoPor2:null,ajudado3:false,ajudadoPor3:null,ajudado4:false,ajudadoPor4:null,seenTests:[]}}
+function fresh(){return{week:1,day:0,peTotal:7,moral:0,moralHalf:false,moralEvent:false,moralEventFailed:false,moralPendingDiscount:false,moralEventId:null,moralSeenIds:[],moralPickPending:false,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,gameReleased:false,weekEventShown:false,attackActive:false,attackMagnitude:null,attackWeek:null,attackDefenseReady:false,attackNoticeDismissed:false,patrulhasUsed:false,fortalezaActive:false,fortalezaUsedThisWeek:false,fortalezaBloqueada:false,fortalezaPromptDone:false,analisePrevUsed:false,analisePrevAtiva:false,ajudasThisWeek:{},autoEventAdj:true,attackStreakWeeks:0,attackHappenedThisWeek:false,convocacaoPending:null,eventProbs:{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50},assignments:{},fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
 function load(){try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s),f=fresh();f.week=d.week||1;f.day=d.day||0;f.peTotal=d.peTotal||7;f.moral=d.moral||0;f.nevoa=!!d.nevoa;f.oAmbarBuff=!!d.oAmbarBuff;f.oAmbarNextWeek=!!d.oAmbarNextWeek;f.gameReleased=!!d.gameReleased;f.weekEventShown=!!d.weekEventShown;f.moralEvent=!!d.moralEvent;f.moralHalf=!!d.moralHalf;f.moralEventFailed=!!d.moralEventFailed;f.moralPendingDiscount=!!d.moralPendingDiscount;
 f.attackActive=!!d.attackActive;f.attackMagnitude=d.attackMagnitude||null;f.attackWeek=d.attackWeek||null;f.attackDefenseReady=!!d.attackDefenseReady;f.attackNoticeDismissed=!!d.attackNoticeDismissed;
-f.patrulhasUsed=!!d.patrulhasUsed;f.fortalezaActive=!!d.fortalezaActive;f.fortalezaUsedThisWeek=!!d.fortalezaUsedThisWeek;f.fortalezaBloqueada=!!d.fortalezaBloqueada;
+f.patrulhasUsed=!!d.patrulhasUsed;f.fortalezaActive=!!d.fortalezaActive;f.fortalezaUsedThisWeek=!!d.fortalezaUsedThisWeek;f.fortalezaBloqueada=!!d.fortalezaBloqueada;f.fortalezaPromptDone=!!d.fortalezaPromptDone;
 f.analisePrevUsed=!!d.analisePrevUsed;f.analisePrevAtiva=!!d.analisePrevAtiva;f.ajudasThisWeek=d.ajudasThisWeek||{};
+f.autoEventAdj=(d.autoEventAdj===undefined)?true:!!d.autoEventAdj;f.attackStreakWeeks=d.attackStreakWeeks||0;f.attackHappenedThisWeek=!!d.attackHappenedThisWeek;f.convocacaoPending=d.convocacaoPending||null;
 f.moralEventId=d.moralEventId||null;f.moralSeenIds=d.moralSeenIds||[];f.moralPickPending=!!d.moralPickPending;
 f.eventProbs=d.eventProbs||{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50};f.assignments=d.assignments||{};f.log=d.log||[];if(d.fronts)OR.forEach(k=>{if(d.fronts[k])f.fronts[k]={...f.fronts[k],...d.fronts[k]}});return f}}catch(e){}return fresh()}
 function save(){
@@ -944,7 +989,12 @@ function openReward(fid){
   document.getElementById('reward-sub').textContent=r.sub;
   document.getElementById('reward-body').textContent=r.text;
   document.getElementById('rewardmodal').style.display='flex';
-  playSoundEffect('pass');
+  // Som apenas na primeira vez que a recompensa é desbloqueada
+  if(G.fronts[fid].rewardJustUnlocked){
+    playSoundEffect('pass');
+    G.fronts[fid].rewardJustUnlocked=false;
+    save();
+  }
 }
 function mlabel(){return ML[String(G.moral)]||'?'}
 function alog(who,msg){G.log.unshift({w:G.week,who,msg});if(G.log.length>80)G.log.pop()}
@@ -954,7 +1004,7 @@ function alog(who,msg){G.log.unshift({w:G.week,who,msg});if(G.log.length>80)G.lo
 function canShowEsforcos(targetFid){return G.assignments[P]==='aqueduto'&&(G.fronts[targetFid].status==='doenca'||G.fronts[targetFid].status==='enfermo')&&targetFid!=='aqueduto'}
 function canUseEsforcosMedicos(targetFid){return canShowEsforcos(targetFid)&&G.fronts.aqueduto.level>=2}
 // SALÃO: Olho Âmbar — apenas o jogador do Salão pode usar, aparece no próprio card do Salão
-function canShowOAmbar(targetFid){return G.assignments[P]==='comando'&&G.fronts.aqueduto.level>=4&&!G.fronts.aqueduto.oAmbarUsed&&targetFid==='aqueduto'}
+function canShowOAmbar(targetFid){return false} // OAmbar agora fica no próprio painel do Salão
 // INFRA: Auxiliar (Rede) — qualquer player pode gastar 2 PE para poder participar do próximo teste de upgrade de outro pilar
 // Comando Unificado (Salão nível 5): auxílio grátis e 2x por semana
 function canShowAjuda(targetFid){
@@ -1131,6 +1181,8 @@ function render(){
       populateMoralOverlay();
     } else if(mov.style.display==='flex'){mov.style.display='none'}
   }
+  // Convocação: mostrar overlay para convocados
+  if(P&&P!=='GM'&&G.gameReleased)_renderConvocacaoResponse();
   // Overlay de ataque para Muralhas player
   if(P&&P!=='GM'&&G.gameReleased){
     const isWallPlayer=G.assignments[P]==='muralhas';
@@ -1224,6 +1276,9 @@ function render(){
     const btn=document.getElementById('gm-release-btn'),st=document.getElementById('gm-release-status');
     if(G.gameReleased){btn.textContent='✓ Jogo liberado';btn.disabled=true;st.textContent='Todos os jogadores foram liberados';st.style.color='var(--teal)'}
     else{btn.disabled=!allReady;btn.textContent='▶ Liberar Jogo para os Jogadores';st.textContent=allReady?'Todos prontos — pode liberar!':` ${assigned}/4 jogadores escolheram pilar`;st.style.color=allReady?'var(--teal)':'var(--t2)'}
+    // Sincronizar checkbox de regulagem automática
+    const autoCb=document.getElementById('auto-event-cb');
+    if(autoCb)autoCb.checked=!!G.autoEventAdj;
     // Abre modal de eventos no início de semana se não foi mostrado ainda
     if(G.gameReleased&&!G.weekEventShown){openWeekModal()}
     rGMPillarGrid();rGMProbs();
@@ -1307,13 +1362,18 @@ function rFronts(){
       if(fid==='muralhas')cls+=' fc-attack-wall';
       else cls+=' fc-attack-bg';
     }
+    // Visual de Fortaleza ativa
+    if(fid==='muralhas'&&G.fortalezaActive&&!G.attackActive)cls+=' fc-fortaleza';
 
     const pips=Array.from({length:5},(_,i)=>{let x='pip';if(i<fs.level)x+=` ${fd.p}`;else if(fs.pending&&i===fs.level)x+=' pend';return`<div class="${x}"></div>`}).join('');
     const sbadge=sick?`<span class="stk stk-sick">🦠 Doença</span>`:dead?`<span class="stk stk-dead">☠️ Enfermo</span>`:''
     const abadge=(G.attackActive&&fid==='muralhas')?`<span class="stk stk-dead">⚔️ Sob Ataque</span>`:'';
     const dbuff=fs.discursoBuff?`<span class="stk stk-buff">📣 −1 PE</span>`:'';
     const rbuff=fs.resistenciaBuff?`<span class="stk stk-buff">🎯 Vantagem</span>`:'';
-    const abuff=fs.ajudado&&fs.ajudadoPor?`<span class="stk stk-buff">🤝 ${fs.ajudadoPor}</span>`:'';
+    const abuff=(fs.ajudado&&fs.ajudadoPor?`<span class="stk stk-buff">🤝 ${fs.ajudadoPor}</span>`:'')+
+               (fs.ajudado2&&fs.ajudadoPor2?`<span class="stk stk-buff">🤝 ${fs.ajudadoPor2}</span>`:'')+
+               (fs.ajudado3&&fs.ajudadoPor3?`<span class="stk stk-buff">🤝 ${fs.ajudadoPor3}</span>`:'')+
+               (fs.ajudado4&&fs.ajudadoPor4?`<span class="stk stk-buff">🤝 ${fs.ajudadoPor4}</span>`:'');
     const ownerBadge=P==='GM'?`<div class="fown">${pillarOwner(fid)||'Sem responsável'}</div>`:(!own?`<div class="fown">${pillarOwner(fid)||'Sem responsável'}</div>`:'');
     let st='';
     if(fs.level>=5)st='<div class="fst sd">✦ Completo</div>';
@@ -1478,6 +1538,26 @@ function rDet(fid){
       analiseBtn=`<div style="margin-bottom:12px"><button class="btn btn-sm" style="border-color:rgba(224,160,48,.5);color:var(--amber)" onclick="useAnalisePrev()" ${avMy>=1?'':'disabled'}>🔭 Análise Probabilística · 1 PE — prever próxima semana</button></div>`;
     }
   }
+  // Olho Âmbar (Salão — desbloqueado por Infra nível 4)
+  let oAmbarBtn='';
+  if(fid==='comando'&&P!=='GM'&&G.fronts.aqueduto.level>=4){
+    if(G.fronts.aqueduto.oAmbarUsed){
+      oAmbarBtn=`<div style="margin-bottom:12px;padding:8px 12px;background:rgba(62,207,160,.07);border:1px solid rgba(62,207,160,.25);border-radius:6px;font-size:12px;color:var(--teal)">📡 Olho Âmbar já usado esta semana${G.oAmbarNextWeek?' — custo −1 PE ativo para próxima semana':''}</div>`;
+    } else {
+      const avMy=myAvailPE();
+      oAmbarBtn=`<div style="margin-bottom:12px"><button class="btn btn-teal btn-sm" onclick="useOAmbar()" ${avMy>=1?'':'disabled'}>📡 Olho Âmbar · 1 PE — todos pagam −1 PE na próxima semana</button></div>`;
+    }
+  }
+  // Torres de Vigia — botão Convocar Heróis (Muralhas nível 3+, durante ataque)
+  let convocacaoBtn='';
+  if(fid==='muralhas'&&P!=='GM'&&G.fronts.muralhas.level>=3&&G.attackActive&&!G.attackDefenseReady){
+    if(G.convocacaoPending){
+      const pendentes=Object.keys(G.convocacaoPending).filter(k=>G.convocacaoPending[k]==='aguardando');
+      convocacaoBtn=`<div style="margin-bottom:12px;padding:10px 14px;background:rgba(90,170,240,.07);border:1px solid rgba(90,170,240,.4);border-radius:6px;font-size:12px;color:var(--blue)">🔔 <b>Convocação enviada</b> — aguardando resposta de: ${pendentes.map(k=>FD[k].name).join(', ')||'todos responderam'}</div>`;
+    } else {
+      convocacaoBtn=`<div style="margin-bottom:12px"><button class="btn btn-sm" style="border-color:rgba(90,170,240,.5);color:var(--blue)" onclick="openConvocacaoModal()">🔔 Convocar Heróis para Defesa · Torres de Vigia</button></div>`;
+    }
+  }
   // Info de Catapultas (Muralhas nível 2) — custos reduzidos visíveis
   let catapultasInfo='';
   if(fid==='muralhas'&&G.fronts.muralhas.level>=2&&G.attackActive){
@@ -1496,7 +1576,7 @@ function rDet(fid){
     <div style="margin-left:auto;font-size:16px;color:${rewardLocked?'var(--t3)':'var(--gold-lo)'}">▶</div>
   </div>
 </div>`:'';
-  panel.innerHTML=`<div class="dth"><span style="font-size:24px">${fd.icon}</span><div class="dttl">${fd.name}</div>${closeBtn}</div><div class="orn" style="margin-bottom:12px"><span>◆</span></div>${oAmbarActive}${gifted}${forcarBtn}${noiteBtn}${segundaBtn}${fortalezaBtn}${analiseBtn}${catapultasInfo}${sickWarn}<div class="lvlist">${lvs}</div>${rewardCard}`;
+  panel.innerHTML=`<div class="dth"><span style="font-size:24px">${fd.icon}</span><div class="dttl">${fd.name}</div>${closeBtn}</div><div class="orn" style="margin-bottom:12px"><span>◆</span></div>${oAmbarActive}${gifted}${forcarBtn}${noiteBtn}${segundaBtn}${fortalezaBtn}${convocacaoBtn}${analiseBtn}${oAmbarBtn}${catapultasInfo}${sickWarn}<div class="lvlist">${lvs}</div>${rewardCard}`;
 }
 
 // ═══════════════ LOG ═══════════════
@@ -1558,9 +1638,10 @@ function useMesa(targetFid,amount){
   save();render();toast(`📋 ${amount} PE transferido para ${FD[targetFid].name}!`);
 }
 function useOAmbar(){
+  if(G.assignments[P]!=='comando')return toast('Apenas o Senhor do Salão pode usar o Olho Âmbar.',true);
   const av=myAvailPE();if(av<1)return toast('PE insuficiente.',true);
-  G.fronts['aqueduto'].peUsed=(G.fronts['aqueduto'].peUsed||0)+1;
-  G.fronts['aqueduto'].oAmbarUsed=true;G.oAmbarNextWeek=true;CrossPopup=null;
+  G.fronts['comando'].peUsed=(G.fronts['comando'].peUsed||0)+1;
+  G.fronts['aqueduto'].oAmbarUsed=true;G.oAmbarNextWeek=true;
   alog(P,'📡 <b>Olho Âmbar</b> contactado (1 PE) — custo de PE reduzido em 1 na próxima semana para todos');
   save();render();toast('📡 Olho Âmbar contactado — custo −1 PE na próxima semana!');
 }
@@ -1633,8 +1714,12 @@ function useForcarMoral(){
   const av=myAvailPE();if(av<2)return toast('PE insuficiente.',true);
   G.fronts['moral'].peUsed=(G.fronts['moral'].peUsed||0)+2;
   G.fronts['moral'].forcarMoralUsed=true;
-  alog(P,'🔔 <b>Forçar Evento Moral</b> ativado (2 PE) — GM deve resolver o evento de Moral agora');
-  save();render();toast('🔔 Evento de Moral forçado — aguarde o GM!','w');
+  G.moralEvent=true;
+  alog(P,'🔔 <b>Forçar Evento Moral</b> ativado (2 PE) — GM deve escolher e disparar o evento agora');
+  save();
+  // Abre o picker imediatamente se for o GM, senão flag para o GM ver
+  activateMoralEvent();
+  render();toast('🔔 Evento de Moral forçado — aguarde o GM!','w');
 }
 function useNoiteCelebracao(){
   const cdWeeks=G.fronts.moral.noiteCdWeek||0;
@@ -1857,6 +1942,7 @@ function closeWeekModal(){
       } else {
         // Baluarte com Semana de Fortaleza: ataque não causa perda de níveis independentemente do resultado
         G.attackActive=true;G.attackMagnitude=ev.mag;G.attackWeek=G.week;G.attackDefenseReady=false;G.attackNoticeDismissed=false;
+        G.attackHappenedThisWeek=true; // para progressão automática de eventos
         // Cobra 3 PE do jogador das Muralhas (ou 0 com Catapultas para Fácil, 1 para Normal)
         const catapultas=G.fronts.muralhas.level>=2;
         let custoDef=3;
@@ -1901,9 +1987,9 @@ function _hasPendingTest(){return OR.some(k=>G.fronts[k].pending&&G.fronts[k].pe
 function _checkTestReady(){OR.forEach(k=>{const fs=G.fronts[k];if(fs.pending&&!fs.pending.testReady&&fs.pending.testResult==null&&G.day>=(fs.pending.startDay+fs.pending.peSpent)){fs.pending.testReady=true;if(!fs.seenTests)fs.seenTests=[];if(!fs.seenTests.includes(fs.pending.lv))fs.seenTests.push(fs.pending.lv);alog('Sistema',`⚔️ <b>${FD[k].name}</b> pronto para o teste! (Dia ${G.day})`);}})}
 function _updateWeekFromDay(){G.week=Math.max(1,Math.ceil(Math.max(G.day,1)/7))}
 function _resetWeek(){
-  OR.forEach(k=>{G.fronts[k].peUsed=0;G.fronts[k].peGifted=0;G.fronts[k].discursoBuff=false;G.fronts[k].resistenciaBuff=false;G.fronts[k].ajudado=false;G.fronts[k].ajudadoPor=null;G.fronts[k].ajudado2=false;G.fronts[k].ajudadoPor2=null;G.fronts[k].mesaUsed=false;G.fronts[k].oAmbarUsed=false;G.fronts[k].forcarMoralUsed=false});
+  OR.forEach(k=>{G.fronts[k].peUsed=0;G.fronts[k].peGifted=0;G.fronts[k].discursoBuff=false;G.fronts[k].resistenciaBuff=false;G.fronts[k].ajudado=false;G.fronts[k].ajudadoPor=null;G.fronts[k].ajudado2=false;G.fronts[k].ajudadoPor2=null;G.fronts[k].ajudado3=false;G.fronts[k].ajudadoPor3=null;G.fronts[k].ajudado4=false;G.fronts[k].ajudadoPor4=null;G.fronts[k].mesaUsed=false;G.fronts[k].oAmbarUsed=false;G.fronts[k].forcarMoralUsed=false});
   G.fronts.moral.discourseUsed=false;G.oAmbarBuff=G.oAmbarNextWeek;G.oAmbarNextWeek=false;
-  G.weekEventShown=false;G.ajudasThisWeek={};
+  G.weekEventShown=false;G.ajudasThisWeek={};G.convocacaoPending=null;
   // Desconto pendente de moral (jogador não usou Segunda Chance antes de virar a semana)
   if(G.moralPendingDiscount){_applyMoralDiscount()}
   G.moralEventFailed=false;G.moralPendingDiscount=false;
@@ -1927,30 +2013,90 @@ function _resetWeek(){
   }
   OR.forEach(k=>{const fs=G.fronts[k];if(fs.status==='enfermo'&&fs.enfermoWeek!=null&&G.week>fs.enfermoWeek+1){fs.status='normal';fs.enfermoWeek=null;alog('Sistema',`<b>${FD[k].name}</b> recuperou`)}});
 }
+function _dayOfWeek(day){return((Math.max(day,1)-1)%7)+1} // 1=primeiro dia, 6=sexto, 7=último
+function _needsDay6Resolution(){
+  // Retorna true se há algo a resolver no dia 6 (Fortaleza prompt para próxima semana)
+  return G.fronts.muralhas.level>=5&&!G.fortalezaActive&&!G.fortalezaBloqueada&&!G.fortalezaPromptDone;
+}
+function _needsEndOfWeekResolution(){
+  // Retorna true se ataque ativo precisa ser resolvido antes de virar semana
+  return G.attackActive||G.attackDefenseReady;
+}
+
 function gmAdvDay(){
   if(_hasPendingTest())return toast('Há um teste aguardando — resolva antes de avançar o dia.',true);
-  const prevWeek=G.week;G.day+=1;_updateWeekFromDay();
-  if(G.week>prevWeek){_resetWeek();alog(P,`→ <b>Semana ${G.week}</b> — PE resetados (Dia ${G.day})`)}
-  else{alog(P,`+1 dia → <b>Dia ${G.day}</b> (Semana ${G.week})`)}
-  // Verifica ataque: no último dia da semana (dia divisível por 7 = dia 7,14,21...) acionar defesa
-  if(G.attackActive&&!G.attackDefenseReady){
-    const dayOfWeek=((G.day-1)%7)+1; // 1-7
-    if(dayOfWeek===7){G.attackDefenseReady=true;alog('Sistema','⚔️ <b>Hora da defesa!</b> — Teste de habilidade das Muralhas agora')}
-    // Atualiza startDay dos upgrades paused (sem Torres)
-    OR.forEach(k=>{
-      const hasTorres=G.fronts.muralhas.level>=3;
-      const fs=G.fronts[k];
-      if(fs.pending&&fs.pending._pausedDay!==undefined&&!hasTorres){
-        fs.pending.startDay++; // estende deadline 1 dia
-      }
-    });
+  if(G.attackDefenseReady)return toast('⚔️ Resolva o resultado da defesa antes de avançar.',true);
+  const prevWeek=G.week;
+  G.day+=1;_updateWeekFromDay();
+  const dow=_dayOfWeek(G.day);
+
+  if(G.week>prevWeek){
+    // Aplicar progressão automática de eventos ANTES do reset
+    _applyAutoEventProgression();
+    _resetWeek();
+    G.fortalezaPromptDone=false;
+    alog(P,`→ <b>Semana ${G.week}</b> — PE resetados (Dia ${G.day})`);
+  } else {
+    alog(P,`+1 dia → <b>Dia ${G.day}</b> (Semana ${G.week})`);
+    // Dia 6: checar se precisa perguntar sobre Fortaleza
+    if(dow===6&&_needsDay6Resolution()){
+      _showFortalezaPrompt();
+    }
+    // Dia 7 (último): checar ataque
+    if(G.attackActive&&!G.attackDefenseReady&&dow===7){
+      G.attackDefenseReady=true;
+      alog('Sistema','⚔️ <b>Hora da defesa!</b> — Teste de habilidade das Muralhas agora');
+    }
+    // Atualiza startDay dos upgrades pausados (sem Torres)
+    if(G.attackActive&&!G.attackDefenseReady){
+      OR.forEach(k=>{
+        const hasTorres=G.fronts.muralhas.level>=3;
+        const fs=G.fronts[k];
+        if(fs.pending&&fs.pending._pausedDay!==undefined&&!hasTorres)fs.pending.startDay++;
+      });
+    }
   }
   _checkTestReady();save();render();
 }
+
 function gmNextWeek(){
   if(_hasPendingTest())return toast('Há um teste aguardando — resolva antes de avançar.',true);
-  const nextStart=Math.ceil(Math.max(G.day,1)/7)*7+1;const skip=nextStart-G.day;
+  if(G.attackDefenseReady)return toast('⚔️ Resolva o resultado da defesa antes de avançar a semana.',true);
+
+  // Se ataque ativo mas defesa ainda não solicitada, precisamos ir até o dia 7 primeiro
+  if(G.attackActive&&!G.attackDefenseReady){
+    // Avança até o último dia da semana atual para acionar a defesa
+    const lastDayOfWeek=Math.ceil(Math.max(G.day,1)/7)*7;
+    if(G.day<lastDayOfWeek){
+      G.day=lastDayOfWeek;_updateWeekFromDay();
+      G.attackDefenseReady=true;
+      alog(P,`⏩ <b>Avançado para Dia ${G.day}</b> — ataque ativo, defesa necessária antes de virar semana`);
+      save();render();
+      return toast('⚔️ Ataque ativo! Resolva a defesa antes de continuar.',true);
+    }
+  }
+
+  // Dia 6 da semana: se Fortaleza disponível e não foi perguntado ainda, parar aqui
+  const dow=_dayOfWeek(G.day);
+  const lastDayOfWeek=Math.ceil(Math.max(G.day,1)/7)*7;
+  if(_needsDay6Resolution()&&G.day<lastDayOfWeek){
+    // Pula para dia 6 da semana atual
+    const targetDay=Math.floor((G.day-1)/7)*7+6;
+    if(G.day<targetDay){
+      G.day=targetDay;_updateWeekFromDay();
+      alog(P,`⏩ <b>Avançado para Dia ${G.day}</b> — Semana de Fortaleza disponível: decida antes de avançar`);
+      save();render();
+      _showFortalezaPrompt();
+      return;
+    }
+  }
+
+  // Tudo resolvido: virar semana normalmente
+  const nextStart=lastDayOfWeek+1;
+  const skip=nextStart-G.day;
+  _applyAutoEventProgression();
   G.day=nextStart;_updateWeekFromDay();_resetWeek();_checkTestReady();
+  G.fortalezaPromptDone=false;
   alog(P,`→ <b>Semana ${G.week}</b> (Dia ${G.day}, +${skip} dias) — PE resetados`);
   save();render();
 }
@@ -1975,7 +2121,15 @@ function gmApprove(fid){
   fs.level=lv;fs.pending=null;
   alog(P,`✓ <b>${FD[fid].name}</b> — teste <b>APROVADO</b> · nível ${fs.level} concluído por ${owner}`);
   playSoundEffect('pass');
-  save();render();toast(`✓ ${FD[fid].name} avançou para nível ${fs.level}!`);
+  // Se completou o pilar (nível 5): seta flag e abre recompensa automaticamente
+  if(fs.level>=5&&REWARDS[fid]){
+    fs.rewardJustUnlocked=true;
+    save();render();
+    setTimeout(()=>openReward(fid),600); // pequeno delay para o render atualizar primeiro
+  } else {
+    save();render();
+  }
+  toast(`✓ ${FD[fid].name} avançou para nível ${fs.level}!`);
 }
 function gmReject(fid){
   const fs=G.fronts[fid];if(!fs.pending||!fs.pending.testReady)return;
@@ -1996,11 +2150,11 @@ function gmReject(fid){
 }
 function gmDefensePass(){
   G.attackActive=false;G.attackDefenseReady=false;G.attackMagnitude=null;G.attackWeek=null;G.attackNoticeDismissed=false;G.patrulhasUsed=false;
-  // Se Fortaleza foi usada com ataque: bloqueia próxima semana
   if(G.fortalezaUsedThisWeek){G.fortalezaBloqueada=true;G.fortalezaActive=false;G.fortalezaUsedThisWeek=false;}
   OR.forEach(k=>{if(G.fronts[k].pending){delete G.fronts[k].pending._pausedDay;delete G.fronts[k].pending._pauseLogged}});
   document.getElementById('testoverlay').style.display='none';
   alog(P,'⚔️ <b>Defesa BEM-SUCEDIDA</b> — ataque repelido sem danos');
+  playSoundEffect('pass');
   save();render();toast('✓ Defesa bem-sucedida!');
 }
 function gmDefenseFail(){
@@ -2018,8 +2172,12 @@ function gmDefenseFail(){
   // Semana de Fortaleza usada com ataque: bloqueia próxima semana
   if(G.fortalezaUsedThisWeek){G.fortalezaBloqueada=true;G.fortalezaActive=false;G.fortalezaUsedThisWeek=false;}
   document.getElementById('testoverlay').style.display='none';
-  if(wasFortaleza){alog(P,'⚔️ <b>Defesa FALHOU</b> — mas 🏰 Semana de Fortaleza protegeu os pilares!');toast('⚠️ Defesa falhou, mas Fortaleza protegeu os pilares!','w');}
-  else{alog(P,'⚔️ <b>Defesa FALHOU</b> — todos os pilares perderam 1 nível');playSoundEffect('stone');toast('✗ Defesa falhou — todos os pilares recuaram 1 nível.',true);}
+  if(wasFortaleza){
+    playSoundEffect('pass');
+    alog(P,'⚔️ <b>Defesa FALHOU</b> — mas 🏰 Semana de Fortaleza protegeu os pilares!');toast('⚠️ Defesa falhou, mas Fortaleza protegeu os pilares!','w');
+  } else {
+    alog(P,'⚔️ <b>Defesa FALHOU</b> — todos os pilares perderam 1 nível');playSoundEffect('stone');toast('✗ Defesa falhou — todos os pilares recuaram 1 nível.',true);
+  }
   save();render();
 }
 function closeAttackOverlay(){
@@ -2036,18 +2194,17 @@ function closeAttackOverlay(){
 function gmMoralPass(){
   G.moralEvent=false;G.moralEventId=null;G.moralPickPending=false;
   G.moralEventFailed=false;
-  // Sucesso: +0.5 nível de moral. Dois sucessos = +1 nível
   if(G.moralHalf){G.moral=Math.min(2,G.moral+1);G.moralHalf=false;alog(P,`🫂 Evento Moral <b>PASSOU</b> — Moral subiu para <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b>`)}
   else{G.moralHalf=true;alog(P,`🫂 Evento Moral <b>PASSOU</b> — meio nível acumulado (passe mais 1 vez para subir)`)}
+  playSoundEffect('pass');
   save();render();toast('✓ Teste de moral passou!');
 }
 function gmMoralFail(){
   G.moralEvent=false;G.moralEventId=null;G.moralPickPending=false;G.moralHalf=false;
-  G.moralEventFailed=true; // permite usar Segunda Chance ANTES do desconto
-  // Moral só cai SE o jogador não usar Segunda Chance
-  // Marcamos que há desconto pendente; é aplicado quando não há mais evento ativo e não foi usada Segunda Chance
+  G.moralEventFailed=true;
   G.moralPendingDiscount=true;
   alog(P,`🫂 Evento Moral <b>NÃO PASSOU</b> — Moral cairá 1 nível. Jogador da Moral pode usar Segunda Chance para refazer o teste.`);
+  playSoundEffect('fail');
   save();render();toast('✗ Teste de moral falhou — aguardando Segunda Chance do jogador.',true);
 }
 function _applyMoralDiscount(){
@@ -2074,6 +2231,7 @@ function gmReleaseGame(){
 }
 function gmReset(){G=fresh();save();alog('Sistema','↺ Reset total');render()}
 function gmClearPE(){OR.forEach(k=>G.fronts[k].peUsed=0);alog(P,'🔄 PE resetados');save();render()}
+function gmToggleAutoEvent(val){G.autoEventAdj=!!val;alog(P,`Regulagem automática de eventos: <b>${val?'ATIVA':'DESATIVADA'}</b>`);save();render()}
 function gmClearAssignments(){if(!confirm('Limpar atribuições?'))return;G.assignments={};alog(P,'✕ Atribuições limpas');save();render()}
 function toast(msg,type=false){const t=document.getElementById('toast');t.textContent=msg;t.className=(type==='w'?'w on':type?'e on':'on');clearTimeout(TT);TT=setTimeout(()=>t.className='',3400)}
 
@@ -2330,6 +2488,130 @@ function resetMEEvent(id){
 function getMoralEvent(id){
   if(!ME_DATA)ME_DATA=loadMoralEvents();
   return ME_DATA.find(e=>e.id===id)||null;
+}
+
+// ═══════════ PROGRESSÃO AUTOMÁTICA DE EVENTOS (#12) ═══════════
+function _applyAutoEventProgression(){
+  if(!G.autoEventAdj)return; // checkbox do GM desativado
+  const w=G.week; // semana que ESTÁ TERMINANDO
+
+  // 12.1 — Doença: na semana 2 (ou seja, ao entrar na semana 3) sobe para 50%
+  if(w===2&&G.eventProbs.doenca<50){
+    G.eventProbs.doenca=50;
+    alog('Sistema','📈 <b>Regulagem Auto</b> — Doença subiu para 50%');
+  }
+
+  // 12.2 — Ataque: sobe 50% por semana sem ataque; zera na semana seguinte a um ataque
+  if(G.attackHappenedThisWeek){
+    G.attackStreakWeeks=0;
+    G.eventProbs.ataque=0;
+    alog('Sistema','📉 <b>Regulagem Auto</b> — Ataque ocorreu: chance de ataque resetada para 0%');
+  } else {
+    G.attackStreakWeeks=(G.attackStreakWeeks||0)+1;
+    const novaChance=Math.min(100,G.attackStreakWeeks*50);
+    G.eventProbs.ataque=novaChance;
+    alog('Sistema',`📈 <b>Regulagem Auto</b> — Ataque: ${novaChance}% (${G.attackStreakWeeks} semana${G.attackStreakWeeks>1?'s':''} sem ataque)`);
+  }
+  G.attackHappenedThisWeek=false;
+
+  // 12.3 — Chuva: aleatório entre 10% e 40%
+  const novaChuva=10+Math.floor(Math.random()*4)*10; // 10,20,30 ou 40
+  G.eventProbs.chuva=novaChuva;
+  alog('Sistema',`🎲 <b>Regulagem Auto</b> — Chuva Forte: ${novaChuva}% (aleatório 10–40%)`);
+}
+
+// ═══════════ FORTALEZA DIA 6 PROMPT (#16) ═══════════
+function _showFortalezaPrompt(){
+  if(G.assignments[P]==='muralhas'||P==='GM'){
+    document.getElementById('fortalezaprompt').style.display='flex';
+    G.fortalezaPromptDone=true;
+    save();
+  }
+}
+function responderFortaleza(ativar){
+  document.getElementById('fortalezaprompt').style.display='none';
+  if(ativar){
+    G.fortalezaActive=true;
+    alog(P,'🏰 <b>Semana de Fortaleza</b> declarada para a próxima semana — pilares protegidos, ataques Fáceis/Normais repelidos automaticamente');
+    toast('🏰 Semana de Fortaleza ativa para a próxima semana!');
+  } else {
+    alog(P,'🏰 Semana de Fortaleza não ativada para a próxima semana.');
+    toast('Fortaleza não ativada.');
+  }
+  save();render();
+}
+
+// ═══════════ CONVOCAÇÃO — TORRES DE VIGIA (#14) ═══════════
+function openConvocacaoModal(){
+  if(G.fronts.muralhas.level<3)return toast('Requer Torres de Vigia (nível 3).',true);
+  if(!G.attackActive)return toast('Convocação só é possível durante um ataque.',true);
+  const list=document.getElementById('conv-list');list.innerHTML='';
+  OR.filter(k=>k!=='muralhas').forEach(k=>{
+    const fd=FD[k],owner=pillarOwner(k);
+    const div=document.createElement('div');
+    div.style.cssText='display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border:1px solid var(--t3);border-radius:6px;cursor:pointer;transition:all .18s';
+    div.innerHTML=`<input type="checkbox" id="conv-${k}" value="${k}" style="width:16px;height:16px;accent-color:var(--blue)"><label for="conv-${k}" style="flex:1;cursor:pointer"><span style="font-size:18px">${fd.icon}</span> <b style="font-family:'Cinzel',serif;font-size:13px">${fd.name}</b><span style="font-size:11px;color:var(--t2);margin-left:8px">${owner?`(${owner})`:'Sem herói'}</span></label>`;
+    list.appendChild(div);
+  });
+  document.getElementById('convmodal').style.display='flex';
+}
+function closeConvocacaoModal(){
+  document.getElementById('convmodal').style.display='none';
+}
+function confirmarConvocacao(){
+  const selecionados=OR.filter(k=>k!=='muralhas'&&document.getElementById('conv-'+k)&&document.getElementById('conv-'+k).checked);
+  if(!selecionados.length){toast('Selecione ao menos um pilar para convocar.',true);return;}
+  // Registra convocação pendente
+  G.convocacaoPending={};
+  selecionados.forEach(k=>{G.convocacaoPending[k]='aguardando'});
+  closeConvocacaoModal();
+  alog(P,`🔔 <b>Convocação enviada</b> — aguardando resposta de: ${selecionados.map(k=>FD[k].name).join(', ')}`);
+  save();render();toast('🔔 Convocação enviada — aguardando respostas!');
+}
+function responderConvocacao(aceitar){
+  document.getElementById('convresp').style.display='none';
+  const mp=myPillar();
+  if(!mp||!G.convocacaoPending)return;
+  G.convocacaoPending[mp]=aceitar?'aceitou':'recusou';
+  if(aceitar){
+    playSoundEffect('pass');
+    // Deduz 1 PE do convocado
+    G.fronts[mp].peUsed=(G.fronts[mp].peUsed||0)+1;
+    // Registra como auxiliar no pilar de Muralhas
+    if(!G.fronts.muralhas.ajudado){G.fronts.muralhas.ajudado=true;G.fronts.muralhas.ajudadoPor=P;}
+    else if(!G.fronts.muralhas.ajudado2){G.fronts.muralhas.ajudado2=true;G.fronts.muralhas.ajudadoPor2=P;}
+    else if(!G.fronts.muralhas.ajudado3){G.fronts.muralhas.ajudado3=true;G.fronts.muralhas.ajudadoPor3=P;}
+    else{G.fronts.muralhas.ajudado4=true;G.fronts.muralhas.ajudadoPor4=P;}
+    alog(P,`✅ <b>${P}</b> aceitou a convocação (−1 PE) — contribuirá com +1d10 na defesa`);
+  } else {
+    playSoundEffect('fail');
+    alog(P,`❌ <b>${P}</b> recusou a convocação`);
+  }
+  // Verifica se todos responderam
+  const pendentes=Object.values(G.convocacaoPending).filter(v=>v==='aguardando').length;
+  if(pendentes===0){
+    // Cobra PE do herói das Muralhas: 1 PE por cada que aceitou
+    const aceitaram=Object.values(G.convocacaoPending).filter(v=>v==='aceitou').length;
+    if(aceitaram>0){
+      G.fronts.muralhas.peUsed=(G.fronts.muralhas.peUsed||0)+aceitaram;
+      alog('Sistema',`🔔 Convocação concluída — ${aceitaram} herói(s) aceitaram · Muralhas: −${aceitaram} PE`);
+    }
+    G.convocacaoPending=null;
+  }
+  save();render();toast(aceitar?'✅ Você aceitou a convocação!':'❌ Você recusou a convocação.');
+}
+
+// ═══════════ RENDER CONVOCAÇÃO — mostrar overlay para convocados ═══════════
+function _renderConvocacaoResponse(){
+  if(!P||P==='GM'||!G.convocacaoPending)return;
+  const mp=myPillar();
+  if(!mp||mp==='muralhas')return;
+  const resp=document.getElementById('convresp');
+  if(G.convocacaoPending[mp]==='aguardando'){
+    if(resp.style.display!=='flex')resp.style.display='flex';
+  } else {
+    resp.style.display='none';
+  }
 }
 
 </script>
