@@ -4,6 +4,40 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pilares da Cidade Perdida</title>
+<!-- Firebase SDK (módulo ES) -->
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import{getDatabase,ref,set,onValue}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+// ─── SUBSTITUA COM O SEU firebaseConfig ──────────────────────────────────────
+// 1. Acesse: https://console.firebase.google.com
+// 2. Crie um projeto → Adicionar app Web
+// 3. Em "Configuração do projeto" → copie o objeto firebaseConfig:
+const firebaseConfig = {
+  apiKey: "AIzaSyCIWX6Ll3vvZi0OS8h8wZ8sm_QN3m7KMaA",
+  authDomain: "cidade-perdida.firebaseapp.com",
+  databaseURL: "https://cidade-perdida-default-rtdb.firebaseio.com",
+  projectId: "cidade-perdida",
+  storageBucket: "cidade-perdida.firebasestorage.app",
+  messagingSenderId: "757217352912",
+  appId: "1:757217352912:web:5f5d2b306b0169f80f52d5"
+};
+
+// 4. No Firebase → Realtime Database → Regras:
+//    { "rules": { ".read": true, ".write": true } }  ← apenas para testes!
+// ─────────────────────────────────────────────────────────────────────────────
+
+try{
+  const app=initializeApp(firebaseConfig);
+  const db=getDatabase(app);
+  const GAME_REF='cidade_v1';
+  window._fb={
+    set: data=>set(ref(db,GAME_REF),data),
+    listen: cb=>onValue(ref(db,GAME_REF),snap=>{if(snap.exists())cb(snap.val())})
+  };
+  console.log('[Firebase] conectado');
+}catch(e){console.warn('[Firebase] falhou:',e.message)}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
@@ -791,24 +825,32 @@ f.patrulhasUsed=!!d.patrulhasUsed;f.fortalezaActive=!!d.fortalezaActive;f.fortal
 f.analisePrevUsed=!!d.analisePrevUsed;f.analisePrevAtiva=!!d.analisePrevAtiva;f.ajudasThisWeek=d.ajudasThisWeek||{};
 f.moralEventId=d.moralEventId||null;f.moralSeenIds=d.moralSeenIds||[];f.moralPickPending=!!d.moralPickPending;
 f.eventProbs=d.eventProbs||{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50};f.assignments=d.assignments||{};f.log=d.log||[];if(d.fronts)OR.forEach(k=>{if(d.fronts[k])f.fronts[k]={...f.fronts[k],...d.fronts[k]}});return f}}catch(e){}return fresh()}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
+function save(){
+  const data=JSON.stringify(G);
+  try{localStorage.setItem(KEY,data)}catch(e){}
+  if(window._fb){window._fb.set(G).catch(e=>console.warn('[Firebase] save erro:',e))}
+}
 let G=load(),P=null,SF=null,TT=null,PPending=null,CrossPopup=null;
 
-// ── SYNC ENTRE ABAS ──────────────────────────────
-// Dispara quando OUTRA aba altera o localStorage
-window.addEventListener('storage',e=>{
-  if(e.key!==KEY)return;
-  G=load();
+// ── SYNC CROSS-DEVICE VIA FIREBASE ─────────────────────────────────────
+let _lastSyncStr=JSON.stringify(G);
+function _applyRemote(data){
+  const str=JSON.stringify(data);
+  if(str===_lastSyncStr)return;
+  _lastSyncStr=str;
+  try{localStorage.setItem(KEY,str)}catch(e){}
+  G=load(); // relê do localStorage recém-atualizado
   if(P)render();
-});
-// Poll de segurança a cada 2s (cobre edge cases de mesmo domínio)
-let _lastSaved='';
-setInterval(()=>{
-  try{
-    const s=localStorage.getItem(KEY)||'';
-    if(s!==_lastSaved){_lastSaved=s;G=load();if(P)render()}
-  }catch(e){}
-},2000);
+}
+// Inicia o listener Firebase quando o módulo estiver pronto
+let _fbWait=0;
+(function waitFb(){
+  if(window._fb){window._fb.listen(_applyRemote);return}
+  if(_fbWait++<20)setTimeout(waitFb,300); // tenta por 6s
+})();
+// Fallback: sync entre abas do mesmo navegador
+window.addEventListener('storage',e=>{if(e.key===KEY){G=load();if(P)render()}});
+
 
 // ═══════════════ HELPERS ═══════════════
 function myPillar(){return G.assignments[P]||null}
