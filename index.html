@@ -36,7 +36,7 @@ try{
     set: data=>set(ref(db,GAME_REF),data),
     listen: cb=>onValue(ref(db,GAME_REF),snap=>{if(snap.exists())cb(snap.val())}),
     setME: data=>set(ref(db,ME_REF),data),
-    listenME: cb=>onValue(ref(db,ME_REF),snap=>{if(snap.exists())cb(snap.val())})
+    listenME: cb=>onValue(ref(db,ME_REF),snap=>cb(snap.exists()?snap.val():null))
   };
   console.log('[Firebase] conectado');
 }catch(e){console.warn('[Firebase] falhou:',e.message)}
@@ -2392,27 +2392,27 @@ function confirmMoralPicker(){
 }
 
 function populateMoralOverlay(){
-  // Garante que a camada de falha está oculta
+  // Garante que a camada de falha está oculta ao mostrar o conteúdo normal
   const failLayer=document.getElementById('moral-fail-layer');
   if(failLayer)failLayer.style.display='none';
   document.getElementById('moraloverlay').style.background='rgba(4,5,13,.93)';
-  // Sempre usa ME_DATA em memória (pode ter sido atualizado pelo Firebase)
-  // Se ainda não carregou, tenta localStorage; o listener ME vai atualizar quando chegar
   if(!ME_DATA)ME_DATA=loadMoralEvents();
   const ev=G.moralEventId?ME_DATA.find(e=>e.id===G.moralEventId):null;
   const titleEl=document.getElementById('moral-event-title');
   const imgEl=document.getElementById('moral-img');
   const txtEl=document.getElementById('moral-txt');
-  if(!titleEl||!imgEl||!txtEl)return;
+  if(!titleEl||!imgEl||!txtEl)return; // segurança
   if(!ev){
     titleEl.style.display='none';
-    imgEl.innerHTML='<span>🖼️<br><br>Aguardando<br>o Mestre</span>';
+    imgEl.innerHTML='<span>🖼️<br><br>Imagem do<br>evento aqui</span>';
     imgEl.style.padding='20px';
     txtEl.innerHTML='<div style="font-family:\'Crimson Pro\',serif;font-size:16px;color:var(--t1);font-style:italic;line-height:1.8">Aguardando o Mestre escolher o evento...</div>';
     return;
   }
+  // Title
   titleEl.textContent=ev.title;
   titleEl.style.display='block';
+  // Image — usa id no onerror em vez de parentNode para evitar referência nula
   if(ev.img&&ev.img.trim()){
     imgEl.innerHTML=`<img src="${ev.img}" style="width:100%;height:100%;object-fit:cover" onerror="const p=document.getElementById('moral-img');if(p){p.innerHTML='<span style=\\'text-align:center;padding:12px\\'>🖼️<br><br>Imagem não<br>encontrada</span>';p.style.padding='20px';}">`;
     imgEl.style.padding='0';
@@ -2420,6 +2420,7 @@ function populateMoralOverlay(){
     imgEl.innerHTML='<span>🖼️<br><br>Sem imagem<br>vinculada</span>';
     imgEl.style.padding='20px';
   }
+  // Text — preserve line breaks
   const lines=ev.text.split('\n').map(l=>l.trim()?`<p style="margin-bottom:10px">${l}</p>`:'').join('');
   txtEl.innerHTML=`<div style="font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);font-style:italic;line-height:1.8;text-align:left">${lines}</div>`;
 }
@@ -2480,33 +2481,43 @@ function loadMoralEvents(){
   return ME_DEFAULT.map(e=>({...e}));
 }
 function saveMoralEvents(){
+  if(!ME_DATA)return;
   try{localStorage.setItem(ME_KEY,JSON.stringify(ME_DATA))}catch(e){}
-  // Propaga edições para todos os dispositivos via Firebase
+  // Publica no Firebase para sincronizar todos os dispositivos
   if(window._fb&&window._fb.setME){
-    window._fb.setME(ME_DATA).catch(e=>console.warn('[Firebase] ME save erro:',e));
+    window._fb.setME(ME_DATA).catch(e=>console.warn('[ME Firebase] erro:',e));
   }
 }
-// Listener Firebase para ME_DATA — atualiza todos os dispositivos quando o GM edita
-let _meListening=false;
-function _initMEListener(){
-  if(_meListening||!window._fb||!window._fb.listenME)return;
-  _meListening=true;
-  window._fb.listenME(data=>{
-    if(!data||!Array.isArray(data))return;
-    try{localStorage.setItem(ME_KEY,JSON.stringify(data))}catch(e){}
-    ME_DATA=data;
-    // Se o overlay de moral está aberto, re-popula com o texto atualizado
+
+// ── LISTENER ME: sincroniza eventos de moral entre dispositivos ──────────────
+let _meReady=false;
+function _startMESync(){
+  if(!window._fb||!window._fb.listenME||_meReady)return;
+  _meReady=true;
+  window._fb.listenME(remoteData=>{
+    if(remoteData&&Array.isArray(remoteData)){
+      // Firebase tem dados — usa como fonte da verdade
+      try{localStorage.setItem(ME_KEY,JSON.stringify(remoteData))}catch(e){}
+      ME_DATA=remoteData;
+    } else {
+      // Firebase vazio — publica os dados locais para que outros dispositivos recebam
+      ME_DATA=loadMoralEvents();
+      if(window._fb&&window._fb.setME){
+        window._fb.setME(ME_DATA).catch(()=>{});
+      }
+    }
+    // Re-popula o overlay se estiver aberto
     const ov=document.getElementById('moraloverlay');
-    if(ov&&ov.style.display!=='none'&&G.moralEventId){
+    if(ov&&ov.style.display==='flex'&&G&&G.moralEventId){
       populateMoralOverlay();
     }
   });
 }
-// Tenta iniciar o listener ME quando Firebase estiver pronto
-let _meFbWait=0;
-(function waitMEFb(){
-  if(window._fb&&window._fb.listenME){_initMEListener();return;}
-  if(_meFbWait++<30)setTimeout(waitMEFb,300);
+// Tenta iniciar assim que Firebase estiver disponível
+let _meWait=0;
+(function waitME(){
+  if(window._fb&&window._fb.listenME){_startMESync();return;}
+  if(_meWait++<30)setTimeout(waitME,300);
 })();
 function openMoralEditor(){
   ME_DATA=loadMoralEvents();
