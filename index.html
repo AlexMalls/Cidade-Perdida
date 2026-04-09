@@ -477,18 +477,37 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 
 <!-- MORAL EVENT OVERLAY -->
 <div id="moraloverlay" style="display:none;position:fixed;inset:0;z-index:86;background:rgba(4,5,13,.93);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow-y:auto">
-  <div style="width:100%;min-height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:32px 20px;box-sizing:border-box">
-  <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(14px,2.2vw,22px);color:var(--rose);letter-spacing:.12em;text-align:center;text-shadow:0 0 30px rgba(224,96,144,.4)">EVENTO DE MORAL</div>
-  <div style="width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--rose),transparent);flex-shrink:0"></div>
-  <div id="moral-event-title" style="font-family:'Cinzel',serif;font-size:clamp(13px,2vw,17px);font-weight:600;color:var(--gold-hi);text-align:center;display:none;padding:0 16px"></div>
-  <div id="moral-img" style="width:260px;height:200px;background:var(--bg2);border:1px solid rgba(224,96,144,.3);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:12px;font-style:italic;text-align:center;padding:20px;flex-shrink:0">
-    <span>🖼️<br><br>Imagem do<br>evento aqui</span>
+
+  <!-- Conteúdo normal do evento (sempre presente, só oculto quando modo falha ativo) -->
+  <div id="moral-normal-content" style="width:100%;min-height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:32px 20px;box-sizing:border-box">
+    <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(14px,2.2vw,22px);color:var(--rose);letter-spacing:.12em;text-align:center;text-shadow:0 0 30px rgba(224,96,144,.4)">EVENTO DE MORAL</div>
+    <div style="width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--rose),transparent);flex-shrink:0"></div>
+    <div id="moral-event-title" style="font-family:'Cinzel',serif;font-size:clamp(13px,2vw,17px);font-weight:600;color:var(--gold-hi);text-align:center;display:none;padding:0 16px"></div>
+    <div id="moral-img" style="width:260px;height:200px;background:var(--bg2);border:1px solid rgba(224,96,144,.3);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:12px;font-style:italic;text-align:center;padding:20px;flex-shrink:0">
+      <span>🖼️<br><br>Imagem do<br>evento aqui</span>
+    </div>
+    <div style="max-width:480px;width:100%;text-align:center;padding:18px 22px;background:var(--bg2);border:1px solid rgba(224,96,144,.2);border-radius:8px" id="moral-txt">
+      <div style="font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);font-style:italic;line-height:1.8">Aguardando o Mestre escolher o evento...</div>
+    </div>
+    <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(224,96,144,.4);text-align:center">Aguardando o Mestre</div>
   </div>
-  <div style="max-width:480px;width:100%;text-align:center;padding:18px 22px;background:var(--bg2);border:1px solid rgba(224,96,144,.2);border-radius:8px" id="moral-txt">
-    <div style="font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);font-style:italic;line-height:1.8">Aguardando o Mestre escolher o evento...</div>
+
+  <!-- Camada de falha: sobrepõe o conteúdo normal sem destruí-lo -->
+  <div id="moral-fail-layer" style="display:none;position:absolute;inset:0;background:rgba(40,4,4,.97);z-index:2;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:32px 20px;box-sizing:border-box">
+    <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(14px,2.2vw,22px);color:var(--dead);letter-spacing:.12em;text-align:center;text-shadow:0 0 30px rgba(200,50,50,.6)">TESTE FALHOU</div>
+    <div style="width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--dead),transparent);flex-shrink:0"></div>
+    <div style="font-family:'Cinzel',serif;font-size:clamp(13px,2vw,17px);font-weight:600;color:var(--dead);text-align:center;padding:0 16px">A Moral Caiu</div>
+    <div style="padding:16px 28px;background:rgba(200,50,50,.12);border:1px solid rgba(200,50,50,.4);border-radius:8px;text-align:center;max-width:420px">
+      <div id="fail-moral-val" style="font-family:'Crimson Pro',serif;font-size:18px;color:var(--t0);margin-bottom:6px"></div>
+      <div style="font-family:'Crimson Pro',serif;font-size:15px;color:var(--t1);font-style:italic;line-height:1.7">O discurso não convenceu os soldados.<br>A insatisfação cresceu entre as fileiras.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:8px">
+      <button id="fail-nbassim-btn" class="btn btn-sm" onclick="useSegundaChance()" style="font-size:13px;padding:11px 28px">🔄 Não é bem assim · 1 PE</button>
+      <div id="fail-cd-msg" style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.12em;color:rgba(224,96,144,.6);min-height:16px;text-align:center"></div>
+      <button class="btn btn-sm" onclick="fecharFalhaMoral()" style="opacity:.6;margin-top:4px">Aceitar e fechar</button>
+    </div>
   </div>
-  <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(224,96,144,.4);text-align:center">Aguardando o Mestre</div>
-  </div>
+
 </div>
 
 <!-- ATTACK OVERLAY (aviso ao herói das Muralhas) -->
@@ -1176,14 +1195,18 @@ function render(){
     const mov=document.getElementById('moraloverlay');
     const wasMoralHidden=mov.style.display!=='flex';
     if(isMoralPlayer&&G.moralFailedOverlay){
-      // Modo falha: mostra o overlay com filtro vermelho
       mov.style.display='flex';
       populateMoralOverlayFailed();
     } else if(isMoralPlayer&&G.moralEvent){
       mov.style.display='flex';
       if(wasMoralHidden)playAlert('moral');
       populateMoralOverlay();
-    } else if(mov.style.display==='flex'){mov.style.display='none'}
+    } else if(mov.style.display==='flex'){
+      mov.style.display='none';
+      // Garante que camada de falha está oculta ao fechar
+      const fl=document.getElementById('moral-fail-layer');
+      if(fl)fl.style.display='none';
+    }
   }
   // Convocação: mostrar overlay para convocados
   if(P&&P!=='GM'&&G.gameReleased)_renderConvocacaoResponse();
@@ -1514,8 +1537,13 @@ function rDet(fid){
     const avMy=myAvailPE();const can=cdLeft<=0&&avMy>=4;
     noiteBtn=`<div style="margin-bottom:12px"><button class="btn btn-sm" onclick="useNoiteCelebracao()" ${can?'':'disabled'}>🎉 Noite de Celebração · 4 PE${cdLeft>0?' (disponível em '+cdLeft+' semana'+(cdLeft>1?'s':'')+')':(avMy<4?' (PE insuficiente)':'')}</button></div>`;
   }
-  // Segunda Chance: agora vive no overlay de falha de moral — não aparece aqui
-  const segundaBtn='';
+  // Botão Segunda Chance (Moral nível ≥ 1) — rejogar teste de moral falhado
+  let segundaBtn='';
+  if(fid==='moral'&&P!=='GM'&&G.fronts.moral.level>=1&&(G.moralEventFailed||G.moralPendingDiscount)&&!G.moralEvent){
+    const cdWeek=G.fronts.moral.segundaCdWeek||0;const cdLeft=Math.max(0,cdWeek-G.week+1);
+    const avMy=myAvailPE();const can=cdLeft<=0&&avMy>=1;
+    segundaBtn=`<div style="margin-bottom:12px"><button class="btn btn-sm" onclick="useSegundaChance()" ${can?'':'disabled'}>🔄 Segunda Chance · 1 PE${cdLeft>0?' (disponível em '+cdLeft+' semana'+(cdLeft>1?'s':'')+')':(avMy<1?' (PE insuficiente)':'')}</button></div>`;
+  }
   // Botão Semana de Fortaleza (Muralhas nível 5)
   let fortalezaBtn='';
   if(fid==='muralhas'&&P!=='GM'&&G.fronts.muralhas.level>=5){
@@ -1732,28 +1760,26 @@ function useNoiteCelebracao(){
 }
 function useSegundaChance(){
   const cdWeek=G.fronts.moral.segundaCdWeek||0;
-  const avMy=myAvailPE();
   if(G.week<=cdWeek){toast(`"Não é bem assim" em cooldown — disponível na semana ${cdWeek+1}.`,true);return;}
   if(!G.moralEventFailed){toast('Nenhum teste de moral falho para refazer.',true);return;}
-  if(avMy<1){toast('PE insuficiente. Custo: 1 PE.',true);return;}
+  const av=myAvailPE();if(av<1){toast('PE insuficiente. Custo: 1 PE.',true);return;}
   // Cobra PE
   G.fronts['moral'].peUsed=(G.fronts['moral'].peUsed||0)+1;
-  // Cooldown: indisponível na semana seguinte (cdWeek = semana atual, disponível só na semana atual+2... 
-  // mas o enunciado diz "semana seguinte fica indisponível", então bloqueia a semana seguinte)
-  G.fronts.moral.segundaCdWeek=G.week+1; // disponível de volta em week+2
-  // Restaura moral ao valor antes da queda
+  // Cooldown: disponível só na semana atual+2 (ou seja, próxima semana fica bloqueado)
+  G.fronts.moral.segundaCdWeek=G.week+1;
+  // Restaura a moral ao valor antes da queda
   G.moral=Math.min(2,G.moral+1);
   // Limpa estado de falha
   G.moralEventFailed=false;
   G.moralFailedOverlay=false;
   G.moralPendingDiscount=false;
-  // Reativa o MESMO evento (mesmo ID) — o overlay de moral volta ao normal
+  // Reativa o MESMO evento — overlay volta ao normal, GM vê botões de novo
   G.moralEvent=true;
-  alog(P,`🔄 <b>Não é bem assim</b> (1 PE) — Moral restaurada para <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b> · Evento sendo refeito · Habilidade indisponível na próxima semana`);
+  alog(P,`🔄 <b>Não é bem assim</b> (1 PE) — Moral restaurada para <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b> · Teste sendo refeito · Habilidade indisponível na próxima semana`);
   save();render();toast('🔄 Não é bem assim! Moral restaurada — refazendo o teste.','w');
 }
 function fecharFalhaMoral(){
-  // Jogador aceita a queda de moral e fecha o overlay de falha
+  // Jogador aceita a queda de moral e fecha o overlay
   G.moralFailedOverlay=false;
   G.moralEventFailed=false;
   save();render();
@@ -2006,7 +2032,7 @@ function _resetWeek(){
   G.weekEventShown=false;G.ajudasThisWeek={};G.convocacaoPending=null;
   // Desconto pendente de moral (jogador não usou Segunda Chance antes de virar a semana)
   if(G.moralPendingDiscount){_applyMoralDiscount()}
-  G.moralEventFailed=false;G.moralPendingDiscount=false;G.moralFailedOverlay=false;
+  G.moralEventFailed=false;G.moralPendingDiscount=false;
   // Fortaleza: se estava bloqueada esta semana, desbloqueia agora
   if(G.fortalezaBloqueada){G.fortalezaBloqueada=false;alog('Sistema','🏰 Semana de Fortaleza disponível novamente');}
   G.fortalezaUsedThisWeek=false;
@@ -2207,20 +2233,20 @@ function closeAttackOverlay(){
 }
 function gmMoralPass(){
   G.moralEvent=false;G.moralEventId=null;G.moralPickPending=false;
-  G.moralEventFailed=false;G.moralFailedOverlay=false;
+  G.moralEventFailed=false;
   if(G.moralHalf){G.moral=Math.min(2,G.moral+1);G.moralHalf=false;alog(P,`🫂 Evento Moral <b>PASSOU</b> — Moral subiu para <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b>`)}
   else{G.moralHalf=true;alog(P,`🫂 Evento Moral <b>PASSOU</b> — meio nível acumulado (passe mais 1 vez para subir)`)}
   playSoundEffect('pass');
   save();render();toast('✓ Teste de moral passou!');
 }
 function gmMoralFail(){
-  // Aplica a queda de moral imediatamente
+  // Aplica a queda de moral imediatamente (não difere mais)
   G.moral=Math.max(-4,G.moral-1);
   G.moralEvent=false;G.moralEventId=null;G.moralPickPending=false;G.moralHalf=false;
   G.moralEventFailed=true;
-  G.moralFailedOverlay=true;   // acende o overlay de falha no jogador da Moral
-  G.moralPendingDiscount=false; // queda já aplicada, não precisa do desconto diferido
-  alog(P,`🫂 Evento Moral <b>NÃO PASSOU</b> — Moral caiu para <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b>. Jogador da Moral pode usar "Não é bem assim" para refazer o teste.`);
+  G.moralFailedOverlay=true;  // acende o overlay vermelho no jogador da Moral
+  G.moralPendingDiscount=false;
+  alog(P,`🫂 Evento Moral <b>NÃO PASSOU</b> — Moral caiu para <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b>. Jogador pode usar "Não é bem assim" para refazer.`);
   playSoundEffect('fail');
   save();render();toast('✗ Teste de moral falhou — moral caiu 1 nível.',true);
 }
@@ -2362,6 +2388,9 @@ function confirmMoralPicker(){
 }
 
 function populateMoralOverlay(){
+  // Garante que a camada de falha está oculta ao mostrar o conteúdo normal
+  const failLayer=document.getElementById('moral-fail-layer');
+  if(failLayer)failLayer.style.display='none';
   document.getElementById('moraloverlay').style.background='rgba(4,5,13,.93)';
   if(!ME_DATA)ME_DATA=loadMoralEvents();
   const ev=G.moralEventId?ME_DATA.find(e=>e.id===G.moralEventId):null;
@@ -2390,46 +2419,31 @@ function populateMoralOverlay(){
   txtEl.innerHTML=`<div style="font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);font-style:italic;line-height:1.8;text-align:left">${lines}</div>`;
 }
 
-
 function populateMoralOverlayFailed(){
-  const mov=document.getElementById('moraloverlay');
-  // Aplica fundo avermelhado sobre o overlay
-  mov.style.background='rgba(40,4,4,.97)';
+  // Atualiza valores na camada de falha (sem tocar no conteúdo normal embaixo)
+  const novaLabel=`${G.moral>=0?'+':''}${G.moral} ${mlabel()}`;
+  document.getElementById('fail-moral-val').innerHTML=`Moral agora: <b style="color:var(--dead)">${novaLabel}</b>`;
+  // Verifica disponibilidade
   const cdWeek=G.fronts.moral.segundaCdWeek||0;
   const emCooldown=G.week<=cdWeek;
   const avMy=myAvailPE();
   const temPE=avMy>=1;
   const hasSeg=G.fronts.moral.level>=1;
   const podeUsar=hasSeg&&!emCooldown&&temPE;
-  let cdMsg='';
-  if(hasSeg&&emCooldown){
-    const semanas=cdWeek-G.week+1;
-    cdMsg=`<div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.12em;color:rgba(224,96,144,.6);margin-top:6px">Indisponível — cooldown de ${semanas} semana${semanas>1?'s':''}</div>`;
-  } else if(hasSeg&&!temPE){
-    cdMsg=`<div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.12em;color:rgba(224,96,144,.6);margin-top:6px">PE insuficiente (custo: 1 PE)</div>`;
-  } else if(!hasSeg){
-    cdMsg=`<div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.12em;color:rgba(224,96,144,.6);margin-top:6px">Requer "Segunda Chance" (Moral nível 1)</div>`;
-  }
-  const novaLabel=`${G.moral>=0?'+':''}${G.moral} ${mlabel()}`;
-  mov.querySelector('div').innerHTML=`
-    <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(14px,2.2vw,22px);color:var(--dead);letter-spacing:.12em;text-align:center;text-shadow:0 0 30px rgba(200,50,50,.6)">TESTE FALHOU</div>
-    <div style="width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--dead),transparent);flex-shrink:0"></div>
-    <div style="font-family:'Cinzel',serif;font-size:clamp(13px,2vw,17px);font-weight:600;color:var(--dead);text-align:center;padding:0 16px">A Moral caiu</div>
-    <div style="padding:16px 28px;background:rgba(200,50,50,.12);border:1px solid rgba(200,50,50,.4);border-radius:8px;text-align:center;max-width:420px">
-      <div style="font-family:'Crimson Pro',serif;font-size:18px;color:var(--t0);margin-bottom:6px">Moral agora: <b style="color:var(--dead)">${novaLabel}</b></div>
-      <div style="font-family:'Crimson Pro',serif;font-size:15px;color:var(--t1);font-style:italic;line-height:1.7">O discurso não convenceu os soldados.<br>A insatisfação cresceu entre as fileiras.</div>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:8px">
-      <button class="btn btn-sm" onclick="useSegundaChance()" ${podeUsar?'':'disabled'} style="font-size:13px;padding:11px 28px;${podeUsar?'border-color:rgba(201,168,76,.7);color:var(--gold-hi);':''}">
-        🔄 Não é bem assim · 1 PE${podeUsar?'':' (indisponível)'}
-      </button>
-      ${cdMsg}
-      <button class="btn btn-sm" onclick="fecharFalhaMoral()" style="opacity:.6;margin-top:4px">Aceitar e fechar</button>
-    </div>
-  `;
+  const btn=document.getElementById('fail-nbassim-btn');
+  btn.disabled=!podeUsar;
+  btn.style.borderColor=podeUsar?'rgba(201,168,76,.7)':'';
+  btn.style.color=podeUsar?'var(--gold-hi)':'';
+  const cdEl=document.getElementById('fail-cd-msg');
+  if(!hasSeg) cdEl.textContent='Requer "Segunda Chance" (Moral nível 1)';
+  else if(emCooldown){const s=cdWeek-G.week+1;cdEl.textContent=`Indisponível — cooldown de ${s} semana${s>1?'s':''}`;}
+  else if(!temPE) cdEl.textContent='PE insuficiente (custo: 1 PE)';
+  else cdEl.textContent='';
+  // Exibe a camada de falha por cima do conteúdo normal
+  document.getElementById('moral-fail-layer').style.display='flex';
 }
 
-
+const ME_KEY='pilares_moral_v1';
 const ME_DEFAULT=[
   {id:1,title:'O Barril Quebrado',text:'Uma briga explodiu no pátio central. Dois soldados estão se empurrando no meio de uma roda de dez ou doze homens e mulheres que gritam, alguns rindo, outros claramente assustados. Um barril de cerveja foi chutado e o chão está molhado.\n\nDoran, um anão veterano, disse que elfas "não deveriam estar reconstruindo muralhas". Sael, uma elfa jovem, respondeu quebrando a xícara dele na cabeça.\n\nA maioria dos presentes está do lado dela.',img:'moral_01.jpg'},
   {id:2,title:'O Que Não Fala Mais',text:'Mira, uma soldada halfling, parou de trabalhar. Não pediu folga, não deu explicação — simplesmente sentou numa pedra e ficou olhando para a parede destruída à frente.\n\nO nome dela estava numa lista de mortos que circulou semana passada — um erro administrativo. A lista chegou até a família dela antes de ser corrigida. Eles já fizeram o luto.\n\nO silêncio está se espalhando.',img:'moral_02.jpg'},
