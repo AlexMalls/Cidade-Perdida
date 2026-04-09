@@ -236,10 +236,10 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .lvb{min-width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:11px;font-weight:600;flex-shrink:0;margin-top:2px}
 .bd{background:rgba(62,207,160,.2);color:var(--teal)}.bn{background:rgba(201,168,76,.2);color:var(--gold)}.bp{background:rgba(224,160,48,.2);color:var(--amber)}.bl{background:var(--bg4);color:var(--t2)}
 .lvbody{flex:1}
-.lvnm{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--t0);margin-bottom:3px}
-.lvrew{font-size:14px;color:var(--t1);margin-bottom:6px;line-height:1.5}
+.lvnm{font-family:'Cinzel',serif;font-size:15px;font-weight:600;color:var(--t0);margin-bottom:3px}
+.lvrew{font-size:15px;color:var(--t1);margin-bottom:6px;line-height:1.6}
 .lvtag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-family:'Cinzel',serif;letter-spacing:.06em;border:1px solid currentColor;margin-bottom:6px}
-.lvcost{font-size:11px;color:var(--t2)}
+.lvcost{font-size:13px;color:var(--t1);margin-top:2px}
 .lvacts{margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 /* LOG */
 #logp{margin-bottom:32px}
@@ -818,8 +818,8 @@ const PILLAR_TITLE={muralhas:'Senhor das Muralhas',aqueduto:'Senhor da Infraestr
 // ═══════════════ ESTADO ═══════════════
 const KEY='acidade_v7';
 function mkFront(){return{level:0,pending:null,peUsed:0,peMod:0,peGifted:0,status:'normal',enfermoWeek:null,discursoBuff:false,resistenciaBuff:false,discourseUsed:false,mesaUsed:false,oAmbarUsed:false,forcarMoralUsed:false,ajudado:false,ajudadoPor:null,ajudado2:false,ajudadoPor2:null,seenTests:[]}}
-function fresh(){return{week:1,day:0,peTotal:7,moral:0,moralHalf:false,moralEvent:false,moralEventFailed:false,moralEventId:null,moralSeenIds:[],moralPickPending:false,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,gameReleased:false,weekEventShown:false,attackActive:false,attackMagnitude:null,attackWeek:null,attackDefenseReady:false,attackNoticeDismissed:false,patrulhasUsed:false,fortalezaActive:false,fortalezaUsedThisWeek:false,fortalezaBloqueada:false,analisePrevUsed:false,analisePrevAtiva:false,ajudasThisWeek:{},eventProbs:{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50},assignments:{},fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
-function load(){try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s),f=fresh();f.week=d.week||1;f.day=d.day||0;f.peTotal=d.peTotal||7;f.moral=d.moral||0;f.nevoa=!!d.nevoa;f.oAmbarBuff=!!d.oAmbarBuff;f.oAmbarNextWeek=!!d.oAmbarNextWeek;f.gameReleased=!!d.gameReleased;f.weekEventShown=!!d.weekEventShown;f.moralEvent=!!d.moralEvent;f.moralHalf=!!d.moralHalf;f.moralEventFailed=!!d.moralEventFailed;
+function fresh(){return{week:1,day:0,peTotal:7,moral:0,moralHalf:false,moralEvent:false,moralEventFailed:false,moralPendingDiscount:false,moralEventId:null,moralSeenIds:[],moralPickPending:false,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,gameReleased:false,weekEventShown:false,attackActive:false,attackMagnitude:null,attackWeek:null,attackDefenseReady:false,attackNoticeDismissed:false,patrulhasUsed:false,fortalezaActive:false,fortalezaUsedThisWeek:false,fortalezaBloqueada:false,analisePrevUsed:false,analisePrevAtiva:false,ajudasThisWeek:{},eventProbs:{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50},assignments:{},fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
+function load(){try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s),f=fresh();f.week=d.week||1;f.day=d.day||0;f.peTotal=d.peTotal||7;f.moral=d.moral||0;f.nevoa=!!d.nevoa;f.oAmbarBuff=!!d.oAmbarBuff;f.oAmbarNextWeek=!!d.oAmbarNextWeek;f.gameReleased=!!d.gameReleased;f.weekEventShown=!!d.weekEventShown;f.moralEvent=!!d.moralEvent;f.moralHalf=!!d.moralHalf;f.moralEventFailed=!!d.moralEventFailed;f.moralPendingDiscount=!!d.moralPendingDiscount;
 f.attackActive=!!d.attackActive;f.attackMagnitude=d.attackMagnitude||null;f.attackWeek=d.attackWeek||null;f.attackDefenseReady=!!d.attackDefenseReady;f.attackNoticeDismissed=!!d.attackNoticeDismissed;
 f.patrulhasUsed=!!d.patrulhasUsed;f.fortalezaActive=!!d.fortalezaActive;f.fortalezaUsedThisWeek=!!d.fortalezaUsedThisWeek;f.fortalezaBloqueada=!!d.fortalezaBloqueada;
 f.analisePrevUsed=!!d.analisePrevUsed;f.analisePrevAtiva=!!d.analisePrevAtiva;f.ajudasThisWeek=d.ajudasThisWeek||{};
@@ -1237,7 +1237,9 @@ function rGMPillarGrid(){
   // Barra de PE por jogador no topo
   const pebar=document.createElement('div');
   pebar.style.cssText='grid-column:1/-1;display:flex;gap:12px;flex-wrap:wrap;margin-bottom:4px';
-  Object.entries(G.assignments).forEach(([name,fid])=>{
+  // Barras de PE na mesma ordem dos cards de pilares (OR order)
+  OR.forEach(fid=>{
+    const name=pillarOwner(fid);if(!name)return;
     const total=pillarTotalPE(fid),used=G.fronts[fid].peUsed||0,av=Math.max(0,total-used+(G.fronts[fid].peGifted||0));
     const pct=total>0?Math.round(av/total*100):0;
     const col=CH[name]?CH[name].col:'var(--gold)';
@@ -1402,7 +1404,11 @@ function rDet(fid){
     let ic='lv ',bc='lvb ',bt=n;
     if(done){ic+='ld';bc+='bd';bt='✓'}else if(pend){ic+='lp';bc+='bp';bt='⚒'}else if(next){ic+='ln';bc+='bn'}else{ic+='ll';bc+='bl'}
     const cr=efectivePE(lv.pe,fid);
-    const cLabel=cr!==lv.pe?`${cr} PE <s style="color:var(--t2);font-size:10px">${lv.pe}</s>`:cr+' PE';
+    const basePE=lv.pe;
+    const modified=cr!==basePE;
+    const cLabel=modified
+      ?`<b style="color:var(--teal)">${cr} PE</b> <s style="color:var(--t2);font-size:10px">${basePE}</s>`
+      :`${cr} PE`;
     // GM e Mesa de Planejamento: txt + rew juntos. Sem Mesa: só txt.
     const desc=(P==='GM'||showFull)
       ?`${lv.txt}<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--t3);color:var(--t0);font-size:13px">${lv.rew}</div>`
@@ -1446,7 +1452,7 @@ function rDet(fid){
   }
   // Botão Segunda Chance (Moral nível ≥ 1) — rejogar teste de moral falhado
   let segundaBtn='';
-  if(fid==='moral'&&P!=='GM'&&G.fronts.moral.level>=1&&G.moralEvent===false&&G.moralEventFailed){
+  if(fid==='moral'&&P!=='GM'&&G.fronts.moral.level>=1&&(G.moralEventFailed||G.moralPendingDiscount)&&!G.moralEvent){
     const cdWeek=G.fronts.moral.segundaCdWeek||0;const cdLeft=Math.max(0,cdWeek-G.week+1);
     const avMy=myAvailPE();const can=cdLeft<=0&&avMy>=1;
     segundaBtn=`<div style="margin-bottom:12px"><button class="btn btn-sm" onclick="useSegundaChance()" ${can?'':'disabled'}>🔄 Segunda Chance · 1 PE${cdLeft>0?' (disponível em '+cdLeft+' semana'+(cdLeft>1?'s':'')+')':(avMy<1?' (PE insuficiente)':'')}</button></div>`;
@@ -1508,14 +1514,13 @@ function su(fid,n){
   if(fs.level!==n-1)return toast('Complete o nível anterior primeiro.',true);
   if(fs.status==='enfermo')return toast('Pilar enfermo — não pode receber PE.',true);
   let cr=efectivePE(lv.pe,fid);
-  // Cultura de Resistência (Moral nível 3): PE gastos no teste reduzidos à metade (arredondado para baixo)
-  const culturaAtiva=G.fronts.moral.level>=3;
-  if(culturaAtiva)cr=Math.max(1,Math.floor(cr/2));
   const av=myAvailPE();
   if(P!=='GM'&&av<cr)return toast(`PE insuficiente. Precisa: ${cr}, disponível: ${av}.`,true);
   if(P!=='GM') G.fronts[fid].peUsed=(G.fronts[fid].peUsed||0)+cr;
-  fs.pending={lv:n,by:P,peSpent:cr,startDay:G.day,testReady:false,testResult:null};
-  const culturaNote=culturaAtiva?` (Cultura de Resistência: custo reduzido para ${cr} PE)`:'';
+  // Cultura de Resistência: cobra o custo cheio agora — devolve metade só se o teste falhar
+  const culturaAtiva=G.fronts.moral.level>=3;
+  fs.pending={lv:n,by:P,peSpent:cr,peSpentFull:cr,culturaAtiva,startDay:G.day,testReady:false,testResult:null};
+  const culturaNote=culturaAtiva?` (Cultura de Resistência ativa — devolve metade dos PE se falhar)`:''
   alog(P,`iniciou <b>${FD[fid].name}</b> nível ${n} (${cr} PE)${culturaNote}`);
   save();render();
 }
@@ -1649,8 +1654,9 @@ function useSegundaChance(){
   G.fronts['moral'].peUsed=(G.fronts['moral'].peUsed||0)+1;
   G.fronts.moral.segundaCdWeek=G.week;
   G.moralEventFailed=false;
+  G.moralPendingDiscount=false; // cancela o desconto de moral — o evento será refeito
   activateMoralEvent();
-  alog(P,'🔄 <b>Segunda Chance</b> (1 PE) — teste de Moral pode ser refeito · Cooldown: 1 semana');
+  alog(P,'🔄 <b>Segunda Chance</b> (1 PE) — evento de Moral será refeito · Cooldown: 1 semana');
   save();render();toast('🔄 Segunda Chance ativada — aguarde o GM!','w');
 }
 
@@ -1862,18 +1868,27 @@ function closeWeekModal(){
     }
     else if(ev.type==='doenca'){G.fronts[ev.fid].status='doenca';alog(P,`🦠 <b>Doença</b> → <b>${FD[ev.fid].name}</b>`);playSoundEffect('cough')}
     else if(ev.type==='chuva'){
-      const aquaLv=G.fronts.aqueduto.level;
-      let desfaz=false;
-      if(aquaLv>=3){// Estruturas Restauradas: 20% de chance de desmoronar (rola 1d10, ocorre em ≤2)
-        const roll=Math.floor(Math.random()*10)+1;
-        desfaz=roll<=2;
-        if(desfaz){alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[ev.fid].name}</b> — estruturas resistentes, mas d10=${roll} (≤2 = desmorona!)`)}
-        else{alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[ev.fid].name}</b> — estruturas resistiram (d10=${roll}, precisa ≤2)`)}
+      // Item 9: Pilares completos são imunes
+      if(G.fronts[ev.fid].level>=5){
+        alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[ev.fid].name}</b> — <b>Pilar Completo</b>, imune ao desmoronamento`);
       } else {
-        desfaz=G.fronts[ev.fid].level>0;
+        const aquaLv=G.fronts.aqueduto.level;
+        let desfaz=false;
+        if(aquaLv>=3){// Estruturas Restauradas: 20% de chance (d10 ≤ 2)
+          const roll=Math.floor(Math.random()*10)+1;
+          desfaz=roll<=2;
+          // Item 8: visual do dado e resultado da resistência
+          if(desfaz){
+            alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[ev.fid].name}</b> — 🎲 d10 = <b>${roll}</b> (≤2 = desmorona!)`);
+          } else {
+            alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[ev.fid].name}</b> — <span style="color:var(--teal)">🏗️ Estruturas resistiram!</span> 🎲 d10 = <b>${roll}</b> (precisa ≤2 para dano)`);
+          }
+        } else {
+          desfaz=G.fronts[ev.fid].level>0;
+        }
+        if(desfaz&&G.fronts[ev.fid].level>0){G.fronts[ev.fid].level--;G.fronts[ev.fid].pending=null;alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[ev.fid].name}</b> recuou para nível ${G.fronts[ev.fid].level}`);playSoundEffect('rain')}
+        else if(!desfaz&&aquaLv<3){alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[ev.fid].name}</b> — sem upgrades para destruir`)}
       }
-      if(desfaz&&G.fronts[ev.fid].level>0){G.fronts[ev.fid].level--;G.fronts[ev.fid].pending=null;alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[ev.fid].name}</b> recuou para nível ${G.fronts[ev.fid].level}`);playSoundEffect('rain')}
-      else if(!desfaz&&aquaLv<3){alog(P,`🌧️ <b>Chuva Forte</b> → <b>${FD[ev.fid].name}</b> — sem upgrades para destruir`)}
     }
   });
   wmQueue=[];
@@ -1883,13 +1898,15 @@ function closeWeekModal(){
 }
 function _hasPendingTest(){return OR.some(k=>G.fronts[k].pending&&G.fronts[k].pending.testReady)||G.attackDefenseReady}
 
-function _checkTestReady(){OR.forEach(k=>{const fs=G.fronts[k];if(fs.pending&&!fs.pending.testReady&&fs.pending.testResult===null&&G.day>=(fs.pending.startDay+fs.pending.peSpent)){fs.pending.testReady=true;if(!fs.seenTests)fs.seenTests=[];if(!fs.seenTests.includes(fs.pending.lv))fs.seenTests.push(fs.pending.lv);alog('Sistema',`⚔️ <b>${FD[k].name}</b> pronto para o teste! (Dia ${G.day})`);}})}
+function _checkTestReady(){OR.forEach(k=>{const fs=G.fronts[k];if(fs.pending&&!fs.pending.testReady&&fs.pending.testResult==null&&G.day>=(fs.pending.startDay+fs.pending.peSpent)){fs.pending.testReady=true;if(!fs.seenTests)fs.seenTests=[];if(!fs.seenTests.includes(fs.pending.lv))fs.seenTests.push(fs.pending.lv);alog('Sistema',`⚔️ <b>${FD[k].name}</b> pronto para o teste! (Dia ${G.day})`);}})}
 function _updateWeekFromDay(){G.week=Math.max(1,Math.ceil(Math.max(G.day,1)/7))}
 function _resetWeek(){
   OR.forEach(k=>{G.fronts[k].peUsed=0;G.fronts[k].peGifted=0;G.fronts[k].discursoBuff=false;G.fronts[k].resistenciaBuff=false;G.fronts[k].ajudado=false;G.fronts[k].ajudadoPor=null;G.fronts[k].ajudado2=false;G.fronts[k].ajudadoPor2=null;G.fronts[k].mesaUsed=false;G.fronts[k].oAmbarUsed=false;G.fronts[k].forcarMoralUsed=false});
   G.fronts.moral.discourseUsed=false;G.oAmbarBuff=G.oAmbarNextWeek;G.oAmbarNextWeek=false;
   G.weekEventShown=false;G.ajudasThisWeek={};
-  G.moralEventFailed=false;
+  // Desconto pendente de moral (jogador não usou Segunda Chance antes de virar a semana)
+  if(G.moralPendingDiscount){_applyMoralDiscount()}
+  G.moralEventFailed=false;G.moralPendingDiscount=false;
   // Fortaleza: se estava bloqueada esta semana, desbloqueia agora
   if(G.fortalezaBloqueada){G.fortalezaBloqueada=false;alog('Sistema','🏰 Semana de Fortaleza disponível novamente');}
   G.fortalezaUsedThisWeek=false;
@@ -1908,7 +1925,7 @@ function _resetWeek(){
     OR.forEach(k=>{G.fronts[k].peGifted=(G.fronts[k].peGifted||0)+1});
     alog('Sistema','✨ <b>A Cidade Respira</b> — +1 PE para todos os pilares esta semana');
   }
-  OR.forEach(k=>{const fs=G.fronts[k];if(fs.status==='enfermo'&&fs.enfermoWeek!==null&&G.week>fs.enfermoWeek+1){fs.status='normal';fs.enfermoWeek=null;alog('Sistema',`<b>${FD[k].name}</b> recuperou`)}});
+  OR.forEach(k=>{const fs=G.fronts[k];if(fs.status==='enfermo'&&fs.enfermoWeek!=null&&G.week>fs.enfermoWeek+1){fs.status='normal';fs.enfermoWeek=null;alog('Sistema',`<b>${FD[k].name}</b> recuperou`)}});
 }
 function gmAdvDay(){
   if(_hasPendingTest())return toast('Há um teste aguardando — resolva antes de avançar o dia.',true);
@@ -1963,8 +1980,17 @@ function gmApprove(fid){
 function gmReject(fid){
   const fs=G.fronts[fid];if(!fs.pending||!fs.pending.testReady)return;
   const owner=pillarOwner(fid)||'?';
+  let culturaNote='';
+  // Cultura de Resistência: devolve metade dos PE gastos ao falhar
+  if(fs.pending.culturaAtiva&&fs.pending.peSpentFull){
+    const devolve=Math.floor(fs.pending.peSpentFull/2);
+    if(devolve>0){
+      G.fronts[fid].peUsed=Math.max(0,(G.fronts[fid].peUsed||0)-devolve);
+      culturaNote=` · <span style="color:var(--teal)">🎯 Cultura de Resistência: ${devolve} PE devolvidos</span>`;
+    }
+  }
   fs.pending=null;
-  alog(P,`✗ <b>${FD[fid].name}</b> — teste <b>REPROVADO</b> por ${owner}`);
+  alog(P,`✗ <b>${FD[fid].name}</b> — teste <b>REPROVADO</b> por ${owner}${culturaNote}`);
   playSoundEffect('fail');
   save();render();toast(`✗ Teste reprovado. ${FD[fid].name} não avançou.`,true);
 }
@@ -1982,7 +2008,10 @@ function gmDefenseFail(){
   G.attackActive=false;G.attackDefenseReady=false;G.attackMagnitude=null;G.attackWeek=null;G.attackNoticeDismissed=false;G.patrulhasUsed=false;
   // Baluarte com Fortaleza: pilares protegidos mesmo na falha
   if(!wasFortaleza){
-    OR.forEach(k=>{if(G.fronts[k].pending){delete G.fronts[k].pending._pausedDay;delete G.fronts[k].pending._pauseLogged}if(G.fronts[k].level>0){G.fronts[k].level--;G.fronts[k].pending=null}});
+    OR.forEach(k=>{if(G.fronts[k].pending){delete G.fronts[k].pending._pausedDay;delete G.fronts[k].pending._pauseLogged}
+    // Item 9: pilares completos são imunes
+    if(G.fronts[k].level>=5)return;
+    if(G.fronts[k].level>0){G.fronts[k].level--;G.fronts[k].pending=null}});
   } else {
     OR.forEach(k=>{if(G.fronts[k].pending){delete G.fronts[k].pending._pausedDay;delete G.fronts[k].pending._pauseLogged}});
   }
@@ -2014,10 +2043,19 @@ function gmMoralPass(){
 }
 function gmMoralFail(){
   G.moralEvent=false;G.moralEventId=null;G.moralPickPending=false;G.moralHalf=false;
-  G.moralEventFailed=true; // permite usar Segunda Chance
+  G.moralEventFailed=true; // permite usar Segunda Chance ANTES do desconto
+  // Moral só cai SE o jogador não usar Segunda Chance
+  // Marcamos que há desconto pendente; é aplicado quando não há mais evento ativo e não foi usada Segunda Chance
+  G.moralPendingDiscount=true;
+  alog(P,`🫂 Evento Moral <b>NÃO PASSOU</b> — Moral cairá 1 nível. Jogador da Moral pode usar Segunda Chance para refazer o teste.`);
+  save();render();toast('✗ Teste de moral falhou — aguardando Segunda Chance do jogador.',true);
+}
+function _applyMoralDiscount(){
+  if(!G.moralPendingDiscount)return;
+  G.moralPendingDiscount=false;G.moralEventFailed=false;
   G.moral=Math.max(-4,G.moral-1);
-  alog(P,`🫂 Evento Moral <b>NÃO PASSOU</b> — Moral caiu para <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b>`);
-  save();render();toast('✗ Teste de moral falhou.',true);
+  alog('Sistema',`🫂 Moral caiu para <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b>`);
+  save();render();
 }
 function gmMoral(d){G.moral=Math.max(-4,Math.min(2,G.moral+d));document.getElementById('gmoralinp').value=G.moral;alog(P,`Moral → <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b>`);save();render()}
 function gmSetMoral(){const v=Math.max(-4,Math.min(2,parseInt(document.getElementById('gmoralinp').value)||0));G.moral=v;alog(P,`Moral definida → <b>${v>=0?'+':''}${v} ${mlabel()}</b>`);save();render()}
