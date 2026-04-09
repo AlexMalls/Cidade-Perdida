@@ -2233,7 +2233,7 @@ function closeAttackOverlay(){
 }
 function gmMoralPass(){
   G.moralEvent=false;G.moralEventId=null;G.moralPickPending=false;
-  G.moralEventFailed=false;
+  G.moralEventFailed=false;G.moralFailedOverlay=false;
   if(G.moralHalf){G.moral=Math.min(2,G.moral+1);G.moralHalf=false;alog(P,`🫂 Evento Moral <b>PASSOU</b> — Moral subiu para <b>${G.moral>=0?'+':''}${G.moral} ${mlabel()}</b>`)}
   else{G.moralHalf=true;alog(P,`🫂 Evento Moral <b>PASSOU</b> — meio nível acumulado (passe mais 1 vez para subir)`)}
   playSoundEffect('pass');
@@ -2242,7 +2242,8 @@ function gmMoralPass(){
 function gmMoralFail(){
   // Aplica a queda de moral imediatamente (não difere mais)
   G.moral=Math.max(-4,G.moral-1);
-  G.moralEvent=false;G.moralEventId=null;G.moralPickPending=false;G.moralHalf=false;
+  // NÃO zeramos moralEventId aqui — precisamos dele se o jogador usar "Não é bem assim"
+  G.moralEvent=false;G.moralPickPending=false;G.moralHalf=false;
   G.moralEventFailed=true;
   G.moralFailedOverlay=true;  // acende o overlay vermelho no jogador da Moral
   G.moralPendingDiscount=false;
@@ -2397,18 +2398,20 @@ function populateMoralOverlay(){
   const titleEl=document.getElementById('moral-event-title');
   const imgEl=document.getElementById('moral-img');
   const txtEl=document.getElementById('moral-txt');
+  if(!titleEl||!imgEl||!txtEl)return; // segurança
   if(!ev){
     titleEl.style.display='none';
     imgEl.innerHTML='<span>🖼️<br><br>Imagem do<br>evento aqui</span>';
+    imgEl.style.padding='20px';
     txtEl.innerHTML='<div style="font-family:\'Crimson Pro\',serif;font-size:16px;color:var(--t1);font-style:italic;line-height:1.8">Aguardando o Mestre escolher o evento...</div>';
     return;
   }
   // Title
   titleEl.textContent=ev.title;
   titleEl.style.display='block';
-  // Image
+  // Image — usa id no onerror em vez de parentNode para evitar referência nula
   if(ev.img&&ev.img.trim()){
-    imgEl.innerHTML=`<img src="${ev.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<span style=text-align:center;padding:12px>🖼️<br><br>Imagem não<br>encontrada</span>'">`;
+    imgEl.innerHTML=`<img src="${ev.img}" style="width:100%;height:100%;object-fit:cover" onerror="const p=document.getElementById('moral-img');if(p){p.innerHTML='<span style=\\'text-align:center;padding:12px\\'>🖼️<br><br>Imagem não<br>encontrada</span>';p.style.padding='20px';}">`;
     imgEl.style.padding='0';
   } else {
     imgEl.innerHTML='<span>🖼️<br><br>Sem imagem<br>vinculada</span>';
