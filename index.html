@@ -1784,11 +1784,9 @@ function useForcarMoral(){
   G.fronts['moral'].peUsed=(G.fronts['moral'].peUsed||0)+2;
   G.fronts['moral'].forcarMoralUsed=true;
   G.moralEvent=true;
+  G.moralPickPending=true;
   alog(P,'🔔 <b>Forçar Evento Moral</b> ativado (2 PE) — GM deve escolher e disparar o evento agora');
-  save();
-  // Abre o picker imediatamente se for o GM, senão flag para o GM ver
-  activateMoralEvent();
-  render();toast('🔔 Evento de Moral forçado — aguarde o GM!','w');
+  save();render();toast('🔔 Evento de Moral forçado — aguarde o GM!','w');
 }
 function useNoiteCelebracao(){
   const cdWeeks=G.fronts.moral.noiteCdWeek||0;
