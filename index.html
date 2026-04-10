@@ -905,14 +905,14 @@ const PILLAR_TITLE={muralhas:'Senhor das Muralhas',aqueduto:'Senhor da Infraestr
 // ═══════════════ ESTADO ═══════════════
 const KEY='acidade_v7';
 function mkFront(){return{level:0,pending:null,peUsed:0,peMod:0,peGifted:0,status:'normal',enfermoWeek:null,discursoBuff:false,resistenciaBuff:false,discourseUsed:false,mesaUsed:false,oAmbarUsed:false,forcarMoralUsed:false,ajudado:false,ajudadoPor:null,ajudado2:false,ajudadoPor2:null,ajudado3:false,ajudadoPor3:null,ajudado4:false,ajudadoPor4:null,seenTests:[]}}
-function fresh(){return{week:1,day:0,peTotal:7,moral:0,moralHalf:false,moralEvent:false,moralEventFailed:false,moralFailedOverlay:false,moralPendingDiscount:false,moralEventId:null,moralSeenIds:[],moralPickPending:false,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,gameReleased:false,weekEventShown:false,attackActive:false,attackMagnitude:null,attackWeek:null,attackDefenseReady:false,attackNoticeDismissed:false,patrulhasUsed:false,fortalezaActive:false,fortalezaUsedThisWeek:false,fortalezaBloqueada:false,fortalezaPromptDone:false,analisePrevUsed:false,analisePrevAtiva:false,ajudasThisWeek:{},autoEventAdj:true,attackStreakWeeks:0,attackHappenedThisWeek:false,convocacaoPending:null,eventProbs:{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50},assignments:{},cityName:'',fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
+function fresh(){return{week:1,day:0,peTotal:7,moral:0,moralHalf:false,moralEvent:false,moralEventFailed:false,moralFailedOverlay:false,moralPendingDiscount:false,moralEventId:null,moralSeenIds:[],moralPickPending:false,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,gameReleased:false,weekEventShown:false,attackActive:false,attackMagnitude:null,attackWeek:null,attackDefenseReady:false,attackNoticeDismissed:false,patrulhasUsed:false,fortalezaActive:false,fortalezaUsedThisWeek:false,fortalezaBloqueada:false,fortalezaPromptDone:false,analisePrevUsed:false,analisePrevAtiva:false,ajudasThisWeek:{},autoEventAdj:true,attackStreakWeeks:0,attackHappenedThisWeek:false,convocacaoPending:null,eventProbs:{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50},assignments:{},cityName:'',cityNamePending:false,fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
 function load(){try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s),f=fresh();f.week=d.week||1;f.day=d.day||0;f.peTotal=d.peTotal||7;f.moral=d.moral||0;f.nevoa=!!d.nevoa;f.oAmbarBuff=!!d.oAmbarBuff;f.oAmbarNextWeek=!!d.oAmbarNextWeek;f.gameReleased=!!d.gameReleased;f.weekEventShown=!!d.weekEventShown;f.moralEvent=!!d.moralEvent;f.moralHalf=!!d.moralHalf;f.moralEventFailed=!!d.moralEventFailed;f.moralFailedOverlay=!!d.moralFailedOverlay;f.moralPendingDiscount=!!d.moralPendingDiscount;
 f.attackActive=!!d.attackActive;f.attackMagnitude=d.attackMagnitude||null;f.attackWeek=d.attackWeek||null;f.attackDefenseReady=!!d.attackDefenseReady;f.attackNoticeDismissed=!!d.attackNoticeDismissed;
 f.patrulhasUsed=!!d.patrulhasUsed;f.fortalezaActive=!!d.fortalezaActive;f.fortalezaUsedThisWeek=!!d.fortalezaUsedThisWeek;f.fortalezaBloqueada=!!d.fortalezaBloqueada;f.fortalezaPromptDone=!!d.fortalezaPromptDone;
 f.analisePrevUsed=!!d.analisePrevUsed;f.analisePrevAtiva=!!d.analisePrevAtiva;f.ajudasThisWeek=d.ajudasThisWeek||{};
 f.autoEventAdj=(d.autoEventAdj===undefined)?true:!!d.autoEventAdj;f.attackStreakWeeks=d.attackStreakWeeks||0;f.attackHappenedThisWeek=!!d.attackHappenedThisWeek;f.convocacaoPending=d.convocacaoPending||null;
 f.moralEventId=d.moralEventId||null;f.moralSeenIds=d.moralSeenIds||[];f.moralPickPending=!!d.moralPickPending;
-f.cityName=d.cityName||'';
+f.cityName=d.cityName||'';f.cityNamePending=!!d.cityNamePending;
 f.eventProbs=d.eventProbs||{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50};f.assignments=d.assignments||{};f.log=d.log||[];if(d.fronts)OR.forEach(k=>{if(d.fronts[k])f.fronts[k]={...f.fronts[k],...d.fronts[k]}});return f}}catch(e){}return fresh()}
 function save(){
   const data=JSON.stringify(G);
@@ -1243,6 +1243,15 @@ function render(){
   }
   // Convocação: mostrar overlay para convocados
   if(P&&P!=='GM'&&G.gameReleased)_renderConvocacaoResponse();
+  // Nome da cidade: mostrar modal para o herói da Moral
+  if(P&&P!=='GM'&&G.gameReleased&&G.cityNamePending&&G.assignments[P]==='moral'){
+    const cnm=document.getElementById('citynamemodal');
+    if(cnm.style.display!=='flex'){
+      cnm.style.display='flex';
+      document.getElementById('cityname-input').value='';
+      setTimeout(()=>document.getElementById('cityname-input').focus(),100);
+    }
+  }
   // Overlay de ataque para Muralhas player
   if(P&&P!=='GM'&&G.gameReleased){
     const isWallPlayer=G.assignments[P]==='muralhas';
@@ -1370,10 +1379,10 @@ function rGMPillarGrid(){
     const defBtns=(fid==='muralhas'&&G.attackDefenseReady)
       ?`<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:10px;color:var(--rose);width:100%;margin-bottom:2px">⚔️ Defesa aguardando resultado:</span><button class="btn btn-sm" style="border-color:#1a7a50;color:var(--teal)" onclick="gmDefensePass()">✓ Defesa Bem-sucedida</button><button class="btn btn-danger btn-sm" onclick="gmDefenseFail()">✗ Defesa Falhou</button></div>`
       :'';
-    const moralEventBtn=(fid==='moral'&&G.moralEvent)
-      ?`<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:10px;color:var(--rose);width:100%;margin-bottom:2px">🫂 Evento Moral aguardando:</span><button class="btn btn-sm" style="border-color:#1a7a50;color:var(--teal)" onclick="gmMoralPass()">✓ Passou no Teste</button><button class="btn btn-danger btn-sm" onclick="gmMoralFail()">✗ Não Passou</button></div>`
-      :(fid==='moral'&&G.moralPickPending)
+    const moralEventBtn=(fid==='moral'&&G.moralPickPending)
       ?`<div style="margin-top:6px;padding:8px 10px;background:rgba(224,96,144,.08);border:1px solid rgba(224,96,144,.4);border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:11px;color:var(--rose)">🫂 Evento de Moral pendente — escolha a história:</span><button class="btn btn-gm btn-sm" onclick="openMoralPicker()">📜 Escolher História</button></div>`
+      :(fid==='moral'&&G.moralEvent)
+      ?`<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:10px;color:var(--rose);width:100%;margin-bottom:2px">🫂 Evento Moral aguardando:</span><button class="btn btn-sm" style="border-color:#1a7a50;color:var(--teal)" onclick="gmMoralPass()">✓ Passou no Teste</button><button class="btn btn-danger btn-sm" onclick="gmMoralFail()">✗ Não Passou</button></div>`
       :'';
     const testReady=fs.pending&&fs.pending.testReady;
     const daysLeft=fs.pending&&!testReady?Math.max(0,(fs.pending.startDay+fs.pending.peSpent)-G.day):0;
@@ -2199,14 +2208,12 @@ function gmApprove(fid){
     fs.rewardJustUnlocked=true;
     playSoundEffect('victory');
     save();render();
-    // Moral nível 5: pede o nome da cidade antes da recompensa
+    // Moral nível 5 sem nome: seta flag para o jogador da Moral nomear
     if(fid==='moral'&&!G.cityName){
-      setTimeout(()=>{
-        document.getElementById('citynamemodal').style.display='flex';
-        document.getElementById('cityname-input').value='';
-        setTimeout(()=>document.getElementById('cityname-input').focus(),100);
-        G._pendingRewardFid='moral';
-      },600);
+      G.cityNamePending=true;
+      save();render();
+      // Se o GM está controlando, mostra aviso
+      if(P==='GM'){toast('👑 O herói da Moral deve batizar a cidade!','w');}
     } else {
       setTimeout(()=>openReward(fid),600);
     }
@@ -2773,23 +2780,20 @@ function confirmCityName(){
   const name=inp.value.trim();
   if(!name){toast('Digite um nome para a cidade.',true);inp.focus();return;}
   G.cityName=name;
+  G.cityNamePending=false;
   document.getElementById('citynamemodal').style.display='none';
   alog(P||'Sistema',`👑 A cidade foi batizada: <b>${name}</b>`);
   playSoundEffect('victory');
   save();render();
-  // Se havia recompensa pendente (moral), abre agora
-  if(G._pendingRewardFid){
-    const fid=G._pendingRewardFid;
-    delete G._pendingRewardFid;
-    setTimeout(()=>openReward(fid),500);
-  }
+  // Abre a recompensa da Moral
+  setTimeout(()=>openReward('moral'),500);
   toast(`👑 ${name} — a cidade tem um nome!`);
 }
 function gmSetCityName(){
   const inp=document.getElementById('gm-cityname-inp');
   const name=inp.value.trim();
   if(!name){toast('Digite um nome.',true);return;}
-  G.cityName=name;
+  G.cityName=name;G.cityNamePending=false;
   alog(P,`👑 Nome da cidade alterado para: <b>${name}</b>`);
   save();render();
   toast(`👑 Nome alterado para: ${name}`);
