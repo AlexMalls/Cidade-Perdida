@@ -1259,6 +1259,16 @@ function render(){
       setTimeout(()=>document.getElementById('cityname-input').focus(),100);
     }
   }
+  // Recompensa de nível 5: mostrar para o dono do pilar (não para o GM)
+  if(P&&P!=='GM'){
+    OR.forEach(fid=>{
+      if(G.fronts[fid]&&G.fronts[fid].rewardPending&&G.assignments[P]===fid){
+        G.fronts[fid].rewardPending=false;
+        save();
+        setTimeout(()=>openReward(fid),600);
+      }
+    });
+  }
   // Overlay de ataque para Muralhas player
   if(P&&P!=='GM'&&G.gameReleased){
     const isWallPlayer=G.assignments[P]==='muralhas';
@@ -2212,15 +2222,15 @@ function gmApprove(fid){
   if(fs.level>=5&&REWARDS[fid]){
     fs.rewardJustUnlocked=true;
     playSoundEffect('victory');
-    save();render();
-    // Moral nível 5 sem nome: seta flag para o jogador da Moral nomear
+    // Moral nível 5 sem nome: pede ao herói da Moral para batizar a cidade
     if(fid==='moral'&&!G.cityName){
       G.cityNamePending=true;
       save();render();
-      // Se o GM está controlando, mostra aviso
       if(P==='GM'){toast('👑 O herói da Moral deve batizar a cidade!','w');}
     } else {
-      setTimeout(()=>openReward(fid),600);
+      // Flag: abre recompensa no dispositivo do dono do pilar, não do GM
+      fs.rewardPending=true;
+      save();render();
     }
   } else {
     save();render();
