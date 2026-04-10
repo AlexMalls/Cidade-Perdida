@@ -537,7 +537,19 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 </div>
 </div>
 
-<!-- TEST OVERLAY (aparece quando é hora de fazer o teste) -->
+<!-- CITY NAME MODAL (aparece quando Moral atinge nível 5) -->
+<div id="citynamemodal" style="display:none;position:fixed;inset:0;z-index:96;background:rgba(4,5,13,.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:20px">
+  <div style="width:100%;max-width:480px;background:var(--bg2);border:1px solid var(--gold);border-radius:var(--r);padding:40px 32px;text-align:center;animation:rise .4s ease;position:relative">
+    <div style="position:absolute;inset:3px;border:1px solid rgba(201,168,76,.08);border-radius:5px;pointer-events:none"></div>
+    <div style="font-size:48px;margin-bottom:12px">👑</div>
+    <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(16px,3vw,22px);color:var(--gold-hi);letter-spacing:.08em;margin-bottom:6px">A Cidade Está Viva</div>
+    <div style="width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 16px"></div>
+    <div style="font-family:'Crimson Pro',serif;font-size:16px;color:var(--t1);font-style:italic;line-height:1.8;margin-bottom:24px">Este lugar já não é mais uma cidade abandonada, mas sim uma resistência… uma força… um lar.<br><br>Chegou a hora de nomeá-la.</div>
+    <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--t2);margin-bottom:10px">Qual será o nome desta cidade?</div>
+    <input type="text" id="cityname-input" maxlength="40" placeholder="Digite o nome…" style="width:100%;padding:14px 18px;background:var(--bg1);border:2px solid var(--gold-lo);border-radius:6px;color:var(--gold-hi);font-family:'Cinzel Decorative',serif;font-size:clamp(18px,3vw,26px);text-align:center;letter-spacing:.06em;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--gold-lo)'" onkeydown="if(event.key==='Enter'&&this.value.trim())confirmCityName()">
+    <div style="margin-top:18px"><button class="btn" onclick="confirmCityName()" style="font-size:13px;padding:12px 32px">✦ Batizar a Cidade</button></div>
+  </div>
+</div>
 <div id="testoverlay" style="display:none;position:fixed;inset:0;z-index:85;background:rgba(4,5,13,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);align-items:center;justify-content:center;flex-direction:column;gap:20px">
   <div id="test-icon" style="font-size:80px;animation:gentleGlow 2s ease-in-out infinite,twinkle 2s ease-in-out infinite"></div>
   <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(16px,2.5vw,24px);color:var(--gold-hi);letter-spacing:.12em;text-align:center;text-shadow:0 0 40px rgba(236,216,120,.4)">TESTE DE HABILIDADE</div>
@@ -626,6 +638,15 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 <div class="gmslbl">Eventos de Moral</div>
 <div class="gmrow">
 <button class="btn btn-gm btn-sm" onclick="openMoralEditor()">📜 Gerenciar Eventos de Moral</button>
+</div>
+</div>
+
+<div class="gmsec">
+<div class="gmslbl">Nome da Cidade</div>
+<div class="gmrow">
+<input class="gminp" id="gm-cityname-inp" type="text" style="width:200px;font-size:12px;letter-spacing:.05em" placeholder="Cidade Perdida">
+<button class="btn btn-gm btn-sm" onclick="gmSetCityName()">✓ Alterar Nome</button>
+<span id="gm-cityname-status" style="font-size:11px;color:var(--t2)"></span>
 </div>
 </div>
 
@@ -884,13 +905,14 @@ const PILLAR_TITLE={muralhas:'Senhor das Muralhas',aqueduto:'Senhor da Infraestr
 // ═══════════════ ESTADO ═══════════════
 const KEY='acidade_v7';
 function mkFront(){return{level:0,pending:null,peUsed:0,peMod:0,peGifted:0,status:'normal',enfermoWeek:null,discursoBuff:false,resistenciaBuff:false,discourseUsed:false,mesaUsed:false,oAmbarUsed:false,forcarMoralUsed:false,ajudado:false,ajudadoPor:null,ajudado2:false,ajudadoPor2:null,ajudado3:false,ajudadoPor3:null,ajudado4:false,ajudadoPor4:null,seenTests:[]}}
-function fresh(){return{week:1,day:0,peTotal:7,moral:0,moralHalf:false,moralEvent:false,moralEventFailed:false,moralFailedOverlay:false,moralPendingDiscount:false,moralEventId:null,moralSeenIds:[],moralPickPending:false,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,gameReleased:false,weekEventShown:false,attackActive:false,attackMagnitude:null,attackWeek:null,attackDefenseReady:false,attackNoticeDismissed:false,patrulhasUsed:false,fortalezaActive:false,fortalezaUsedThisWeek:false,fortalezaBloqueada:false,fortalezaPromptDone:false,analisePrevUsed:false,analisePrevAtiva:false,ajudasThisWeek:{},autoEventAdj:true,attackStreakWeeks:0,attackHappenedThisWeek:false,convocacaoPending:null,eventProbs:{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50},assignments:{},fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
+function fresh(){return{week:1,day:0,peTotal:7,moral:0,moralHalf:false,moralEvent:false,moralEventFailed:false,moralFailedOverlay:false,moralPendingDiscount:false,moralEventId:null,moralSeenIds:[],moralPickPending:false,nevoa:false,oAmbarBuff:false,oAmbarNextWeek:false,gameReleased:false,weekEventShown:false,attackActive:false,attackMagnitude:null,attackWeek:null,attackDefenseReady:false,attackNoticeDismissed:false,patrulhasUsed:false,fortalezaActive:false,fortalezaUsedThisWeek:false,fortalezaBloqueada:false,fortalezaPromptDone:false,analisePrevUsed:false,analisePrevAtiva:false,ajudasThisWeek:{},autoEventAdj:true,attackStreakWeeks:0,attackHappenedThisWeek:false,convocacaoPending:null,eventProbs:{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50},assignments:{},cityName:'',fronts:{muralhas:mkFront(),aqueduto:mkFront(),comando:mkFront(),moral:mkFront()},log:[]}}
 function load(){try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s),f=fresh();f.week=d.week||1;f.day=d.day||0;f.peTotal=d.peTotal||7;f.moral=d.moral||0;f.nevoa=!!d.nevoa;f.oAmbarBuff=!!d.oAmbarBuff;f.oAmbarNextWeek=!!d.oAmbarNextWeek;f.gameReleased=!!d.gameReleased;f.weekEventShown=!!d.weekEventShown;f.moralEvent=!!d.moralEvent;f.moralHalf=!!d.moralHalf;f.moralEventFailed=!!d.moralEventFailed;f.moralFailedOverlay=!!d.moralFailedOverlay;f.moralPendingDiscount=!!d.moralPendingDiscount;
 f.attackActive=!!d.attackActive;f.attackMagnitude=d.attackMagnitude||null;f.attackWeek=d.attackWeek||null;f.attackDefenseReady=!!d.attackDefenseReady;f.attackNoticeDismissed=!!d.attackNoticeDismissed;
 f.patrulhasUsed=!!d.patrulhasUsed;f.fortalezaActive=!!d.fortalezaActive;f.fortalezaUsedThisWeek=!!d.fortalezaUsedThisWeek;f.fortalezaBloqueada=!!d.fortalezaBloqueada;f.fortalezaPromptDone=!!d.fortalezaPromptDone;
 f.analisePrevUsed=!!d.analisePrevUsed;f.analisePrevAtiva=!!d.analisePrevAtiva;f.ajudasThisWeek=d.ajudasThisWeek||{};
 f.autoEventAdj=(d.autoEventAdj===undefined)?true:!!d.autoEventAdj;f.attackStreakWeeks=d.attackStreakWeeks||0;f.attackHappenedThisWeek=!!d.attackHappenedThisWeek;f.convocacaoPending=d.convocacaoPending||null;
 f.moralEventId=d.moralEventId||null;f.moralSeenIds=d.moralSeenIds||[];f.moralPickPending=!!d.moralPickPending;
+f.cityName=d.cityName||'';
 f.eventProbs=d.eventProbs||{doenca:10,chuva:40,ataque:0,nevoa:30,moral:50};f.assignments=d.assignments||{};f.log=d.log||[];if(d.fronts)OR.forEach(k=>{if(d.fronts[k])f.fronts[k]={...f.fronts[k],...d.fronts[k]}});return f}}catch(e){}return fresh()}
 function save(){
   const data=JSON.stringify(G);
@@ -933,6 +955,8 @@ let _fbWait=0;
 })();
 // Fallback: sync entre abas do mesmo navegador
 window.addEventListener('storage',e=>{if(e.key===KEY){G=load();if(P)render()}});
+// Aplica nome da cidade no carregamento inicial (antes do login)
+setTimeout(()=>{try{_applyCityName()}catch(e){}},0);
 
 
 // ═══════════════ HELPERS ═══════════════
@@ -999,11 +1023,16 @@ function playSoundEffect(type){
     _noise(ctx,.3,600,.5,t+.2);// impacto
     _osc(ctx,70,'sine',t+.2,.3,.2);// estrondo grave
     _noise(ctx,.5,300,.3,t+.4);// escombros
+  } else if(type==='victory'){
+    // Fanfarra épica — arpejo triunfante com harmonia
+    [[262,.15],[330,.15],[392,.15],[523,.2],[659,.2],[784,.35]].forEach(([f,d],i)=>_osc(ctx,f,'sine',t+i*.15,d,0.16));
+    [[262,.15],[330,.15],[392,.15],[523,.2],[659,.2],[784,.35]].forEach(([f,d],i)=>_osc(ctx,f*1.5,'sine',t+i*.15+.02,d*.8,0.06));
+    _osc(ctx,131,'sine',t,.9,.08);// pedal grave
   }
 }
 function pillarTotalPE(fid){return Math.max(1,G.peTotal+(G.fronts[fid].peMod||0))}
 function myAvailPE(){if(P==='GM')return G.peTotal;const mp=myPillar();if(!mp)return 0;return Math.max(0,pillarTotalPE(mp)-(G.fronts[mp].peUsed||0)+(G.fronts[mp].peGifted||0))}
-function efectivePE(base,fid){let c=base;if(G.nevoa)c+=1;if(G.moral>=1)c=Math.max(1,c-1);if(G.moral<=-1)c+=1;if(G.oAmbarBuff)c=Math.max(1,c-1);if(fid&&G.fronts[fid].discursoBuff)c=Math.max(1,c-1);if(fid==='muralhas'&&G.fronts.aqueduto.level>=2)c=Math.max(1,c-1);if(G.fronts.aqueduto.level>=5)c=Math.max(1,c-1);return Math.max(1,c)}
+function efectivePE(base,fid){let c=base;if(G.nevoa)c+=1;if(G.moral<=-1)c+=1;if(fid&&G.fronts[fid].discursoBuff){c=Math.max(1,c-1)}else{if(G.moral>=1)c=Math.max(1,c-1);if(G.oAmbarBuff)c=Math.max(1,c-1);if(fid==='muralhas'&&G.fronts.aqueduto.level>=2)c=Math.max(1,c-1);if(G.fronts.aqueduto.level>=5)c=Math.max(1,c-1)}return Math.max(1,c)}
 function openReward(fid){
   const r=REWARDS[fid];if(!r)return;
   document.getElementById('reward-icon').textContent=r.icon;
@@ -1186,12 +1215,13 @@ function cGM(){
   const h=Array.from(input).reduce((a,c)=>((a<<5)-a+c.charCodeAt(0))|0,0);
   if(h===1683994800){xGM();L('GM')}else{document.getElementById('gerr').textContent='Senha incorreta.';document.getElementById('gpwd').value='';document.getElementById('gpwd').focus()}
 }
-function logout(){P=null;SF=null;PPending=null;CrossPopup=null;document.getElementById('app').style.display='none';document.getElementById('ppick').classList.remove('open');document.getElementById('psum').classList.remove('open');document.getElementById('login').style.display='flex';document.getElementById('gmp').classList.remove('open');document.getElementById('gmtog').style.display='none'}
+function logout(){P=null;SF=null;PPending=null;CrossPopup=null;document.getElementById('app').style.display='none';document.getElementById('ppick').classList.remove('open');document.getElementById('psum').classList.remove('open');document.getElementById('login').style.display='flex';document.getElementById('gmp').classList.remove('open');document.getElementById('gmtog').style.display='none';_applyCityName()}
 function tGMP(){document.getElementById('gmp').classList.toggle('open')}
 
 // ═══════════════ RENDER ═══════════════
 function render(){
   if(!P)return;
+  _applyCityName();
   // Overlay de evento moral
   if(P&&P!=='GM'&&G.gameReleased){
     const isMoralPlayer=G.assignments[P]==='moral';
@@ -2164,11 +2194,22 @@ function gmApprove(fid){
   fs.level=lv;fs.pending=null;
   alog(P,`✓ <b>${FD[fid].name}</b> — teste <b>APROVADO</b> · nível ${fs.level} concluído por ${owner}`);
   playSoundEffect('pass');
-  // Se completou o pilar (nível 5): seta flag e abre recompensa automaticamente
+  // Se completou o pilar (nível 5): som de vitória + recompensa
   if(fs.level>=5&&REWARDS[fid]){
     fs.rewardJustUnlocked=true;
+    playSoundEffect('victory');
     save();render();
-    setTimeout(()=>openReward(fid),600); // pequeno delay para o render atualizar primeiro
+    // Moral nível 5: pede o nome da cidade antes da recompensa
+    if(fid==='moral'&&!G.cityName){
+      setTimeout(()=>{
+        document.getElementById('citynamemodal').style.display='flex';
+        document.getElementById('cityname-input').value='';
+        setTimeout(()=>document.getElementById('cityname-input').focus(),100);
+        G._pendingRewardFid='moral';
+      },600);
+    } else {
+      setTimeout(()=>openReward(fid),600);
+    }
   } else {
     save();render();
   }
@@ -2724,6 +2765,51 @@ function _renderConvocacaoResponse(){
   } else {
     resp.style.display='none';
   }
+}
+
+// ═══════════ NOME DA CIDADE ═══════════
+function confirmCityName(){
+  const inp=document.getElementById('cityname-input');
+  const name=inp.value.trim();
+  if(!name){toast('Digite um nome para a cidade.',true);inp.focus();return;}
+  G.cityName=name;
+  document.getElementById('citynamemodal').style.display='none';
+  alog(P||'Sistema',`👑 A cidade foi batizada: <b>${name}</b>`);
+  playSoundEffect('victory');
+  save();render();
+  // Se havia recompensa pendente (moral), abre agora
+  if(G._pendingRewardFid){
+    const fid=G._pendingRewardFid;
+    delete G._pendingRewardFid;
+    setTimeout(()=>openReward(fid),500);
+  }
+  toast(`👑 ${name} — a cidade tem um nome!`);
+}
+function gmSetCityName(){
+  const inp=document.getElementById('gm-cityname-inp');
+  const name=inp.value.trim();
+  if(!name){toast('Digite um nome.',true);return;}
+  G.cityName=name;
+  alog(P,`👑 Nome da cidade alterado para: <b>${name}</b>`);
+  save();render();
+  toast(`👑 Nome alterado para: ${name}`);
+  document.getElementById('gm-cityname-status').textContent='✓ Salvo';
+  setTimeout(()=>{const el=document.getElementById('gm-cityname-status');if(el)el.textContent=''},2000);
+}
+function _getCityDisplayName(){return G.cityName||'Cidade Perdida'}
+function _applyCityName(){
+  const name=_getCityDisplayName();
+  // Título da página
+  document.title='Pilares de '+name;
+  // Título no login
+  const ltitle=document.querySelector('.ltitle');
+  if(ltitle)ltitle.textContent='Pilares de '+name;
+  // Subtítulo no login
+  // Header não tem referência direta, mas o título da aba já cobre
+  // Input do GM: mostra nome atual
+  const gmInp=document.getElementById('gm-cityname-inp');
+  if(gmInp&&document.activeElement!==gmInp)gmInp.value=G.cityName||'';
+  gmInp&&(gmInp.placeholder=G.cityName||'Cidade Perdida');
 }
 
 </script>
