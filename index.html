@@ -1241,10 +1241,17 @@ function render(){
       if(fl)fl.style.display='none';
     }
   }
+  // Moral picker: forçar abertura para o GM quando pendente
+  if(P==='GM'&&G.moralPickPending){
+    const picker=document.getElementById('moralpicker');
+    if(picker&&picker.style.display!=='flex'){
+      openMoralPicker();
+    }
+  }
   // Convocação: mostrar overlay para convocados
   if(P&&P!=='GM'&&G.gameReleased)_renderConvocacaoResponse();
   // Nome da cidade: mostrar modal para o herói da Moral
-  if(P&&P!=='GM'&&G.gameReleased&&G.cityNamePending&&G.assignments[P]==='moral'){
+  if(P&&P!=='GM'&&G.cityNamePending&&G.assignments[P]==='moral'){
     const cnm=document.getElementById('citynamemodal');
     if(cnm.style.display!=='flex'){
       cnm.style.display='flex';
